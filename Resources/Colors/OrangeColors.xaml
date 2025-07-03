@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 橙色主题色调 -->
+    <Color x:Key="PrimaryColor">#FF9800</Color>
+    <Color x:Key="PrimaryLightColor">#FFCC80</Color>
+    <Color x:Key="PrimaryDarkColor">#F57C00</Color>
+    <Color x:Key="PrimaryDarkHoverColor">#FFB74D</Color>
+
+    <Color x:Key="SecondaryColor">#FF5722</Color>
+    <Color x:Key="SecondaryLightColor">#FF8A65</Color>
+    <Color x:Key="SecondaryDarkColor">#D84315</Color>
+
+    <Color x:Key="AccentColor">#3F51B5</Color>
+    <Color x:Key="AccentLightColor">#7986CB</Color>
+    <Color x:Key="AccentDarkColor">#303F9F</Color>
+
+    <!-- 画刷 -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}"/>
+    <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}"/>
+
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryLightBrush" Color="{StaticResource SecondaryLightColor}"/>
+    <SolidColorBrush x:Key="SecondaryDarkBrush" Color="{StaticResource SecondaryDarkColor}"/>
+
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    <SolidColorBrush x:Key="AccentLightBrush" Color="{StaticResource AccentLightColor}"/>
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentDarkColor}"/>
+</ResourceDictionary>

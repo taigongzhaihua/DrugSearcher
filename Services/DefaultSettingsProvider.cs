@@ -1,0 +1,381 @@
+using DrugSearcher.Common.Enums;
+using DrugSearcher.Constants;
+using DrugSearcher.Models;
+using System.Diagnostics;
+using System.Globalization;
+
+namespace DrugSearcher.Services;
+
+/// <summary>
+/// 默认设置提供程序，定义和管理应用程序的默认设置配置
+/// 包括设置定义、默认值、验证规则等
+/// </summary>
+public class DefaultSettingsProvider : IDefaultSettingsProvider
+{
+    #region 公共方法
+
+    /// <summary>
+    /// 获取所有设置的默认定义
+    /// </summary>
+    /// <returns>设置定义列表</returns>
+    public List<SettingDefinition> GetDefaultDefinitions()
+    {
+        try
+        {
+            var definitions = CreateSettingDefinitions();
+            Debug.WriteLine($"已创建 {definitions.Count} 个设置定义");
+            return definitions;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"获取默认设置定义失败: {ex.Message}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// 获取默认设置项（用于数据库初始化）
+    /// </summary>
+    /// <returns>设置项列表</returns>
+    public List<SettingItem> GetDefaultSettingItems()
+    {
+        try
+        {
+            var definitions = GetDefaultDefinitions();
+            var settingItems = ConvertDefinitionsToSettingItems(definitions);
+
+            Debug.WriteLine($"已创建 {settingItems.Count} 个默认设置项");
+            return settingItems;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"获取默认设置项失败: {ex.Message}");
+            throw;
+        }
+    }
+
+    #endregion
+
+    #region 私有方法 - 设置定义创建
+
+    /// <summary>
+    /// 创建所有设置定义
+    /// </summary>
+    /// <returns>设置定义列表</returns>
+    private static List<SettingDefinition> CreateSettingDefinitions()
+    {
+        return
+        [
+            ..CreateTraySettings(),
+            ..CreateUiSettings(),
+            ..CreateApplicationSettings()
+        ];
+    }
+
+    /// <summary>
+    /// 创建托盘相关设置定义
+    /// </summary>
+    /// <returns>托盘设置定义列表</returns>
+    private static List<SettingDefinition> CreateTraySettings()
+    {
+        return
+        [
+            new SettingDefinition
+            {
+                Key = SettingKeys.MinimizeToTrayOnClose,
+                ValueType = typeof(bool),
+                DefaultValue = true,
+                Description = "关闭窗口时最小化到托盘",
+                Category = SettingCategories.Tray,
+                IsReadOnly = false,
+                Validator = value => value is bool
+            },
+
+
+            new SettingDefinition
+            {
+                Key = SettingKeys.ShowTrayIcon,
+                ValueType = typeof(bool),
+                DefaultValue = true,
+                Description = "显示系统托盘图标",
+                Category = SettingCategories.Tray,
+                IsReadOnly = false,
+                Validator = value => value is bool
+            },
+
+
+            new SettingDefinition
+            {
+                Key = SettingKeys.ShowTrayNotifications,
+                ValueType = typeof(bool),
+                DefaultValue = true,
+                Description = "显示托盘通知",
+                Category = SettingCategories.Tray,
+                IsReadOnly = false,
+                Validator = value => value is bool
+            }
+        ];
+    }
+
+    /// <summary>
+    /// 创建UI相关设置定义
+    /// </summary>
+    /// <returns>UI设置定义列表</returns>
+    private static List<SettingDefinition> CreateUiSettings()
+    {
+        return
+        [
+            new SettingDefinition
+            {
+                Key = SettingKeys.ThemeMode,
+                ValueType = typeof(ThemeMode),
+                DefaultValue = ThemeMode.Light,
+                Description = "主题模式（浅色/深色/跟随系统）",
+                Category = SettingCategories.UI,
+                IsReadOnly = false,
+                Validator = ValidateThemeMode
+            },
+
+
+            new SettingDefinition
+            {
+                Key = SettingKeys.ThemeColor,
+                ValueType = typeof(ThemeColor),
+                DefaultValue = ThemeColor.Blue,
+                Description = "主题颜色",
+                Category = SettingCategories.UI,
+                IsReadOnly = false,
+                Validator = ValidateThemeColor
+            },
+
+
+            new SettingDefinition
+            {
+                Key = SettingKeys.FontSize,
+                ValueType = typeof(int),
+                DefaultValue = 12,
+                Description = "字体大小",
+                Category = SettingCategories.UI,
+                IsReadOnly = false,
+                Validator = ValidateFontSize
+            },
+
+
+            new SettingDefinition
+            {
+                Key = SettingKeys.Language,
+                ValueType = typeof(string),
+                DefaultValue = "zh-CN",
+                Description = "界面语言",
+                Category = SettingCategories.UI,
+                IsReadOnly = false,
+                Validator = ValidateLanguage
+            }
+        ];
+    }
+
+    /// <summary>
+    /// 创建应用程序相关设置定义
+    /// </summary>
+    /// <returns>应用程序设置定义列表</returns>
+    private static List<SettingDefinition> CreateApplicationSettings()
+    {
+        return
+        [
+            new SettingDefinition
+            {
+                Key = SettingKeys.AutoStartup,
+                ValueType = typeof(bool),
+                DefaultValue = false,
+                Description = "开机自启动",
+                Category = SettingCategories.Application,
+                IsReadOnly = false,
+                Validator = value => value is bool
+            }
+        ];
+    }
+
+    #endregion
+
+    #region 私有方法 - 验证器
+
+    /// <summary>
+    /// 验证主题模式
+    /// </summary>
+    /// <param name="value">要验证的值</param>
+    /// <returns>是否有效</returns>
+    private static bool ValidateThemeMode(object? value)
+    {
+        return value is ThemeMode themeMode && Enum.IsDefined(themeMode);
+    }
+
+    /// <summary>
+    /// 验证主题颜色
+    /// </summary>
+    /// <param name="value">要验证的值</param>
+    /// <returns>是否有效</returns>
+    private static bool ValidateThemeColor(object? value)
+    {
+        return value is ThemeColor themeColor && Enum.IsDefined(themeColor);
+    }
+
+    /// <summary>
+    /// 验证字体大小
+    /// </summary>
+    /// <param name="value">要验证的值</param>
+    /// <returns>是否有效</returns>
+    private static bool ValidateFontSize(object? value)
+    {
+        if (value is not int fontSize)
+            return false;
+
+        return fontSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize;
+    }
+
+    /// <summary>
+    /// 验证语言设置
+    /// </summary>
+    /// <param name="value">要验证的值</param>
+    /// <returns>是否有效</returns>
+    private static bool ValidateLanguage(object? value)
+    {
+        if (value is not string language)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(language))
+            return false;
+
+        // 检查是否为支持的语言
+        var supportedLanguages = GetSupportedLanguages();
+        return supportedLanguages.Contains(language);
+    }
+
+    /// <summary>
+    /// 获取支持的语言列表
+    /// </summary>
+    /// <returns>支持的语言代码列表</returns>
+    private static HashSet<string> GetSupportedLanguages()
+    {
+        return
+        [
+            "zh-CN", // 简体中文
+            "en-US", // 英语
+            "zh-TW"
+        ];
+    }
+
+    #endregion
+
+    #region 私有方法 - 转换
+
+    /// <summary>
+    /// 将设置定义转换为设置项
+    /// </summary>
+    /// <param name="definitions">设置定义列表</param>
+    /// <returns>设置项列表</returns>
+    private static List<SettingItem> ConvertDefinitionsToSettingItems(List<SettingDefinition> definitions)
+    {
+        var settingItems = new List<SettingItem>();
+        var currentTime = DateTime.UtcNow;
+
+        foreach (var definition in definitions)
+        {
+            try
+            {
+                var settingItem = ConvertDefinitionToSettingItem(definition, currentTime);
+                settingItems.Add(settingItem);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"转换设置定义 '{definition.Key}' 时出错: {ex.Message}");
+                // 继续处理其他设置
+            }
+        }
+
+        return settingItems;
+    }
+
+    /// <summary>
+    /// 将单个设置定义转换为设置项
+    /// </summary>
+    /// <param name="definition">设置定义</param>
+    /// <param name="currentTime">当前时间</param>
+    /// <returns>设置项</returns>
+    private static SettingItem ConvertDefinitionToSettingItem(SettingDefinition definition, DateTime currentTime)
+    {
+        return new SettingItem
+        {
+            Key = definition.Key,
+            ValueType = definition.ValueType.Name,
+            Value = ConvertValueToString(definition.DefaultValue),
+            Description = definition.Description,
+            Category = definition.Category,
+            IsReadOnly = definition.IsReadOnly,
+            UserId = null, // 全局设置
+            CreatedAt = currentTime,
+            UpdatedAt = currentTime
+        };
+    }
+
+    /// <summary>
+    /// 将值转换为字符串表示
+    /// </summary>
+    /// <param name="value">要转换的值</param>
+    /// <returns>字符串表示</returns>
+    private static string? ConvertValueToString(object? value)
+    {
+        try
+        {
+            return value switch
+            {
+                null => null,
+                bool b => b.ToString().ToLowerInvariant(),
+                double d => d.ToString(CultureInfo.InvariantCulture),
+                decimal dec => dec.ToString(CultureInfo.InvariantCulture),
+                float f => f.ToString(CultureInfo.InvariantCulture),
+                DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
+                DateTimeOffset dto => dto.ToString("O", CultureInfo.InvariantCulture),
+                Enum e => e.ToString(),
+                _ => value.ToString()
+            };
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"转换值到字符串时出错: {ex.Message}, 值: {value}");
+            return value?.ToString();
+        }
+    }
+
+    #endregion
+}
+
+/// <summary>
+/// 字体大小约束常量
+/// </summary>
+public static class FontSizeConstraints
+{
+    /// <summary>
+    /// 最小字体大小
+    /// </summary>
+    public const int MinSize = 8;
+
+    /// <summary>
+    /// 最大字体大小
+    /// </summary>
+    public const int MaxSize = 72;
+
+    /// <summary>
+    /// 默认字体大小
+    /// </summary>
+    public const int DefaultSize = 12;
+
+    /// <summary>
+    /// 验证字体大小是否在有效范围内
+    /// </summary>
+    /// <param name="size">字体大小</param>
+    /// <returns>是否有效</returns>
+    public static bool IsValidSize(int size)
+    {
+        return size is >= MinSize and <= MaxSize;
+    }
+}
