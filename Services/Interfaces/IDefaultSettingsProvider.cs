@@ -1,10 +1,9 @@
 using DrugSearcher.Models;
 
-namespace DrugSearcher.Services
+namespace DrugSearcher.Services;
+
+public interface IDefaultSettingsProvider
 {
-    public interface IDefaultSettingsProvider
-    {
-        List<SettingDefinition> GetDefaultDefinitions();
-        List<SettingItem> GetDefaultSettingItems();
-    }
+    List<SettingDefinition> GetDefaultDefinitions();
+    List<SettingItem> GetDefaultSettingItems();
 }

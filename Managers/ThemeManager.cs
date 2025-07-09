@@ -678,24 +678,39 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// </summary>
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// 释放资源的具体实现
+    /// </summary>
+    /// <param name="disposing">是否正在释放托管资源</param>
+    protected virtual void Dispose(bool disposing)
+    {
         if (_disposed) return;
 
-        try
+        if (disposing)
         {
-            // 取消订阅事件
-            UnsubscribeFromSystemThemeChanges();
-            UnsubscribeFromSettingsChanges();
+            try
+            {
+                // 释放托管资源
+                UnsubscribeFromSystemThemeChanges();
+                UnsubscribeFromSettingsChanges();
+                ClearCache();
 
-            // 清理缓存
-            ClearCache();
+                Debug.WriteLine("ThemeManager 已释放资源");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"释放 ThemeManager 资源失败: {ex.Message}");
+            }
+        }
 
-            _disposed = true;
-            Debug.WriteLine("ThemeManager 已释放资源");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"释放 ThemeManager 资源失败: {ex.Message}");
-        }
+        // 释放非托管资源（如果有的话）
+        // ...
+
+        _disposed = true;
     }
 
     #endregion

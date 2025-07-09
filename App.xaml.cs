@@ -1,9 +1,11 @@
 ﻿using Autofac;
 using DrugSearcher.Configuration;
 using DrugSearcher.Data;
+using DrugSearcher.Data.Interfaces;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
 using DrugSearcher.Views;
+using Microsoft.EntityFrameworkCore;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 
@@ -74,7 +76,7 @@ public partial class App
             Console.WriteLine("数据库初始化完成");
 
             // 获取设置服务以触发其初始化
-            var settingsService = ContainerAccessor.Resolve<IUserSettingsService>();
+            ContainerAccessor.Resolve<IUserSettingsService>();
 
             // 等待一小段时间让设置服务完成异步初始化
             await Task.Delay(100);
@@ -85,6 +87,26 @@ public partial class App
         {
             Console.WriteLine($"服务初始化失败: {ex.Message}");
             // 不抛出异常，允许应用程序继续启动
+        }
+        try
+        {
+
+            var contextFactory = ContainerAccessor.Resolve<IDrugSearcherDbContextFactory>();
+            await using var context = contextFactory.CreateDbContext();
+
+            // 确保数据库存在
+            await context.Database.EnsureCreatedAsync();
+
+            // 应用待处理的迁移
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                await context.Database.MigrateAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"数据库初始化失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

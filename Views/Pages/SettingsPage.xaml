@@ -13,11 +13,11 @@
     <Page.Resources>
         <!-- Fluent Design 设置卡片样式 -->
         <Style x:Key="FluentSettingsCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="20,16"/>
+            <Setter Property="BorderThickness" Value="0.8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="16,12"/>
             <Setter Property="Margin" Value="0,0,0,12"/>
             <Setter Property="Effect">
                 <Setter.Value>
@@ -33,7 +33,7 @@
 
         <!-- 设置组标题样式 -->
         <Style x:Key="SettingsGroupHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
             <Setter Property="Margin" Value="0"/>
@@ -41,7 +41,7 @@
 
         <!-- 设置项标题样式 -->
         <Style x:Key="SettingTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Medium"/>
             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -49,10 +49,10 @@
 
         <!-- 设置项描述样式 -->
         <Style x:Key="SettingDescriptionStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0,4,0,0"/>
+            <Setter Property="Margin" Value="0,4,10,0"/>
             <Setter Property="LineHeight" Value="18"/>
         </Style>
 
@@ -60,61 +60,10 @@
         <Style x:Key="FluentSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentThemeButtonStyle}">
             <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="Padding" Value="20,12"></Setter>
+            <Setter Property="Padding" Value="13,11"/>
+            <Setter Property="FontSize" Value="14"></Setter>
         </Style>
 
-        <!-- Fluent Design 文本框样式 -->
-        <Style x:Key="FluentTextBoxStyle" TargetType="TextBox">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="6,5,10,7"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="BorderElement"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6">
-                            <Grid>
-                                <ScrollViewer x:Name="PART_ContentHost"
-                                            Margin="{TemplateBinding Padding}"
-                                            VerticalAlignment="Center"/>
-                                <TextBlock x:Name="PlaceholderText"
-                                         Text="{TemplateBinding Tag}"
-                                         Foreground="{DynamicResource SecondaryTextBrush}"
-                                         Margin="{TemplateBinding Padding}"
-                                         VerticalAlignment="Center"
-                                         IsHitTestVisible="False"/>
-                            </Grid>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="Text" Value="">
-                                <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                            <Trigger Property="Text" Value="{x:Null}">
-                                <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
-                            </Trigger>
-                            <MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="Text" Value=""/>
-                                    <Condition Property="IsFocused" Value="False"/>
-                                </MultiTrigger.Conditions>
-                                <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
-                            </MultiTrigger>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="BorderElement" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
-                                <Setter TargetName="BorderElement" Property="BorderThickness" Value="2"/>
-                                <Setter TargetName="PlaceholderText" Property="Visibility" Value="Collapsed"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <!-- Fluent Design 切换开关样式 -->
         <Style x:Key="FluentToggleSwitchStyle" TargetType="CheckBox">
@@ -126,16 +75,16 @@
                     <ControlTemplate TargetType="CheckBox">
                         <Grid>
                             <Border x:Name="BackgroundBorder"
-                                    Width="44"
-                                    Height="24"
+                                    Width="40"
+                                    Height="21"
                                     Background="{DynamicResource BorderBrush}"
-                                    CornerRadius="12"
-                                    HorizontalAlignment="Left"/>
+                                    CornerRadius="10"
+                                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
                             <Ellipse x:Name="ToggleThumb"
-                                     Width="18"
-                                     Height="18"
+                                     Width="14"
+                                     Height="14"
                                      Fill="White"
-                                     HorizontalAlignment="Left"
+                                     HorizontalAlignment="Left" VerticalAlignment="Center"
                                      Margin="3,0,0,0"
                                      RenderTransformOrigin="0.5,0.5">
                                 <Ellipse.RenderTransform>
@@ -219,7 +168,7 @@
                 <TextBox Grid.Column="1"
                          x:Name="SearchBox"
                          Width="280" VerticalAlignment="Center"
-                         Style="{StaticResource FluentTextBoxStyle}"
+                         Style="{StaticResource BaseTextBoxStyle}"
                          Tag="搜索设置..."
                          TextChanged="SearchBox_TextChanged">
                     <TextBox.InputBindings>
@@ -234,7 +183,7 @@
                       VerticalScrollBarVisibility="Auto" 
                       Padding="32,24"
                       Background="Transparent">
-            <StackPanel x:Name="SettingsContainer" MaxWidth="800" HorizontalAlignment="Left">
+            <StackPanel x:Name="SettingsContainer" MaxWidth="800" HorizontalAlignment="Center">
 
                 <!-- 加载指示器 -->
                 <ProgressBar IsIndeterminate="True" 
@@ -393,7 +342,7 @@
                                       VerticalAlignment="Center">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="enums:ThemeMode">
-                                        <TextBlock Text="{Binding}" FontSize="14"/>
+                                        <TextBlock Text="{Binding}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
@@ -461,8 +410,7 @@
                                             MinWidth="40">
                                         <TextBlock Text="{Binding FontSize}" 
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
-                                                   TextAlignment="Center"
-                                                   FontSize="12"/>
+                                                   TextAlignment="Center"/>
                                     </Border>
                                 </Grid>
                             </StackPanel>
@@ -490,7 +438,7 @@
                                       VerticalAlignment="Center">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayName}" FontSize="14"/>
+                                        <TextBlock Text="{Binding DisplayName}"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>

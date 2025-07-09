@@ -6,8 +6,8 @@
         xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
         mc:Ignorable="d"
         Title="{Binding Title}"
-        Height="600"
-        Width="800"
+        Height="780"
+        Width="1100"
         Style="{StaticResource BaseWindowStyle}"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}">
 
@@ -166,8 +166,7 @@
                             <RadioButton.Content>
                                 <Ellipse Width="24" Height="24" 
                                          Fill="#2196F3" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
+                                         />
                             </RadioButton.Content>
                         </RadioButton>
 

@@ -3,128 +3,133 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
+      xmlns:converters="clr-namespace:DrugSearcher.Common.Converters"
+      xmlns:behaviors="clr-namespace:DrugSearcher.Common.Behaviors"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1000"
+      d:DesignHeight="600" d:DesignWidth="1000" d:DataContext="{viewModels:HomePageViewModel}"
       Title="药物查询">
+
+
+    <Page.Resources>
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Border" 
+                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                CornerRadius="4" Margin="4"
+                                BorderThickness="1"
+                                BorderBrush="Transparent">
+                            <Grid>
+                                <ContentPresenter HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                                            Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource PrimaryHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="Border"
+                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                            Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+    </Page.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- 搜索区域 -->
-        <Border Grid.Row="1" 
+        <Border Grid.Row="0" 
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="20"
                 Margin="0,0,0,20">
-            <StackPanel>
-                <!-- 搜索输入 -->
-                <Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 搜索框和按钮 -->
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- 搜索输入框 -->
                     <TextBox Grid.Column="0"
-                             x:Name="SearchTextBox"
+                             Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
                              Tag="请输入药物名称、通用名或批准文号"
-                             Style="{StaticResource BaseTextBoxStyle}"
-                             KeyDown="SearchTextBox_KeyDown"/>
+                             Style="{StaticResource BaseTextBoxStyle}">
+                        <i:Interaction.Behaviors>
+                            <behaviors:KeyDownBehavior Key="Enter" Command="{Binding SearchCommand}" />
+                        </i:Interaction.Behaviors>
+                    </TextBox>
 
+                    <!-- 搜索按钮 -->
                     <Button Grid.Column="1"
-                            x:Name="SearchButton"
                             Content="搜索"
                             Style="{StaticResource BaseButtonStyle}"
                             Margin="10,0,0,0"
-                            Click="SearchButton_Click"/>
+                            Command="{Binding SearchCommand}"
+                            IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 </Grid>
 
-                <!-- 数据源选择 -->
-                <GroupBox Header="数据源选择" 
-                          Margin="0,15,0,0"
-                          Foreground="{DynamicResource PrimaryTextBrush}">
-                    <StackPanel Orientation="Horizontal" Margin="10">
-                        <CheckBox x:Name="LocalDbCheckBox" 
-                                  Content="本地数据库" 
-                                  IsChecked="True"
-                                  Margin="0,0,20,0"
-                                  Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <CheckBox x:Name="OnlineSearchCheckBox" 
-                                  Content="在线查询" 
-                                  IsChecked="True"
-                                  Margin="0,0,20,0"
-                                  Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <CheckBox x:Name="CachedDocsCheckBox" 
-                                  Content="本地缓存" 
-                                  IsChecked="True"
-                                  Foreground="{DynamicResource PrimaryTextBrush}"/>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- 高级搜索选项 -->
-                <Expander Header="高级搜索" 
-                          Margin="0,10,0,0"
-                          Foreground="{DynamicResource PrimaryTextBrush}">
-                    <Grid Margin="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="200"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Row="0" Grid.Column="0" 
-                                   Text="药物类型:" 
-                                   Margin="0,0,10,5"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" Style="{DynamicResource FluentComboBoxStyle}"
-                                  x:Name="DrugTypeComboBox"
-                                  Margin="0,0,20,5">
-                            <ComboBoxItem Content="全部"/>
-                            <ComboBoxItem Content="处方药"/>
-                            <ComboBoxItem Content="非处方药"/>
-                            <ComboBoxItem Content="中药"/>
-                            <ComboBoxItem Content="生物制品"/>
-                        </ComboBox>
-
-                        <TextBlock Grid.Row="0" Grid.Column="2" 
-                                   Text="生产厂家:" 
-                                   Margin="0,0,10,5"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <TextBox Grid.Row="0" Grid.Column="3" 
-                                 x:Name="ManufacturerTextBox"
-                                 Tag="请输入生产厂家"
-                                 Style="{StaticResource BaseTextBoxStyle}"
-                                 Margin="0,0,0,5"/>
-
-                        <TextBlock Grid.Row="1" Grid.Column="0" 
-                                   Text="适应症:" 
-                                   Margin="0,0,10,0"
-                                   VerticalAlignment="Center"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" 
-                                 x:Name="IndicationTextBox"
-                                 Tag="请输入适应症关键词"
-                                 Style="{StaticResource BaseTextBoxStyle}"
-                                 Margin="0,0,20,0"/>
-                    </Grid>
-                </Expander>
-            </StackPanel>
+                <!-- 数据源选择（简化版） -->
+                <StackPanel Grid.Row="1" 
+                            Orientation="Horizontal" 
+                            Margin="0,10,0,0">
+                    <CheckBox Content="本地数据库" 
+                              IsChecked="{Binding IsLocalDbEnabled}"
+                              Margin="0,0,20,0"
+                              Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <CheckBox Content="在线数据" 
+                              IsChecked="{Binding IsOnlineEnabled}"
+                              Margin="0,0,20,0"
+                              Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <TextBlock Text="注: 在线数据包含本地缓存和实时爬取" 
+                               FontSize="11"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- 搜索结果区域 -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -149,12 +154,10 @@
                             Background="{DynamicResource SecondaryBackgroundBrush}"
                             Padding="15,10">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock x:Name="ResultCountTextBlock"
-                                       Text="搜索结果: 0 条"
+                            <TextBlock Text="{Binding ResultCount}"
                                        Foreground="{DynamicResource PrimaryTextBrush}"
                                        FontWeight="SemiBold"/>
-                            <TextBlock x:Name="SearchStatusTextBlock"
-                                       Text=""
+                            <TextBlock Text="{Binding SearchStatus}"
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Margin="20,0,0,0"/>
                         </StackPanel>
@@ -162,67 +165,75 @@
 
                     <!-- 结果列表 -->
                     <ListBox Grid.Row="1" 
-                             x:Name="SearchResultsListBox"
+                             ItemsSource="{Binding SearchResults}"
+                             SelectedItem="{Binding SelectedDrug}"
                              Background="Transparent"
                              BorderThickness="0"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             SelectionChanged="SearchResultsListBox_SelectionChanged"
-                             >
+                             MinWidth="300">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectDrugCommand}" 
+                                                      CommandParameter="{Binding SelectedDrug}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
 
-                                <Border x:Name="Border" Background="{DynamicResource SecondaryBackgroundBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="0,0,0,1" HorizontalAlignment="Stretch"
-                                        Padding="15,10"
-                                        Width="360">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Grid.Row="0"
+                                <Grid Margin="10,5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 药物名称 -->
+                                    <TextBlock Grid.Column="0" Grid.Row="0"
                                                    Text="{Binding DrugName}" 
                                                    FontWeight="SemiBold"
                                                    FontSize="14"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="0" 
+
+                                    <!-- 通用名称 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" 
                                                    Text="{Binding GenericName}" 
                                                    FontSize="12"
                                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                                    Margin="0,2,0,0"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="1"
+
+                                    <!-- 生产厂家 -->
+                                    <TextBlock Grid.Row="1" Grid.Column="1"
                                                    HorizontalAlignment="Right"
                                                    Text="{Binding Manufacturer}" 
                                                    FontSize="11"
                                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                                    Margin="0,2,0,0"/>
-                                        <StackPanel Grid.Column="1" Grid.Row="0"
+
+                                    <!-- 数据源标识 -->
+                                    <StackPanel Grid.Column="1" Grid.Row="0"
                                                     HorizontalAlignment="Right"
-                                                    Orientation="Horizontal" Margin="0,5,0,0">
-                                            <Border Background="{Binding DataSourceColor}"
+                                                    Orientation="Horizontal" 
+                                                    Margin="0,0,0,0">
+                                        <Border Background="{Binding DataSourceColor}"
                                                     CornerRadius="2"
                                                     Padding="4,2">
-                                                <TextBlock Text="{Binding DataSource}"
+                                            <TextBlock Text="{Binding DataSource}"
                                                            FontSize="10"
                                                            Foreground="White"/>
-                                            </Border>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
 
                     <!-- 加载指示器 -->
                     <ProgressBar Grid.Row="2" 
-                                 x:Name="SearchProgressBar"
                                  IsIndeterminate="True"
-                                 Visibility="Collapsed"
+                                 Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                                  Height="4"/>
                 </Grid>
             </Border>
@@ -234,21 +245,20 @@
                     BorderThickness="1"
                     CornerRadius="8"
                     Margin="10,0,0,0">
-                <ScrollViewer x:Name="DetailScrollViewer" 
-                              VerticalScrollBarVisibility="Auto"
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Padding="20">
-                    <StackPanel x:Name="DrugDetailPanel">
+                    <StackPanel>
                         <!-- 默认提示 -->
-                        <TextBlock x:Name="DefaultHintTextBlock"
-                                   Text="请在左侧搜索并选择药物以查看详细信息"
+                        <TextBlock Text="请在左侧搜索并选择药物以查看详细信息"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                    FontSize="16"
-                                   Margin="0,100,0,0"/>
+                                   Margin="0,100,0,0"
+                                   Visibility="{Binding IsDetailPanelVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
 
-                        <!-- 药物详情内容（初始隐藏） -->
-                        <StackPanel x:Name="DrugInfoPanel" Visibility="Collapsed">
+                        <!-- 药物详情内容 -->
+                        <StackPanel Visibility="{Binding IsDetailPanelVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <!-- 基本信息 -->
                             <TextBlock Text="基本信息" 
                                        FontSize="20" 
@@ -269,27 +279,64 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="药品名称:" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="DrugNameTextBlock" Foreground="{DynamicResource PrimaryTextBrush}" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" 
+                                           Text="药品名称:" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" 
+                                           Text="{Binding DrugName}" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           TextWrapping="Wrap"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="通用名称:" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="GenericNameTextBlock" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" 
+                                           Text="通用名称:" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" 
+                                           Text="{Binding GenericName}" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0" 
+                                           TextWrapping="Wrap"/>
 
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="生产厂家:" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="ManufacturerInfoTextBlock" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" 
+                                           Text="生产厂家:" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" 
+                                           Text="{Binding ManufacturerInfo}" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0" 
+                                           TextWrapping="Wrap"/>
 
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="批准文号:" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0"/>
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="ApprovalNumberTextBlock" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                <TextBlock Grid.Row="3" Grid.Column="0" 
+                                           Text="批准文号:" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" 
+                                           Text="{Binding ApprovalNumber}" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0" 
+                                           TextWrapping="Wrap"/>
 
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="数据来源:" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0"/>
-                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="DataSourceInfoTextBlock" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="0" 
+                                           Text="数据来源:" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" 
+                                           Text="{Binding DataSourceInfo}" 
+                                           Foreground="{DynamicResource PrimaryTextBrush}" 
+                                           Margin="0,5,0,0"/>
                             </Grid>
 
                             <!-- 详细信息选项卡 -->
-                            <TabControl x:Name="DrugDetailTabControl" Margin="0,10,0,0">
+                            <TabControl Margin="0,10,0,0">
                                 <TabItem Header="药物说明">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                                        <TextBlock x:Name="DrugDescriptionTextBlock" 
+                                        <TextBlock Text="{Binding DrugDescription}" 
                                                    TextWrapping="Wrap"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                                    Margin="10"/>
@@ -297,7 +344,7 @@
                                 </TabItem>
                                 <TabItem Header="适应症">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                                        <TextBlock x:Name="IndicationsTextBlock" 
+                                        <TextBlock Text="{Binding Indications}" 
                                                    TextWrapping="Wrap"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                                    Margin="10"/>
@@ -305,7 +352,7 @@
                                 </TabItem>
                                 <TabItem Header="用法用量">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                                        <TextBlock x:Name="DosageTextBlock" 
+                                        <TextBlock Text="{Binding Dosage}" 
                                                    TextWrapping="Wrap"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                                    Margin="10"/>
@@ -313,7 +360,7 @@
                                 </TabItem>
                                 <TabItem Header="不良反应">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                                        <TextBlock x:Name="SideEffectsTextBlock" 
+                                        <TextBlock Text="{Binding SideEffects}" 
                                                    TextWrapping="Wrap"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                                    Margin="10"/>
@@ -321,7 +368,7 @@
                                 </TabItem>
                                 <TabItem Header="注意事项">
                                     <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                                        <TextBlock x:Name="PrecautionsTextBlock" 
+                                        <TextBlock Text="{Binding Precautions}" 
                                                    TextWrapping="Wrap"
                                                    Foreground="{DynamicResource PrimaryTextBrush}"
                                                    Margin="10"/>

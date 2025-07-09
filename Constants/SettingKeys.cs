@@ -24,11 +24,3 @@ public static class SettingKeys
     public const string MaxResults = "search.max_results";
     public const string CacheEnabled = "search.cache_enabled";
 }
-
-public static class SettingCategories
-{
-    public const string Tray = "托盘";
-    public const string UI = "界面";
-    public const string Application = "应用";
-    public const string Search = "搜索";
-}

@@ -1,4 +1,5 @@
 using DrugSearcher.Constants;
+using DrugSearcher.Models;
 using DrugSearcher.Services;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -683,10 +684,9 @@ public class TrayManager : IDisposable
     /// 关于请求事件
     /// </summary>
     public event Action? AboutRequested;
-
     #endregion
 
-    #region IDisposable
+    #region 资源释放
 
     /// <summary>
     /// 释放资源
@@ -715,6 +715,7 @@ public class TrayManager : IDisposable
         }
 
         _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -722,14 +723,12 @@ public class TrayManager : IDisposable
     /// </summary>
     private void DisposeTrayIcon()
     {
-        if (_notifyIcon != null)
-        {
-            _notifyIcon.Visible = false;
-            _notifyIcon.DoubleClick -= OnNotifyIconDoubleClick;
-            _notifyIcon.Click -= OnNotifyIconClick;
-            _notifyIcon.Dispose();
-            _notifyIcon = null;
-        }
+        if (_notifyIcon == null) return;
+        _notifyIcon.Visible = false;
+        _notifyIcon.DoubleClick -= OnNotifyIconDoubleClick;
+        _notifyIcon.Click -= OnNotifyIconClick;
+        _notifyIcon.Dispose();
+        _notifyIcon = null;
     }
 
     /// <summary>
@@ -737,12 +736,10 @@ public class TrayManager : IDisposable
     /// </summary>
     private void DisposeContextMenu()
     {
-        if (_contextMenu != null)
-        {
-            _contextMenu.Opening -= OnContextMenuOpening;
-            _contextMenu.Dispose();
-            _contextMenu = null;
-        }
+        if (_contextMenu == null) return;
+        _contextMenu.Opening -= OnContextMenuOpening;
+        _contextMenu.Dispose();
+        _contextMenu = null;
     }
 
     #endregion
