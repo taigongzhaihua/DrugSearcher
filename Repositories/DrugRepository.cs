@@ -14,7 +14,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<DrugInfo?> GetByIdAsync(int id)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
             return await context.DrugInfos.FindAsync(id);
         }
 
@@ -23,7 +23,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<List<DrugInfo>> GetAllAsync()
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
             return await context.DrugInfos
                 .OrderBy(d => d.DrugName)
                 .ToListAsync();
@@ -34,7 +34,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<(List<DrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             var totalCount = await context.DrugInfos.CountAsync();
             var items = await context.DrugInfos
@@ -52,9 +52,9 @@ namespace DrugSearcher.Repositories
         public async Task<List<DrugInfo>> SearchAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
-                return new List<DrugInfo>();
+                return [];
 
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             // 将关键词转换为小写，用于不区分大小写的搜索
             var keywordLower = keyword.Trim().ToLower();
@@ -78,9 +78,9 @@ namespace DrugSearcher.Repositories
         public async Task<List<string>> GetDrugNameSuggestionsAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
-                return new List<string>();
+                return [];
 
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             var keywordLower = keyword.Trim().ToLower();
 
@@ -97,7 +97,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<bool> ExistsAsync(string drugName, string? specification, string? manufacturer)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             return await context.DrugInfos
                 .AnyAsync(d => d.DrugName == drugName &&
@@ -110,7 +110,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<DrugInfo> AddAsync(DrugInfo drugInfo)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             context.DrugInfos.Add(drugInfo);
             await context.SaveChangesAsync();
@@ -122,7 +122,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<List<DrugInfo>> AddRangeAsync(List<DrugInfo> drugInfos)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             context.DrugInfos.AddRange(drugInfos);
             await context.SaveChangesAsync();
@@ -134,7 +134,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<DrugInfo> UpdateAsync(DrugInfo drugInfo)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             context.DrugInfos.Update(drugInfo);
             await context.SaveChangesAsync();
@@ -146,7 +146,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<List<DrugInfo>> UpdateRangeAsync(List<DrugInfo> drugInfos)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             context.DrugInfos.UpdateRange(drugInfos);
             await context.SaveChangesAsync();
@@ -158,7 +158,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<bool> DeleteAsync(int id)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             var drugInfo = await context.DrugInfos.FindAsync(id);
             if (drugInfo == null)
@@ -174,7 +174,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<bool> DeleteRangeAsync(List<int> ids)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             var drugInfos = await context.DrugInfos
                 .Where(d => ids.Contains(d.Id))
@@ -193,7 +193,7 @@ namespace DrugSearcher.Repositories
         /// </summary>
         public async Task<List<DrugInfo>> GetDuplicatesAsync(List<ExcelImportDto> importData)
         {
-            using var context = contextFactory.CreateDbContext();
+            await using var context = contextFactory.CreateDbContext();
 
             var duplicates = new List<DrugInfo>();
 

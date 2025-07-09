@@ -64,7 +64,7 @@ public class KeyDownBehavior : Behavior<UIElement>
     /// <param name="e">事件参数</param>
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key && Command?.CanExecute(null) == true)
+        if (e.Key == Key && Command.CanExecute(null))
         {
             Command.Execute(null);
         }

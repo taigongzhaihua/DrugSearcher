@@ -131,7 +131,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 ValueType = typeof(ThemeMode),
                 DefaultValue = ThemeMode.Light,
                 Description = "主题模式（浅色/深色/跟随系统）",
-                Category = SettingCategories.UI,
+                Category = SettingCategories.Ui,
                 IsReadOnly = false,
                 Validator = ValidateThemeMode
             },
@@ -143,7 +143,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 ValueType = typeof(ThemeColor),
                 DefaultValue = ThemeColor.Blue,
                 Description = "主题颜色",
-                Category = SettingCategories.UI,
+                Category = SettingCategories.Ui,
                 IsReadOnly = false,
                 Validator = ValidateThemeColor
             },
@@ -155,7 +155,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 ValueType = typeof(int),
                 DefaultValue = 12,
                 Description = "字体大小",
-                Category = SettingCategories.UI,
+                Category = SettingCategories.Ui,
                 IsReadOnly = false,
                 Validator = ValidateFontSize
             },
@@ -167,7 +167,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 ValueType = typeof(string),
                 DefaultValue = "zh-CN",
                 Description = "界面语言",
-                Category = SettingCategories.UI,
+                Category = SettingCategories.Ui,
                 IsReadOnly = false,
                 Validator = ValidateLanguage
             }

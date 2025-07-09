@@ -175,7 +175,7 @@ namespace DrugSearcher.Services
         public async Task<List<string>> GetSearchSuggestionsAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
-                return new List<string>();
+                return [];
 
             try
             {
@@ -198,7 +198,7 @@ namespace DrugSearcher.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"获取搜索建议失败: {ex.Message}");
-                return new List<string>();
+                return [];
             }
         }
     }

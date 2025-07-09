@@ -1,4 +1,4 @@
-namespace DrugSearcher.Data;
+namespace DrugSearcher.Models;
 
 /// <summary>
 /// 设置项约束常量

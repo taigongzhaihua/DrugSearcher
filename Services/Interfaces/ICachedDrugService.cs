@@ -45,7 +45,7 @@ namespace DrugSearcher.Services
         {
             // TODO: 实现缓存搜索逻辑
             await Task.Delay(50); // 模拟查询延迟
-            return new List<DrugInfo>();
+            return [];
         }
 
         public async Task<DrugInfo?> GetCachedDrugDetailAsync(int id)
@@ -65,7 +65,7 @@ namespace DrugSearcher.Services
         {
             // TODO: 实现缓存建议获取逻辑
             await Task.Delay(50); // 模拟查询延迟
-            return new List<string>();
+            return [];
         }
     }
 }

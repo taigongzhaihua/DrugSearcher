@@ -365,9 +365,7 @@ public static class SystemThemeHelper
     /// <returns>如果是主题相关的变化则返回true</returns>
     private static bool IsThemeRelatedPreferenceChange(UserPreferenceCategory category)
     {
-        return category == UserPreferenceCategory.General ||
-               category == UserPreferenceCategory.VisualStyle ||
-               category == UserPreferenceCategory.Color;
+        return category is UserPreferenceCategory.General or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.Color;
     }
 
     #endregion

@@ -174,16 +174,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 "显示托盘通知", SettingCategories.Tray, baseTime),
 
             CreateDefaultSetting(4, SettingKeys.ThemeMode, nameof(ThemeMode), "Light",
-                "主题模式", SettingCategories.UI, baseTime),
+                "主题模式", SettingCategories.Ui, baseTime),
 
             CreateDefaultSetting(5, SettingKeys.ThemeColor, nameof(ThemeColor), "Blue",
-                "主题颜色", SettingCategories.UI, baseTime),
+                "主题颜色", SettingCategories.Ui, baseTime),
 
             CreateDefaultSetting(6, SettingKeys.FontSize, nameof(Int32), "12",
-                "字体大小", SettingCategories.UI, baseTime),
+                "字体大小", SettingCategories.Ui, baseTime),
 
             CreateDefaultSetting(7, SettingKeys.Language, nameof(String), "zh-CN",
-                "界面语言", SettingCategories.UI, baseTime),
+                "界面语言", SettingCategories.Ui, baseTime),
 
             CreateDefaultSetting(8, SettingKeys.AutoStartup, nameof(Boolean), "false",
                 "开机自启动", SettingCategories.Application, baseTime)
@@ -368,19 +368,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
 
             CreateRuntimeDefaultSetting(SettingKeys.ThemeMode, nameof(ThemeMode), "Light",
-                "主题模式", SettingCategories.UI, currentTime),
+                "主题模式", SettingCategories.Ui, currentTime),
 
 
             CreateRuntimeDefaultSetting(SettingKeys.ThemeColor, nameof(ThemeColor), "Blue",
-                "主题颜色", SettingCategories.UI, currentTime),
+                "主题颜色", SettingCategories.Ui, currentTime),
 
 
             CreateRuntimeDefaultSetting(SettingKeys.FontSize, nameof(Int32), "12",
-                "字体大小", SettingCategories.UI, currentTime),
+                "字体大小", SettingCategories.Ui, currentTime),
 
 
             CreateRuntimeDefaultSetting(SettingKeys.Language, nameof(String), "zh-CN",
-                "界面语言", SettingCategories.UI, currentTime),
+                "界面语言", SettingCategories.Ui, currentTime),
 
 
             CreateRuntimeDefaultSetting(SettingKeys.AutoStartup, nameof(Boolean), "false",

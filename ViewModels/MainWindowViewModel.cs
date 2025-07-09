@@ -34,7 +34,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         InitializeColorSelectionStates();
         SubscribeToThemeEvents();
-        InitializeUIElements();
+        InitializeUiElements();
     }
 
     #endregion
@@ -260,7 +260,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// <summary>
     /// 初始化UI元素
     /// </summary>
-    private void InitializeUIElements()
+    private void InitializeUiElements()
     {
         try
         {

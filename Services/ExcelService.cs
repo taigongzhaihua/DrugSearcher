@@ -27,16 +27,15 @@ public class ExcelService : IExcelService
                 : new HSSFWorkbook(fileStream);
 
             var sheet = workbook.GetSheetAt(0);
-            if (sheet == null) return;
 
             // 读取表头，确定列的位置
-            var headerRow = sheet.GetRow(0);
+            var headerRow = sheet?.GetRow(0);
             if (headerRow == null) return;
 
             var columnMapping = GetColumnMapping(headerRow);
 
             // 从第二行开始读取数据
-            for (int rowIndex = 1; rowIndex <= sheet.LastRowNum; rowIndex++)
+            for (var rowIndex = 1; rowIndex <= sheet?.LastRowNum; rowIndex++)
             {
                 var row = sheet.GetRow(rowIndex);
                 if (row == null) continue;
@@ -61,6 +60,7 @@ public class ExcelService : IExcelService
 
         return result;
     }
+    private static readonly string[] Action = ["药物名称", "通用名称", "规格", "生产厂家", "批准文号", "适应症", "用法用量", "创建时间", "更新时间"];
 
     /// <summary>
     /// 导出药物数据到Excel
@@ -76,16 +76,16 @@ public class ExcelService : IExcelService
 
                 // 创建表头
                 var headerRow = sheet.CreateRow(0);
-                var headers = new[] { "药物名称", "通用名称", "规格", "生产厂家", "批准文号", "适应症", "用法用量", "创建时间", "更新时间" };
+                var headers = Action;
 
-                for (int i = 0; i < headers.Length; i++)
+                for (var i = 0; i < headers.Length; i++)
                 {
                     var cell = headerRow.CreateCell(i);
                     cell.SetCellValue(headers[i]);
                 }
 
                 // 填充数据
-                for (int i = 0; i < drugInfos.Count; i++)
+                for (var i = 0; i < drugInfos.Count; i++)
                 {
                     var row = sheet.CreateRow(i + 1);
                     var drug = drugInfos[i];
@@ -102,7 +102,7 @@ public class ExcelService : IExcelService
                 }
 
                 // 自动调整列宽
-                for (int i = 0; i < headers.Length; i++)
+                for (var i = 0; i < headers.Length; i++)
                 {
                     sheet.AutoSizeColumn(i);
                 }
@@ -119,6 +119,7 @@ public class ExcelService : IExcelService
             return false;
         }
     }
+    private static readonly string[] Function = ["药物名称"];
 
     /// <summary>
     /// 验证Excel文件格式
@@ -150,10 +151,10 @@ public class ExcelService : IExcelService
                 if (headerRow == null)
                     return false;
 
-                var requiredColumns = new[] { "药物名称" };
+                var requiredColumns = Function;
                 var headerText = new List<string>();
 
-                for (int i = 0; i < headerRow.LastCellNum; i++)
+                for (var i = 0; i < headerRow.LastCellNum; i++)
                 {
                     var cell = headerRow.GetCell(i);
                     if (cell != null)
@@ -174,20 +175,18 @@ public class ExcelService : IExcelService
     /// <summary>
     /// 获取列映射
     /// </summary>
-    private Dictionary<string, int> GetColumnMapping(IRow headerRow)
+    private static Dictionary<string, int> GetColumnMapping(IRow headerRow)
     {
         var mapping = new Dictionary<string, int>();
 
-        for (int i = 0; i < headerRow.LastCellNum; i++)
+        for (var i = 0; i < headerRow.LastCellNum; i++)
         {
             var cell = headerRow.GetCell(i);
-            if (cell != null)
+            if (cell == null) continue;
+            var cellValue = cell.StringCellValue?.Trim() ?? "";
+            if (!string.IsNullOrEmpty(cellValue))
             {
-                var cellValue = cell.StringCellValue?.Trim() ?? "";
-                if (!string.IsNullOrEmpty(cellValue))
-                {
-                    mapping[cellValue] = i;
-                }
+                mapping[cellValue] = i;
             }
         }
 
@@ -197,7 +196,7 @@ public class ExcelService : IExcelService
     /// <summary>
     /// 获取单元格值
     /// </summary>
-    private string GetCellValue(IRow row, int columnIndex)
+    private static string GetCellValue(IRow row, int columnIndex)
     {
         if (columnIndex < 0 || columnIndex >= row.LastCellNum)
             return string.Empty;

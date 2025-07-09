@@ -31,7 +31,7 @@ namespace DrugSearcher.Services
         {
             // TODO: 实现在线搜索逻辑
             await Task.Delay(100); // 模拟网络延迟
-            return new List<DrugInfo>();
+            return [];
         }
 
         public async Task<DrugInfo?> GetDrugDetailByIdAsync(int id)

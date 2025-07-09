@@ -17,8 +17,8 @@ namespace DrugSearcher.ViewModels
         public HomePageViewModel(DrugSearchService drugSearchService)
         {
             _drugSearchService = drugSearchService;
-            SearchResults = new ObservableCollection<DrugInfo>();
-            SearchSuggestions = new ObservableCollection<string>();
+            SearchResults = [];
+            SearchSuggestions = [];
 
             // 设置默认值
             IsLocalDbEnabled = true;

@@ -30,7 +30,7 @@ namespace DrugSearcher.Services
         public async Task<List<string>> GetDrugNameSuggestionsAsync(string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
-                return new List<string>();
+                return [];
 
             var drugs = await drugRepository.SearchAsync(keyword);
             return drugs.Select(d => d.DrugName)
