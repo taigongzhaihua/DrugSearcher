@@ -531,6 +531,15 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="TextBlock" x:Key="DefaultTextStyle">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DefaultTextStyle}"/>
     <!-- 标准间距 -->
     <Thickness x:Key="SmallMargin">4</Thickness>
     <Thickness x:Key="MediumMargin">8</Thickness>

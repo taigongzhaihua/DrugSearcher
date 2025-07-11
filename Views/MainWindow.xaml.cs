@@ -236,7 +236,19 @@ public partial class MainWindow
             Debug.WriteLine($"导航到数据管理页失败: {ex.Message}");
         }
     }
-
+    private void NavigateToCrawlerPage()
+    {
+        try
+        {
+            var crawlerPage = ContainerAccessor.Resolve<CrawlerPage>();
+            MainFrame.Navigate(crawlerPage);
+            Debug.WriteLine("已导航到爬虫页");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"导航到爬虫页失败: {ex.Message}");
+        }
+    }
     /// <summary>
     /// 处理框架导航事件
     /// </summary>
@@ -505,6 +517,18 @@ public partial class MainWindow
             Debug.WriteLine($"数据管理菜单项点击处理失败: {ex.Message}");
         }
     }
+    private void MenuItem_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            NavigateToCrawlerPage();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"数据管理菜单项点击处理失败: {ex.Message}");
+        }
+    }
+
 
     /// <summary>
     /// 处理设置菜单项点击
@@ -748,4 +772,6 @@ public partial class MainWindow
     }
 
     #endregion
+
+
 }

@@ -10,22 +10,22 @@ public interface IDrugRepository
     /// <summary>
     /// 根据ID获取药物信息
     /// </summary>
-    Task<DrugInfo?> GetByIdAsync(int id);
+    Task<LocalDrugInfo?> GetByIdAsync(int id);
 
     /// <summary>
     /// 获取所有药物信息
     /// </summary>
-    Task<List<DrugInfo>> GetAllAsync();
+    Task<List<LocalDrugInfo>> GetAllAsync();
 
     /// <summary>
     /// 分页获取药物信息
     /// </summary>
-    Task<(List<DrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize);
+    Task<(List<LocalDrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize);
 
     /// <summary>
     /// 根据关键词搜索药物
     /// </summary>
-    Task<List<DrugInfo>> SearchAsync(string keyword);
+    Task<List<LocalDrugInfo>> SearchAsync(string keyword);
 
     /// <summary>
     /// 获取药物名称建议
@@ -40,22 +40,22 @@ public interface IDrugRepository
     /// <summary>
     /// 添加药物信息
     /// </summary>
-    Task<DrugInfo> AddAsync(DrugInfo drugInfo);
+    Task<LocalDrugInfo> AddAsync(LocalDrugInfo localDrugInfo);
 
     /// <summary>
     /// 批量添加药物信息
     /// </summary>
-    Task<List<DrugInfo>> AddRangeAsync(List<DrugInfo> drugInfos);
+    Task<List<LocalDrugInfo>> AddRangeAsync(List<LocalDrugInfo> drugInfos);
 
     /// <summary>
     /// 更新药物信息
     /// </summary>
-    Task<DrugInfo> UpdateAsync(DrugInfo drugInfo);
+    Task<LocalDrugInfo> UpdateAsync(LocalDrugInfo localDrugInfo);
 
     /// <summary>
     /// 批量更新药物信息
     /// </summary>
-    Task<List<DrugInfo>> UpdateRangeAsync(List<DrugInfo> drugInfos);
+    Task<List<LocalDrugInfo>> UpdateRangeAsync(List<LocalDrugInfo> drugInfos);
 
     /// <summary>
     /// 删除药物信息
@@ -70,5 +70,5 @@ public interface IDrugRepository
     /// <summary>
     /// 获取重复的药物记录
     /// </summary>
-    Task<List<DrugInfo>> GetDuplicatesAsync(List<ExcelImportDto> importData);
+    Task<List<LocalDrugInfo>> GetDuplicatesAsync(List<ExcelImportDto> importData);
 }

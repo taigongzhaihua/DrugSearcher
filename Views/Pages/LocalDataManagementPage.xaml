@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
+      xmlns:model="clr-namespace:DrugSearcher.Models"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewModels:LocalDataManagementViewModel}"
       Title="本地数据管理"
@@ -12,11 +13,11 @@
 
     <Page.Resources>
         <!-- 数据源显示模板 -->
-        <DataTemplate x:Key="DataSourceTemplate">
+        <DataTemplate x:Key="DataSourceTemplate" DataType="{x:Type model:BaseDrugInfo}">
             <Border Background="{Binding DataSourceColor}" 
                     CornerRadius="12" 
                     Padding="8,4">
-                <TextBlock Text="{Binding DataSource}" 
+                <TextBlock Text="{Binding DataSourceText}" 
                            Foreground="White" 
                            FontSize="11" 
                            FontWeight="Medium"/>

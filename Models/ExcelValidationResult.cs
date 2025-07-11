@@ -23,17 +23,17 @@ public class ExcelValidationResult
     /// <summary>
     /// 检测到的列
     /// </summary>
-    public List<string> DetectedColumns { get; set; } = new();
+    public List<string> DetectedColumns { get; set; } = [];
 
     /// <summary>
     /// 缺少的必需列
     /// </summary>
-    public List<string> MissingRequiredColumns { get; set; } = new();
+    public List<string> MissingRequiredColumns { get; set; } = [];
 
     /// <summary>
     /// 缺少的可选列
     /// </summary>
-    public List<string> MissingOptionalColumns { get; set; } = new();
+    public List<string> MissingOptionalColumns { get; set; } = [];
 
     /// <summary>
     /// 数据行数

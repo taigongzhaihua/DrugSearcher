@@ -15,7 +15,7 @@ public interface IExcelService
     /// <summary>
     /// 导出药物数据到Excel
     /// </summary>
-    Task<bool> ExportToExcelAsync(List<DrugInfo> drugInfos, string filePath);
+    Task<bool> ExportToExcelAsync(List<LocalDrugInfo> drugInfos, string filePath);
 
     /// <summary>
     /// 验证Excel文件格式

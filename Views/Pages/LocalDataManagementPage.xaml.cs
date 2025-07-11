@@ -54,7 +54,7 @@ public partial class LocalDataManagementPage
         if (DataContext is LocalDataManagementViewModel viewModel)
         {
             // 添加新选中的项
-            foreach (DrugInfo item in e.AddedItems)
+            foreach (LocalDrugInfo item in e.AddedItems)
             {
                 if (!viewModel.SelectedDrugs.Contains(item))
                 {
@@ -63,7 +63,7 @@ public partial class LocalDataManagementPage
             }
 
             // 移除取消选中的项
-            foreach (DrugInfo item in e.RemovedItems)
+            foreach (LocalDrugInfo item in e.RemovedItems)
             {
                 viewModel.SelectedDrugs.Remove(item);
             }

@@ -34,12 +34,12 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 药物列表
     /// </summary>
-    public ObservableCollection<DrugInfo> DrugItems { get; }
+    public ObservableCollection<LocalDrugInfo> DrugItems { get; }
 
     /// <summary>
     /// 选中的药物列表
     /// </summary>
-    public ObservableCollection<DrugInfo> SelectedDrugs { get; }
+    public ObservableCollection<LocalDrugInfo> SelectedDrugs { get; }
 
     /// <summary>
     /// 搜索关键词
@@ -93,7 +93,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 选中的药物
     /// </summary>
     [ObservableProperty]
-    private DrugInfo? _selectedDrug;
+    private LocalDrugInfo? _selectedDrug;
 
     /// <summary>
     /// 是否可以上一页
@@ -206,7 +206,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 编辑命令
     /// </summary>
     [RelayCommand]
-    private void Edit(DrugInfo? drug)
+    private void Edit(LocalDrugInfo? drug)
     {
         ShowEditDialog(drug);
     }
@@ -215,7 +215,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 删除命令
     /// </summary>
     [RelayCommand]
-    private async Task Delete(DrugInfo? drug)
+    private async Task Delete(LocalDrugInfo? drug)
     {
         await DeleteDrugAsync(drug);
     }
@@ -509,7 +509,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 显示编辑对话框
     /// </summary>
-    private void ShowEditDialog(DrugInfo? drug)
+    private void ShowEditDialog(LocalDrugInfo? drug)
     {
         if (drug == null) return;
 
@@ -539,14 +539,14 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 添加药物
     /// </summary>
-    private async Task AddDrugAsync(DrugInfo drugInfo)
+    private async Task AddDrugAsync(LocalDrugInfo localDrugInfo)
     {
         try
         {
             IsLoading = true;
             StatusMessage = "正在添加药物...";
 
-            var newDrug = await _localDrugService.AddDrugAsync(drugInfo);
+            var newDrug = await _localDrugService.AddDrugAsync(localDrugInfo);
             DrugItems.Insert(0, newDrug);
 
             StatusMessage = "药物添加成功";
@@ -566,14 +566,14 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 更新药物
     /// </summary>
-    private async Task UpdateDrugAsync(DrugInfo drugInfo)
+    private async Task UpdateDrugAsync(LocalDrugInfo localDrugInfo)
     {
         try
         {
             IsLoading = true;
             StatusMessage = "正在更新药物...";
 
-            var updatedDrug = await _localDrugService.UpdateDrugAsync(drugInfo);
+            var updatedDrug = await _localDrugService.UpdateDrugAsync(localDrugInfo);
 
             var index = DrugItems.ToList().FindIndex(d => d.Id == updatedDrug.Id);
             if (index >= 0)
@@ -597,7 +597,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 删除药物
     /// </summary>
-    private async Task DeleteDrugAsync(DrugInfo? drug)
+    private async Task DeleteDrugAsync(LocalDrugInfo? drug)
     {
         if (drug == null) return;
 

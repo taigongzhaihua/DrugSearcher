@@ -280,6 +280,11 @@
                                       Click="DataManagementMenuItem_Click"
                                       ToolTip="本地数据管理"/>
 
+                            <MenuItem Header="爬虫页面"
+                                      Tag="&#xe628;"
+                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Click="MenuItem_OnClick"/>
+
                             <!-- 设置 -->
                             <MenuItem x:Name="SettingsMenuItem"
                                       Header="设置"

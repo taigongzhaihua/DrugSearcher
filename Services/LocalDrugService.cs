@@ -11,7 +11,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 搜索药物
     /// </summary>
-    public async Task<List<DrugInfo>> SearchDrugsAsync(string keyword)
+    public async Task<List<LocalDrugInfo>> SearchDrugsAsync(string keyword)
     {
         return await drugRepository.SearchAsync(keyword);
     }
@@ -19,7 +19,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 获取药物详情
     /// </summary>
-    public async Task<DrugInfo?> GetDrugDetailAsync(int id)
+    public async Task<LocalDrugInfo?> GetDrugDetailAsync(int id)
     {
         return await drugRepository.GetByIdAsync(id);
     }
@@ -42,35 +42,35 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 添加药物
     /// </summary>
-    public async Task<DrugInfo> AddDrugAsync(DrugInfo drugInfo)
+    public async Task<LocalDrugInfo> AddDrugAsync(LocalDrugInfo localDrugInfo)
     {
         // 检查是否已存在
         var exists = await drugRepository.ExistsAsync(
-            drugInfo.DrugName,
-            drugInfo.Specification,
-            drugInfo.Manufacturer);
+            localDrugInfo.DrugName,
+            localDrugInfo.Specification,
+            localDrugInfo.Manufacturer);
 
         if (exists)
         {
             throw new InvalidOperationException("药物已存在（名称、规格、厂家均相同）");
         }
 
-        drugInfo.DataSource = DataSource.LocalDatabase;
-        return await drugRepository.AddAsync(drugInfo);
+        localDrugInfo.DataSource = DataSource.LocalDatabase;
+        return await drugRepository.AddAsync(localDrugInfo);
     }
 
     /// <summary>
     /// 更新药物
     /// </summary>
-    public async Task<DrugInfo> UpdateDrugAsync(DrugInfo drugInfo)
+    public async Task<LocalDrugInfo> UpdateDrugAsync(LocalDrugInfo localDrugInfo)
     {
-        var existing = await drugRepository.GetByIdAsync(drugInfo.Id);
+        var existing = await drugRepository.GetByIdAsync(localDrugInfo.Id);
         if (existing == null)
         {
             throw new InvalidOperationException("药物不存在");
         }
 
-        return await drugRepository.UpdateAsync(drugInfo);
+        return await drugRepository.UpdateAsync(localDrugInfo);
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
             }
 
             // 转换为DrugInfo对象并处理重复数据
-            var drugInfos = new List<DrugInfo>();
+            var drugInfos = new List<LocalDrugInfo>();
             var processedItems = new HashSet<string>(); // 用于跟踪已处理的项目
 
             foreach (var item in importData)
@@ -151,7 +151,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
                     }
 
                     // 创建新的药物信息
-                    var drugInfo = new DrugInfo
+                    var drugInfo = new LocalDrugInfo
                     {
                         DrugName = item.DrugName,
                         Specification = item.Specification,
@@ -232,7 +232,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 获取所有药物（分页）
     /// </summary>
-    public async Task<(List<DrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize)
+    public async Task<(List<LocalDrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize)
     {
         return await drugRepository.GetPagedAsync(pageIndex, pageSize);
     }

@@ -8,36 +8,56 @@ namespace DrugSearcher.Services;
 public interface IOnlineDrugService
 {
     /// <summary>
-    /// 在线搜索药物
+    /// 搜索在线药物
     /// </summary>
-    /// <param name="keyword">关键词</param>
-    /// <returns>药物列表</returns>
-    Task<List<DrugInfo>> SearchOnlineDrugsAsync(string keyword);
+    Task<List<OnlineDrugInfo>> SearchOnlineDrugsAsync(string keyword);
 
     /// <summary>
-    /// 根据ID获取在线药物详情
+    /// 根据ID获取药物详情
     /// </summary>
-    /// <param name="id">药物ID</param>
-    /// <returns>药物信息</returns>
-    Task<DrugInfo?> GetDrugDetailByIdAsync(int id);
-}
+    Task<OnlineDrugInfo?> GetDrugDetailByIdAsync(int id);
 
-/// <summary>
-/// 在线药物服务实现（暂时空实现）
-/// </summary>
-public class OnlineDrugService : IOnlineDrugService
-{
-    public async Task<List<DrugInfo>> SearchOnlineDrugsAsync(string keyword)
-    {
-        // TODO: 实现在线搜索逻辑
-        await Task.Delay(100); // 模拟网络延迟
-        return [];
-    }
+    /// <summary>
+    /// 爬取单个药物信息
+    /// </summary>
+    Task<OnlineDrugInfo?> CrawlSingleDrugInfoAsync(int id);
 
-    public async Task<DrugInfo?> GetDrugDetailByIdAsync(int id)
-    {
-        // TODO: 实现在线获取药物详情逻辑
-        await Task.Delay(100); // 模拟网络延迟
-        return null;
-    }
+    /// <summary>
+    /// 批量爬取药物信息
+    /// </summary>
+    Task<CrawlResult> CrawlDrugInfosAsync(int startId, int endId, int batchSize = 10, int delayMs = 1000, IProgress<CrawlProgress>? progress = null);
+
+    /// <summary>
+    /// 获取已爬取的药物数量
+    /// </summary>
+    Task<int> GetCrawledDrugCountAsync();
+
+    /// <summary>
+    /// 获取失败的药物ID列表
+    /// </summary>
+    Task<List<int>> GetFailedDrugIdsAsync();
+
+    /// <summary>
+    /// 重新爬取失败的药物
+    /// </summary>
+    Task<CrawlResult> RetryCrawlFailedDrugsAsync(List<int> failedIds, IProgress<CrawlProgress>? progress = null);
+
+    /// <summary>
+    /// 获取爬取统计信息
+    /// </summary>
+    Task<CrawlStatistics> GetCrawlStatisticsAsync();
+
+    /// <summary>
+    /// 清理旧的失败记录
+    /// </summary>
+    /// <param name="olderThanDays">清理多少天之前的记录</param>
+    /// <returns>清理的记录数量</returns>
+    Task<int> CleanupOldFailedRecordsAsync(int olderThanDays = 30);
+
+    /// <summary>
+    /// 获取最近爬取的药物
+    /// </summary>
+    /// <param name="count">获取数量</param>
+    /// <returns>最近爬取的药物列表</returns>
+    Task<List<OnlineDrugInfo>> GetRecentCrawledDrugsAsync(int count = 10);
 }

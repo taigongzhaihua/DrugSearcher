@@ -3,10 +3,13 @@ using DrugSearcher.Data;
 using DrugSearcher.Managers;
 using DrugSearcher.Repositories;
 using DrugSearcher.Services;
+using DrugSearcher.Services.Interfaces;
 using DrugSearcher.ViewModels;
 using DrugSearcher.Views;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Net.Http;
 
 namespace DrugSearcher.Configuration;
 
@@ -26,6 +29,7 @@ public static class ContainerConfig
         try
         {
             // 按类别注册各种依赖
+            RegisterLoggingServices(builder);
             RegisterDatabaseServices(builder);
             RegisterRepositories(builder);
             RegisterBusinessServices(builder);
@@ -43,6 +47,42 @@ public static class ContainerConfig
     }
 
     /// <summary>
+    /// 注册日志服务
+    /// </summary>
+    private static void RegisterLoggingServices(ContainerBuilder builder)
+    {
+        // 注册 ILoggerFactory
+        builder.Register<ILoggerFactory>(_ =>
+        {
+            var loggerFactory = LoggerFactory.Create(config =>
+            {
+                config.AddConsole();
+                config.AddDebug();
+                config.SetMinimumLevel(LogLevel.Information);
+
+                // 开发环境下启用更详细的日志
+#if DEBUG
+                config.SetMinimumLevel(LogLevel.Debug);
+#endif
+            });
+
+            return loggerFactory;
+        }).As<ILoggerFactory>().SingleInstance();
+
+        // 注册泛型 ILogger<T>
+        builder.RegisterGeneric(typeof(Logger<>))
+            .As(typeof(ILogger<>))
+            .SingleInstance();
+
+        // 注册 ILogger (非泛型版本)
+        builder.Register(context =>
+        {
+            var loggerFactory = context.Resolve<ILoggerFactory>();
+            return loggerFactory.CreateLogger("DrugSearcher");
+        }).As<ILogger>().SingleInstance();
+    }
+
+    /// <summary>
     /// 注册数据库相关服务
     /// </summary>
     private static void RegisterDatabaseServices(ContainerBuilder builder)
@@ -55,52 +95,52 @@ public static class ContainerConfig
             var connectionString = $"Data Source={dbPath}";
             optionsBuilder.UseSqlite(connectionString);
 
-            // 开发环境配置
 #if DEBUG
             optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.LogTo(message => System.Diagnostics.Debug.WriteLine(message), Microsoft.Extensions.Logging.LogLevel.Information);
+            optionsBuilder.LogTo(message => System.Diagnostics.Debug.WriteLine(message), LogLevel.Information);
 #endif
 
             return optionsBuilder.Options;
         }).As<DbContextOptions<ApplicationDbContext>>().SingleInstance();
 
-        // 注册 DrugSearcherDbContext 配置
+        // 注册药物数据库上下文配置
         builder.Register(_ =>
         {
-            var optionsBuilder = new DbContextOptionsBuilder<DrugSearcherDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<DrugDbContext>();
             var dbPath = GetDrugDatabasePath();
             var connectionString = $"Data Source={dbPath}";
             optionsBuilder.UseSqlite(connectionString);
 
-            // 开发环境配置
 #if DEBUG
             optionsBuilder.EnableSensitiveDataLogging();
-
-            // 修改以下代码以解决 CS1618 错误  
-            optionsBuilder.LogTo(message => System.Diagnostics.Debug.WriteLine(message), Microsoft.Extensions.Logging.LogLevel.Information);
+            optionsBuilder.LogTo(message => System.Diagnostics.Debug.WriteLine(message), LogLevel.Information);
 #endif
 
             return optionsBuilder.Options;
-        }).As<DbContextOptions<DrugSearcherDbContext>>().SingleInstance();
+        }).As<DbContextOptions<DrugDbContext>>().SingleInstance();
 
-        // 注册 DbContext 工厂
+        // 注册数据库工厂
         builder.RegisterType<ApplicationDbContextFactory>()
             .As<IApplicationDbContextFactory>()
             .SingleInstance();
 
-        builder.RegisterType<DrugSearcherDbContextFactory>()
-            .As<IDrugSearcherDbContextFactory>()
+        builder.RegisterType<DrugDbContextFactory>()
+            .As<IDrugDbContextFactory>()
             .SingleInstance();
     }
-
     /// <summary>
     /// 注册仓储层
     /// </summary>
     private static void RegisterRepositories(ContainerBuilder builder)
     {
-        builder.RegisterType<DrugRepository>()
+        // 注册适配器保持向后兼容
+        builder.RegisterType<DrugRepositoryAdapter>()
             .As<IDrugRepository>()
-            .InstancePerLifetimeScope(); // 改为 InstancePerLifetimeScope，避免并发问题
+            .InstancePerLifetimeScope();
+
+        builder.RegisterType<OnlineDrugRepositoryAdapter>()
+            .As<IOnlineDrugRepository>()
+            .InstancePerLifetimeScope();
     }
 
     /// <summary>
@@ -108,6 +148,14 @@ public static class ContainerConfig
     /// </summary>
     private static void RegisterBusinessServices(ContainerBuilder builder)
     {
+        // 注册 HttpClient
+        builder.Register(_ =>
+        {
+            var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromMinutes(5); // 设置超时时间
+            return httpClient;
+        }).As<HttpClient>().InstancePerLifetimeScope();
+
         // 设置相关服务 - 全局单例
         builder.RegisterType<DefaultSettingsProvider>()
             .As<IDefaultSettingsProvider>()
@@ -126,19 +174,22 @@ public static class ContainerConfig
             .As<ILocalDrugService>()
             .InstancePerLifetimeScope(); // 数据操作服务使用作用域
 
-        // 在线服务和缓存服务（如果需要的话）
-        builder.RegisterType<OnlineDrugService>()
+        builder.RegisterType<YaozsOnlineDrugService>()
             .As<IOnlineDrugService>()
-            .InstancePerLifetimeScope();
+            .InstancePerLifetimeScope(); // 在线药物服务使用作用域
 
         builder.RegisterType<CachedDrugService>()
             .As<ICachedDrugService>()
-            .InstancePerLifetimeScope();
+            .InstancePerLifetimeScope(); // 缓存服务使用作用域
 
         // 药物搜索服务 - 聚合服务
         builder.RegisterType<DrugSearchService>()
             .AsSelf()
             .InstancePerLifetimeScope(); // 改为作用域，避免状态混乱
+
+        builder.RegisterType<DatabaseInitializationService>()
+            .As<IDatabaseInitializationService>()
+            .SingleInstance();
     }
 
     /// <summary>
@@ -171,6 +222,10 @@ public static class ContainerConfig
             .AsSelf()
             .InstancePerDependency();
 
+        builder.RegisterType<CrawlerPageViewModel>()
+            .AsSelf()
+            .SingleInstance();
+
     }
 
     /// <summary>
@@ -202,6 +257,11 @@ public static class ContainerConfig
         builder.RegisterType<DrugEditDialog>()
             .AsSelf()
             .InstancePerDependency(); // 对话框通常是临时的，使用 InstancePerDependency
+
+        // 注册爬虫页面
+        builder.RegisterType<CrawlerPage>()
+            .AsSelf()
+            .SingleInstance(); // 爬虫页面通常是全局单例
 
     }
 

@@ -10,7 +10,7 @@ namespace DrugSearcher.ViewModels;
 /// </summary>
 public partial class DrugEditDialogViewModel : ObservableValidator
 {
-    public DrugEditDialogViewModel(DrugInfo? drugInfo = null)
+    public DrugEditDialogViewModel(LocalDrugInfo? drugInfo = null)
     {
         IsEditMode = drugInfo != null;
 
@@ -28,7 +28,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 原始药物信息（编辑模式下使用）
     /// </summary>
-    public DrugInfo? OriginalDrugInfo { get; private set; }
+    public LocalDrugInfo? OriginalDrugInfo { get; private set; }
 
     /// <summary>
     /// 对话框结果
@@ -38,7 +38,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 生成的药物信息
     /// </summary>
-    public DrugInfo? ResultDrugInfo { get; private set; }
+    public LocalDrugInfo? ResultDrugInfo { get; private set; }
 
     /// <summary>
     /// 药物名称
@@ -168,7 +168,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 初始化属性
     /// </summary>
-    private void InitializeProperties(DrugInfo? drugInfo)
+    private void InitializeProperties(LocalDrugInfo? drugInfo)
     {
         if (drugInfo != null)
         {
@@ -186,7 +186,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
             TcmSyndrome = drugInfo.TcmSyndrome ?? string.Empty;
             Remarks = drugInfo.Remarks ?? string.Empty;
             Description = drugInfo.Description ?? string.Empty;
-            SideEffects = drugInfo.SideEffects ?? string.Empty;
+            SideEffects = drugInfo.AdverseReactions ?? string.Empty;
             Precautions = drugInfo.Precautions ?? string.Empty;
         }
         else
@@ -232,12 +232,12 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 创建更新的药物信息
     /// </summary>
-    private DrugInfo CreateUpdatedDrugInfo()
+    private LocalDrugInfo CreateUpdatedDrugInfo()
     {
         if (OriginalDrugInfo == null)
             throw new InvalidOperationException("原始药物信息不能为空");
 
-        return new DrugInfo
+        return new LocalDrugInfo
         {
             Id = OriginalDrugInfo.Id,
             DrugName = SafeTrim(DrugName),
@@ -251,7 +251,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
             TcmSyndrome = SafeTrimOrNull(TcmSyndrome),
             Remarks = SafeTrimOrNull(Remarks),
             Description = SafeTrimOrNull(Description),
-            SideEffects = SafeTrimOrNull(SideEffects),
+            AdverseReactions = SafeTrimOrNull(SideEffects),
             Precautions = SafeTrimOrNull(Precautions),
             DataSource = OriginalDrugInfo.DataSource,
             CreatedAt = OriginalDrugInfo.CreatedAt,
@@ -262,9 +262,9 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 创建新药物信息
     /// </summary>
-    private DrugInfo CreateNewDrugInfo()
+    private LocalDrugInfo CreateNewDrugInfo()
     {
-        return new DrugInfo
+        return new LocalDrugInfo
         {
             DrugName = SafeTrim(DrugName),
             GenericName = SafeTrimOrNull(GenericName),
@@ -277,7 +277,7 @@ public partial class DrugEditDialogViewModel : ObservableValidator
             TcmSyndrome = SafeTrimOrNull(TcmSyndrome),
             Remarks = SafeTrimOrNull(Remarks),
             Description = SafeTrimOrNull(Description),
-            SideEffects = SafeTrimOrNull(SideEffects),
+            AdverseReactions = SafeTrimOrNull(SideEffects),
             Precautions = SafeTrimOrNull(Precautions),
             DataSource = DataSource.LocalDatabase,
             CreatedAt = DateTime.Now,

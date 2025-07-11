@@ -50,17 +50,20 @@ public partial class HomePageViewModel : ObservableObject
     private bool _isDetailPanelVisible;
 
     [ObservableProperty]
-    private DrugInfo? _selectedDrug;
+    private UnifiedDrugSearchResult? _selectedDrug;
 
     [ObservableProperty]
     private bool _showSearchSuggestions;
 
-    // 详细信息属性
+    // 基本信息属性
     [ObservableProperty]
     private string _drugName = string.Empty;
 
     [ObservableProperty]
     private string _genericName = string.Empty;
+
+    [ObservableProperty]
+    private string _tradeName = string.Empty;
 
     [ObservableProperty]
     private string _manufacturerInfo = string.Empty;
@@ -69,24 +72,125 @@ public partial class HomePageViewModel : ObservableObject
     private string _approvalNumber = string.Empty;
 
     [ObservableProperty]
+    private string _specification = string.Empty;
+
+    [ObservableProperty]
     private string _dataSourceInfo = string.Empty;
 
     [ObservableProperty]
-    private string _drugDescription = "暂无信息";
+    private string _matchInfo = string.Empty;
+
+    // 中医信息属性
+    [ObservableProperty]
+    private bool _hasTcmInfo;
 
     [ObservableProperty]
-    private string _indications = "暂无信息";
+    private string _tcmDisease = string.Empty;
 
     [ObservableProperty]
-    private string _dosage = "暂无信息";
+    private string _tcmSyndrome = string.Empty;
 
     [ObservableProperty]
-    private string _sideEffects = "暂无信息";
+    private string _tcmRemarks = string.Empty;
+
+    // 详细信息属性 - 带有是否有内容的标识
+    [ObservableProperty]
+    private string _drugDescription = string.Empty;
 
     [ObservableProperty]
-    private string _precautions = "暂无信息";
+    private bool _hasDrugDescription;
 
-    public ObservableCollection<DrugInfo> SearchResults { get; }
+    [ObservableProperty]
+    private string _indications = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasIndications;
+
+    [ObservableProperty]
+    private string _dosage = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasDosage;
+
+    [ObservableProperty]
+    private string _sideEffects = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasSideEffects;
+
+    [ObservableProperty]
+    private string _precautions = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasPrecautions;
+
+    [ObservableProperty]
+    private string _contraindications = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasContraindications;
+
+    [ObservableProperty]
+    private string _pregnancyAndLactation = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasPregnancyAndLactation;
+
+    [ObservableProperty]
+    private string _pediatricUse = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasPediatricUse;
+
+    [ObservableProperty]
+    private string _geriatricUse = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasGeriatricUse;
+
+    [ObservableProperty]
+    private string _drugInteractions = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasDrugInteractions;
+
+    [ObservableProperty]
+    private string _pharmacology = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasPharmacology;
+
+    [ObservableProperty]
+    private string _pharmacokinetics = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasPharmacokinetics;
+
+    [ObservableProperty]
+    private string _storage = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasStorage;
+
+    [ObservableProperty]
+    private string _shelfLife = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasShelfLife;
+
+    [ObservableProperty]
+    private string _appearance = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasAppearance;
+
+    [ObservableProperty]
+    private string _mainIngredients = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasMainIngredients;
+
+    public ObservableCollection<UnifiedDrugSearchResult> SearchResults { get; }
     public ObservableCollection<string> SearchSuggestions { get; }
 
     #endregion
@@ -106,12 +210,12 @@ public partial class HomePageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task SelectDrug(DrugInfo drug)
+    private async Task SelectDrug(UnifiedDrugSearchResult drugResult)
     {
-        if (drug != null)
+        if (drugResult != null)
         {
-            SelectedDrug = drug;
-            await DisplayDrugDetails(drug);
+            SelectedDrug = drugResult;
+            await DisplayDrugDetails(drugResult);
         }
     }
 
@@ -164,7 +268,9 @@ public partial class HomePageViewModel : ObservableObject
             {
                 SearchTerm = SearchTerm?.Trim(),
                 SearchLocalDb = IsLocalDbEnabled,
-                SearchOnline = IsOnlineEnabled
+                SearchOnline = IsOnlineEnabled,
+                MaxResults = 100,
+                MinMatchScore = 0.1
             };
 
             var results = await _drugSearchService.SearchDrugsAsync(searchCriteria);
@@ -173,12 +279,18 @@ public partial class HomePageViewModel : ObservableObject
             if (_searchCancellationTokenSource.Token.IsCancellationRequested)
                 return;
 
-            foreach (var drug in results)
+            foreach (var drugResult in results)
             {
-                SearchResults.Add(drug);
+                SearchResults.Add(drugResult);
             }
 
             UpdateResultCount(results.Count);
+
+            // 如果有结果，自动选择第一个
+            if (results.Count > 0)
+            {
+                await SelectDrug(results[0]);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -194,42 +306,23 @@ public partial class HomePageViewModel : ObservableObject
         }
     }
 
-    private async Task DisplayDrugDetails(DrugInfo drug)
+    private async Task DisplayDrugDetails(UnifiedDrugSearchResult drugResult)
     {
         try
         {
-            // 先显示基本信息
-            ShowBasicInfo(drug);
+            // 显示基本信息
+            ShowBasicInfo(drugResult);
             ShowDetailPanel();
 
-            // 异步获取详细信息
-            var detailInfo = await _drugSearchService.GetDrugDetailsAsync(drug.Id, drug.DataSource);
+            // 异步获取详细信息（如果需要）
+            var detailInfo = await _drugSearchService.GetDrugDetailsAsync(
+                drugResult.DrugInfo.Id,
+                drugResult.DrugInfo.DataSource);
 
             if (detailInfo != null)
             {
                 // 更新详细信息
-                DrugDescription = detailInfo.Description ?? "暂无信息";
-                Indications = detailInfo.Indications ?? "暂无信息";
-                Dosage = detailInfo.Dosage ?? "暂无信息";
-                SideEffects = detailInfo.SideEffects ?? "暂无信息";
-                Precautions = detailInfo.Precautions ?? "暂无信息";
-
-                // 如果是缓存数据，异步更新在线数据
-                if (detailInfo.DataSource == DataSource.CachedDocuments)
-                {
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await _drugSearchService.UpdateCachedDataAsync(drug.Id);
-                        }
-                        catch (Exception ex)
-                        {
-                            // 静默处理更新失败，不影响用户体验
-                            System.Diagnostics.Debug.WriteLine($"更新缓存数据失败: {ex.Message}");
-                        }
-                    });
-                }
+                UpdateDetailInfo(detailInfo);
             }
         }
         catch (Exception ex)
@@ -241,7 +334,6 @@ public partial class HomePageViewModel : ObservableObject
     /// <summary>
     /// 搜索词变化时获取建议
     /// </summary>
-    /// <param name="value">搜索词</param>
     partial void OnSearchTermChanged(string value)
     {
         // 延迟获取建议，避免频繁请求
@@ -257,7 +349,6 @@ public partial class HomePageViewModel : ObservableObject
     /// <summary>
     /// 获取搜索建议
     /// </summary>
-    /// <param name="keyword">关键词</param>
     private async Task GetSearchSuggestions(string keyword)
     {
         try
@@ -281,13 +372,145 @@ public partial class HomePageViewModel : ObservableObject
         }
     }
 
-    private void ShowBasicInfo(DrugInfo drug)
+    private void ShowBasicInfo(UnifiedDrugSearchResult drugResult)
     {
-        DrugName = drug.DrugName ?? string.Empty;
-        GenericName = drug.GenericName ?? string.Empty;
-        ManufacturerInfo = drug.Manufacturer ?? string.Empty;
-        ApprovalNumber = drug.ApprovalNumber ?? string.Empty;
-        DataSourceInfo = GetDataSourceDisplay(drug.DataSource);
+        var drugInfo = drugResult.DrugInfo;
+
+        DrugName = drugInfo.DrugName ?? string.Empty;
+        ManufacturerInfo = drugInfo.Manufacturer ?? string.Empty;
+        ApprovalNumber = drugInfo.ApprovalNumber ?? string.Empty;
+        Specification = drugInfo.Specification ?? string.Empty;
+        DataSourceInfo = drugInfo.GetDataSourceText();
+
+        // 显示匹配信息
+        var matchScore = (drugResult.MatchScore * 100).ToString("F1");
+        var matchedFields = string.Join(", ", drugResult.MatchedFields);
+        MatchInfo = $"匹配度: {matchScore}% | 匹配字段: {matchedFields}";
+
+        // 根据不同的数据源显示不同的信息
+        if (drugInfo is LocalDrugInfo localDrug)
+        {
+            GenericName = localDrug.GenericName ?? string.Empty;
+            TradeName = string.Empty;
+
+            // 设置中医信息
+            SetTcmInfo(localDrug);
+        }
+        else if (drugInfo is OnlineDrugInfo onlineDrug)
+        {
+            GenericName = string.Empty;
+            TradeName = onlineDrug.TradeName ?? string.Empty;
+
+            // 清空中医信息
+            ClearTcmInfo();
+        }
+        else
+        {
+            GenericName = string.Empty;
+            TradeName = string.Empty;
+            ClearTcmInfo();
+        }
+    }
+
+    private void SetTcmInfo(LocalDrugInfo localDrug)
+    {
+        TcmDisease = localDrug.TcmDisease ?? string.Empty;
+        TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
+        TcmRemarks = localDrug.Remarks ?? string.Empty;
+
+        // 判断是否有中医信息
+        HasTcmInfo = !string.IsNullOrWhiteSpace(TcmDisease) ||
+                     !string.IsNullOrWhiteSpace(TcmSyndrome) ||
+                     !string.IsNullOrWhiteSpace(TcmRemarks);
+    }
+
+    private void ClearTcmInfo()
+    {
+        TcmDisease = string.Empty;
+        TcmSyndrome = string.Empty;
+        TcmRemarks = string.Empty;
+        HasTcmInfo = false;
+    }
+
+    private void UpdateDetailInfo(BaseDrugInfo drugInfo)
+    {
+        // 通用信息
+        SetDetailField(drugInfo.Indications, value => { Indications = value; HasIndications = !string.IsNullOrWhiteSpace(value); });
+        SetDetailField(drugInfo.Dosage, value => { Dosage = value; HasDosage = !string.IsNullOrWhiteSpace(value); });
+        SetDetailField(drugInfo.AdverseReactions, value => { SideEffects = value; HasSideEffects = !string.IsNullOrWhiteSpace(value); });
+        SetDetailField(drugInfo.Precautions, value => { Precautions = value; HasPrecautions = !string.IsNullOrWhiteSpace(value); });
+
+        // 根据不同的数据源显示不同的详细信息
+        if (drugInfo is LocalDrugInfo localDrug)
+        {
+            // 设置本地药品特有字段
+            SetDetailField(localDrug.Description, value => { DrugDescription = value; HasDrugDescription = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.Manufacturer, value => { ManufacturerInfo = value; });
+            SetDetailField(localDrug.GenericName, value => { GenericName = value; });
+            SetDetailField(localDrug.Specification, value => { Specification = value; });
+            HasTcmInfo = false;
+            SetDetailField(localDrug.TcmDisease, value => { TcmDisease = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.TcmSyndrome, value => { TcmSyndrome = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.Remarks, value => { TcmRemarks = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.AdverseReactions, value => { SideEffects = value; HasSideEffects = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.Precautions, value => { Precautions = value; HasPrecautions = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.Indications, value => { Indications = value; HasIndications = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(localDrug.Dosage, value => { Dosage = value; HasDosage = !string.IsNullOrWhiteSpace(value); });
+
+
+
+            // 清空在线数据特有字段
+            ClearOnlineSpecificFields();
+        }
+        else if (drugInfo is OnlineDrugInfo onlineDrug)
+        {
+            SetDetailField(onlineDrug.MainIngredients, value => { MainIngredients = value; HasMainIngredients = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.Appearance, value => { Appearance = value; HasAppearance = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.Contraindications, value => { Contraindications = value; HasContraindications = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.PregnancyAndLactation, value => { PregnancyAndLactation = value; HasPregnancyAndLactation = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.PediatricUse, value => { PediatricUse = value; HasPediatricUse = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.GeriatricUse, value => { GeriatricUse = value; HasGeriatricUse = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.DrugInteractions, value => { DrugInteractions = value; HasDrugInteractions = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.PharmacologyToxicology, value => { Pharmacology = value; HasPharmacology = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.Pharmacokinetics, value => { Pharmacokinetics = value; HasPharmacokinetics = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.Storage, value => { Storage = value; HasStorage = !string.IsNullOrWhiteSpace(value); });
+            SetDetailField(onlineDrug.ShelfLife, value => { ShelfLife = value; HasShelfLife = !string.IsNullOrWhiteSpace(value); });
+
+            // 清空本地数据特有字段
+            DrugDescription = string.Empty;
+            HasDrugDescription = false;
+        }
+    }
+
+    private void SetDetailField(string? value, Action<string> setter)
+    {
+        setter(value ?? string.Empty);
+    }
+
+    private void ClearOnlineSpecificFields()
+    {
+        MainIngredients = string.Empty;
+        HasMainIngredients = false;
+        Appearance = string.Empty;
+        HasAppearance = false;
+        Contraindications = string.Empty;
+        HasContraindications = false;
+        PregnancyAndLactation = string.Empty;
+        HasPregnancyAndLactation = false;
+        PediatricUse = string.Empty;
+        HasPediatricUse = false;
+        GeriatricUse = string.Empty;
+        HasGeriatricUse = false;
+        DrugInteractions = string.Empty;
+        HasDrugInteractions = false;
+        Pharmacology = string.Empty;
+        HasPharmacology = false;
+        Pharmacokinetics = string.Empty;
+        HasPharmacokinetics = false;
+        Storage = string.Empty;
+        HasStorage = false;
+        ShelfLife = string.Empty;
+        HasShelfLife = false;
     }
 
     private void SetLoadingState(bool isLoading)
@@ -309,17 +532,6 @@ public partial class HomePageViewModel : ObservableObject
     private void HideDetailPanel()
     {
         IsDetailPanelVisible = false;
-    }
-
-    private string GetDataSourceDisplay(DataSource dataSource)
-    {
-        return dataSource switch
-        {
-            DataSource.LocalDatabase => "本地数据库",
-            DataSource.OnlineSearch => "在线查询",
-            DataSource.CachedDocuments => "本地缓存",
-            _ => "未知"
-        };
     }
 
     #endregion

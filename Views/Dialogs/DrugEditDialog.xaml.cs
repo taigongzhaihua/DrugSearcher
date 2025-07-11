@@ -12,7 +12,7 @@ public partial class DrugEditDialog
 {
     private DrugEditDialogViewModel? _viewModel;
 
-    public DrugEditDialog(DrugInfo? drugInfo = null)
+    public DrugEditDialog(LocalDrugInfo? drugInfo = null)
     {
         InitializeComponent();
 
@@ -33,7 +33,7 @@ public partial class DrugEditDialog
     /// <summary>
     /// 获取编辑后的药物信息
     /// </summary>
-    public DrugInfo? DrugInfo => _viewModel?.ResultDrugInfo;
+    public LocalDrugInfo? DrugInfo => _viewModel?.ResultDrugInfo;
 
     /// <summary>
     /// 保存按钮点击事件

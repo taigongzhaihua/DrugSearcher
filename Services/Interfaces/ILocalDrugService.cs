@@ -10,12 +10,12 @@ public interface ILocalDrugService
     /// <summary>
     /// 搜索药物
     /// </summary>
-    Task<List<DrugInfo>> SearchDrugsAsync(string keyword);
+    Task<List<LocalDrugInfo>> SearchDrugsAsync(string keyword);
 
     /// <summary>
     /// 获取药物详情
     /// </summary>
-    Task<DrugInfo?> GetDrugDetailAsync(int id);
+    Task<LocalDrugInfo?> GetDrugDetailAsync(int id);
 
     /// <summary>
     /// 获取药物名称建议
@@ -25,12 +25,12 @@ public interface ILocalDrugService
     /// <summary>
     /// 添加药物
     /// </summary>
-    Task<DrugInfo> AddDrugAsync(DrugInfo drugInfo);
+    Task<LocalDrugInfo> AddDrugAsync(LocalDrugInfo localDrugInfo);
 
     /// <summary>
     /// 更新药物
     /// </summary>
-    Task<DrugInfo> UpdateDrugAsync(DrugInfo drugInfo);
+    Task<LocalDrugInfo> UpdateDrugAsync(LocalDrugInfo localDrugInfo);
 
     /// <summary>
     /// 删除药物
@@ -60,7 +60,7 @@ public interface ILocalDrugService
     /// <summary>
     /// 获取所有药物（分页）
     /// </summary>
-    Task<(List<DrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize);
+    Task<(List<LocalDrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize);
 
     /// <summary>
     /// 获取药物统计信息

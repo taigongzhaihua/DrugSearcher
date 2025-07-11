@@ -21,12 +21,22 @@ public class DrugSearchCriteria
     public bool SearchOnline { get; set; } = true;
 
     /// <summary>
-    /// 页码（用于分页）
+    /// 最大结果数量
     /// </summary>
-    public int PageIndex { get; set; } = 0;
+    public int? MaxResults { get; set; } = 100;
 
     /// <summary>
-    /// 每页大小
+    /// 最小匹配度（0-1之间）
     /// </summary>
-    public int PageSize { get; set; } = 50;
+    public double MinMatchScore { get; set; } = 0.0;
+
+    /// <summary>
+    /// 数据源过滤
+    /// </summary>
+    public List<DataSource>? DataSources { get; set; }
+
+    /// <summary>
+    /// 是否只返回精确匹配
+    /// </summary>
+    public bool ExactMatchOnly { get; set; } = false;
 }

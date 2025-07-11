@@ -4,7 +4,6 @@ using DrugSearcher.Data;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
 using DrugSearcher.Views;
-using Microsoft.EntityFrameworkCore;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 
@@ -33,7 +32,7 @@ public partial class App
             ContainerAccessor.Initialize(container);
             Console.WriteLine("容器初始化完成");
 
-            // 等待数据库和设置服务初始化完成
+            // 初始化数据库和服务
             await InitializeServicesAsync();
 
             // 初始化主题管理器
@@ -69,10 +68,18 @@ public partial class App
         {
             Console.WriteLine("正在初始化数据库和服务...");
 
-            // 获取数据库工厂并确保数据库已创建
-            var dbContextFactory = ContainerAccessor.Resolve<IApplicationDbContextFactory>();
-            await dbContextFactory.EnsureDatabaseCreatedAsync();
-            Console.WriteLine("数据库初始化完成");
+            // 使用数据库初始化服务
+            var databaseInitService = ContainerAccessor.Resolve<IDatabaseInitializationService>();
+            await databaseInitService.InitializeAsync();
+
+            // 检查数据库状态
+            var isReady = await databaseInitService.CheckDatabaseStatusAsync();
+            if (!isReady)
+            {
+                Console.WriteLine("警告：数据库状态检查未通过");
+                MessageBox.Show("数据库初始化可能存在问题，某些功能可能不可用。",
+                    "数据库警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
 
             // 获取设置服务以触发其初始化
             ContainerAccessor.Resolve<IUserSettingsService>();
@@ -80,32 +87,13 @@ public partial class App
             // 等待一小段时间让设置服务完成异步初始化
             await Task.Delay(100);
 
-            Console.WriteLine("服务初始化完成");
+            Console.WriteLine("所有服务初始化完成");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"服务初始化失败: {ex.Message}");
-            // 不抛出异常，允许应用程序继续启动
-        }
-        try
-        {
-
-            var contextFactory = ContainerAccessor.Resolve<IDrugSearcherDbContextFactory>();
-            await using var context = contextFactory.CreateDbContext();
-
-            // 确保数据库存在
-            await context.Database.EnsureCreatedAsync();
-
-            // 应用待处理的迁移
-            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-            if (pendingMigrations.Any())
-            {
-                await context.Database.MigrateAsync();
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"数据库初始化失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"服务初始化失败: {ex.Message}\n\n应用程序将继续启动，但某些功能可能不可用。",
+                "初始化警告", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -121,13 +109,18 @@ public partial class App
                 var themeManager = ContainerAccessor.Container.ResolveOptional<ThemeManager>();
                 themeManager?.Dispose();
 
-                // 释放数据库上下文
-                var dbContext = ContainerAccessor.Container.ResolveOptional<ApplicationDbContext>();
-                dbContext?.Dispose();
+                // 释放应用程序数据库上下文
+                var appDbContext = ContainerAccessor.Container.ResolveOptional<ApplicationDbContext>();
+                appDbContext?.Dispose();
+
+                // 释放药物数据库上下文
+                var drugDbContext = ContainerAccessor.Container.ResolveOptional<DrugDbContext>();
+                drugDbContext?.Dispose();
 
                 // 释放容器
                 ContainerAccessor.Dispose();
             }
+
             // 清理单实例管理器
             SingleInstanceManager.Cleanup();
 

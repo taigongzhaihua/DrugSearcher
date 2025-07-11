@@ -315,7 +315,7 @@ public class ExcelService : IExcelService
     /// <summary>
     /// 导出药物数据到Excel
     /// </summary>
-    public async Task<bool> ExportToExcelAsync(List<DrugInfo> drugInfos, string filePath)
+    public async Task<bool> ExportToExcelAsync(List<LocalDrugInfo> drugInfos, string filePath)
     {
         try
         {
