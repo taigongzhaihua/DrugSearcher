@@ -8,7 +8,7 @@ namespace DrugSearcher.Views;
 /// <summary>
 /// 本地数据管理页面
 /// </summary>
-public partial class LocalDataManagementPage : Page
+public partial class LocalDataManagementPage
 {
     public LocalDataManagementPage(LocalDataManagementViewModel viewModel)
     {

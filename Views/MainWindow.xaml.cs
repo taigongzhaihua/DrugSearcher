@@ -15,7 +15,7 @@ namespace DrugSearcher.Views;
 /// 主窗口，应用程序的主要用户界面
 /// 包括窗口管理、导航控制、托盘集成等功能
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow
 {
     #region 私有字段
 
