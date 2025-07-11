@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace DrugSearcher.Views;
+namespace DrugSearcher.Converters;
 
 /// <summary>
 /// 大于比较转换器

@@ -1,4 +1,4 @@
-﻿namespace DrugSearcher.Common.Enums;
+﻿namespace DrugSearcher.Enums;
 
 public enum ThemeColor
 {

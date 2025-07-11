@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows.Data;
 using Binding = System.Windows.Forms.Binding;
 
-namespace DrugSearcher.Views;
+namespace DrugSearcher.Converters;
 
 /// <summary>
 /// 小于比较转换器

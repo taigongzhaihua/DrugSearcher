@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using DrugSearcher.Configuration;
 using DrugSearcher.Data;
-using DrugSearcher.Data.Interfaces;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
 using DrugSearcher.Views;

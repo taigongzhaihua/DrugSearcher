@@ -1,4 +1,4 @@
-using DrugSearcher.Data.Interfaces;
+using DrugSearcher.Data;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Diagnostics;
 
-namespace DrugSearcher.Common.Helpers;
+namespace DrugSearcher.Helpers;
 
 /// <summary>
 /// 系统主题帮助类，用于检测和监听Windows系统主题变化

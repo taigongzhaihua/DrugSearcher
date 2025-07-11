@@ -1,4 +1,3 @@
-using DrugSearcher.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DrugSearcher.Data;

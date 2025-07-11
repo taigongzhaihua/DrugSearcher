@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
-      xmlns:enums="clr-namespace:DrugSearcher.Common.Enums"
+      xmlns:enums="clr-namespace:DrugSearcher.Enums"
       mc:Ignorable="d" 
       d:DesignHeight="700" d:DesignWidth="900"
       d:DataContext="{d:DesignInstance viewModels:SettingsPageViewModel}"

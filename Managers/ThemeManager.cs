@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using DrugSearcher.Common.Enums;
-using DrugSearcher.Common.Helpers;
 using DrugSearcher.Constants;
+using DrugSearcher.Enums;
+using DrugSearcher.Helpers;
 using DrugSearcher.Models;
 using DrugSearcher.Services;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using Application = System.Windows.Application;
-using ThemeMode = DrugSearcher.Common.Enums.ThemeMode;
+using ThemeMode = DrugSearcher.Enums.ThemeMode;
 
 namespace DrugSearcher.Managers;
 

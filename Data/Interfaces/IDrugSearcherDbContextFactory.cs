@@ -1,4 +1,4 @@
-namespace DrugSearcher.Data.Interfaces;
+namespace DrugSearcher.Data;
 
 /// <summary>
 /// DrugSearcherDbContext 工厂接口

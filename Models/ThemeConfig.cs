@@ -1,4 +1,4 @@
-﻿using DrugSearcher.Common.Enums;
+﻿using DrugSearcher.Enums;
 
 namespace DrugSearcher.Models;
 

@@ -1,7 +1,6 @@
-using DrugSearcher.Views;
 using System.Windows.Data;
 
-namespace DrugSearcher.Common.Converters;
+namespace DrugSearcher.Converters;
 
 /// <summary>
 /// 转换器集合

@@ -1,5 +1,5 @@
-using DrugSearcher.Common.Enums;
 using DrugSearcher.Data;
+using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;

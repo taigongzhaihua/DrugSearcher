@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
-namespace DrugSearcher.Common.Behaviors;
+namespace DrugSearcher.Behaviors;
 
 /// <summary>
 /// 按键事件行为

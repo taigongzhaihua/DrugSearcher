@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DrugSearcher.Common.Enums;
 using DrugSearcher.Constants;
+using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using DrugSearcher.Services;
 using System.Collections.ObjectModel;

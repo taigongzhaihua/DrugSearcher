@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace DrugSearcher.Common.Converters;
+namespace DrugSearcher.Converters;
 
 /// <summary>
 /// 布尔值转可见性转换器

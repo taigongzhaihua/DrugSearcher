@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using DrugSearcher.Data;
-using DrugSearcher.Data.Interfaces;
 using DrugSearcher.Managers;
 using DrugSearcher.Repositories;
 using DrugSearcher.Services;

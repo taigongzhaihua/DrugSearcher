@@ -1,5 +1,5 @@
-using DrugSearcher.Common.Enums;
 using DrugSearcher.Constants;
+using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using System.Diagnostics;
 using System.Globalization;
