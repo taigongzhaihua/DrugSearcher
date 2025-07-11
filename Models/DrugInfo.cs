@@ -26,6 +26,18 @@ public class DrugInfo
     public string? GenericName { get; set; }
 
     /// <summary>
+    /// 商品名称
+    /// </summary>
+    [StringLength(200)]
+    public string? TradeName { get; set; }
+
+    /// <summary>
+    /// 汉语拼音
+    /// </summary>
+    [StringLength(200)]
+    public string? Pinyin { get; set; }
+
+    /// <summary>
     /// 规格
     /// </summary>
     [StringLength(100)]
@@ -44,6 +56,33 @@ public class DrugInfo
     public string? ApprovalNumber { get; set; }
 
     /// <summary>
+    /// 药品分类
+    /// </summary>
+    [StringLength(100)]
+    public string? DrugCategory { get; set; }
+
+    /// <summary>
+    /// 药品性质
+    /// </summary>
+    [StringLength(100)]
+    public string? DrugNature { get; set; }
+
+    /// <summary>
+    /// 相关疾病
+    /// </summary>
+    public string? RelatedDiseases { get; set; }
+
+    /// <summary>
+    /// 性状
+    /// </summary>
+    public string? Characteristics { get; set; }
+
+    /// <summary>
+    /// 主要成份
+    /// </summary>
+    public string? MainIngredients { get; set; }
+
+    /// <summary>
     /// 适应症
     /// </summary>
     public string? Indications { get; set; }
@@ -52,6 +91,55 @@ public class DrugInfo
     /// 用法用量
     /// </summary>
     public string? Dosage { get; set; }
+
+    /// <summary>
+    /// 不良反应
+    /// </summary>
+    public string? SideEffects { get; set; }
+
+    /// <summary>
+    /// 禁忌
+    /// </summary>
+    public string? Contraindications { get; set; }
+
+    /// <summary>
+    /// 注意事项
+    /// </summary>
+    public string? Precautions { get; set; }
+
+    /// <summary>
+    /// 药物相互作用
+    /// </summary>
+    public string? DrugInteractions { get; set; }
+
+    /// <summary>
+    /// 药理作用
+    /// </summary>
+    public string? PharmacologicalAction { get; set; }
+
+    /// <summary>
+    /// 贮藏
+    /// </summary>
+    [StringLength(200)]
+    public string? Storage { get; set; }
+
+    /// <summary>
+    /// 包装
+    /// </summary>
+    [StringLength(200)]
+    public string? Packaging { get; set; }
+
+    /// <summary>
+    /// 有效期
+    /// </summary>
+    [StringLength(100)]
+    public string? ValidityPeriod { get; set; }
+
+    /// <summary>
+    /// 执行标准
+    /// </summary>
+    [StringLength(200)]
+    public string? ExecutionStandard { get; set; }
 
     /// <summary>
     /// 中医病名
@@ -75,14 +163,16 @@ public class DrugInfo
     public string? Description { get; set; }
 
     /// <summary>
-    /// 不良反应
+    /// 外部ID（来源网站的ID）
     /// </summary>
-    public string? SideEffects { get; set; }
+    [StringLength(100)]
+    public string? ExternalId { get; set; }
 
     /// <summary>
-    /// 注意事项
+    /// 外部URL（来源网站的URL）
     /// </summary>
-    public string? Precautions { get; set; }
+    [StringLength(500)]
+    public string? ExternalUrl { get; set; }
 
     /// <summary>
     /// 数据来源

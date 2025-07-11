@@ -1,14 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<UseWPF>true</UseWPF>
-		<UseWindowsForms>true</UseWindowsForms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<StartupObject>DrugSearcher.Tests.YaoZsCrawlerTest</StartupObject>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="App.xaml.cs" />
+		<Compile Remove="AssemblyInfo.cs" />
+		<Compile Remove="ViewModels\**" />
+		<Compile Remove="Views\**" />
+		<Compile Remove="Managers\**" />
+		<Compile Remove="Data\**" />
+		<Compile Remove="Repositories\**" />
+		<Compile Remove="Common\**" />
+		<Compile Remove="Properties\**" />
+		<Compile Remove="Services\DefaultSettingsProvider.cs" />
+		<Compile Remove="Services\LocalDrugService.cs" />
+		<Compile Remove="Services\UserSettingsService.cs" />
+		<Compile Remove="Services\ExcelService.cs" />
+		<Compile Remove="Services\DrugSearchService.cs" />
+		<Compile Remove="Services\Interfaces\IDefaultSettingsProvider.cs" />
+		<Compile Remove="Services\Interfaces\IExcelService.cs" />
+		<Compile Remove="Services\Interfaces\ILocalDrugService.cs" />
+		<Compile Remove="Services\Interfaces\IUserSettingsService.cs" />
+		<Compile Remove="Services\Interfaces\ICachedDrugService.cs" />
+		<Compile Remove="Models\ThemeConfig.cs" />
+		<Compile Remove="Models\ExcelImportDto.cs" />
+		<Compile Remove="Models\ExcelValidationResult.cs" />
+		<Compile Remove="Models\FontSizeConstraints.cs" />
+		<Compile Remove="Models\ImportResult.cs" />
+		<Compile Remove="Models\LanguageOption.cs" />
+		<Compile Remove="Models\SettingChangedEventArgs.cs" />
+		<Compile Remove="Models\SettingConstraints.cs" />
+		<Compile Remove="Models\SettingDefinition.cs" />
+		<Compile Remove="Models\SettingItem.cs" />
+		<Compile Remove="Models\DrugSearchCriteria.cs" />
+		<Compile Remove="Models\DrugStatistics.cs" />
+		<None Remove="App.xaml" />
+		<None Remove="ViewModels\**" />
+		<None Remove="Views\**" />
+		<None Remove="Managers\**" />
+		<None Remove="Data\**" />
+		<None Remove="Repositories\**" />
+		<None Remove="Common\**" />
+		<None Remove="Properties\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Remove="Resources\app.ico" />
@@ -40,12 +81,11 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-		<PackageReference Include="NPOI" Version="2.7.4" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

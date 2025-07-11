@@ -20,24 +20,26 @@ public interface IOnlineDrugService
     /// <param name="id">药物ID</param>
     /// <returns>药物信息</returns>
     Task<DrugInfo?> GetDrugDetailByIdAsync(int id);
-}
 
-/// <summary>
-/// 在线药物服务实现（暂时空实现）
-/// </summary>
-public class OnlineDrugService : IOnlineDrugService
-{
-    public async Task<List<DrugInfo>> SearchOnlineDrugsAsync(string keyword)
-    {
-        // TODO: 实现在线搜索逻辑
-        await Task.Delay(100); // 模拟网络延迟
-        return [];
-    }
+    /// <summary>
+    /// 根据外部ID获取药物详情
+    /// </summary>
+    /// <param name="externalId">外部ID</param>
+    /// <returns>药物信息</returns>
+    Task<DrugInfo?> GetDrugDetailByExternalIdAsync(string externalId);
 
-    public async Task<DrugInfo?> GetDrugDetailByIdAsync(int id)
-    {
-        // TODO: 实现在线获取药物详情逻辑
-        await Task.Delay(100); // 模拟网络延迟
-        return null;
-    }
+    /// <summary>
+    /// 批量获取药物信息
+    /// </summary>
+    /// <param name="startId">起始ID</param>
+    /// <param name="endId">结束ID</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns>药物信息列表</returns>
+    Task<List<DrugInfo>> GetDrugsBatchAsync(int startId, int endId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取可用的药物总数
+    /// </summary>
+    /// <returns>总数</returns>
+    Task<int> GetAvailableDrugCountAsync();
 }
