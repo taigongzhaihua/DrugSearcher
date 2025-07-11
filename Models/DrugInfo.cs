@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DrugSearcher.Models;
 
@@ -11,7 +10,6 @@ public class DrugInfo
     /// <summary>
     /// 主键ID
     /// </summary>
-    [Key]
     public int Id { get; set; }
 
     /// <summary>
@@ -28,7 +26,7 @@ public class DrugInfo
     public string? GenericName { get; set; }
 
     /// <summary>
-    /// 药物规格
+    /// 规格
     /// </summary>
     [StringLength(100)]
     public string? Specification { get; set; }
@@ -46,33 +44,44 @@ public class DrugInfo
     public string? ApprovalNumber { get; set; }
 
     /// <summary>
-    /// 适应症（包含中医证型）
+    /// 适应症
     /// </summary>
-    [Column(TypeName = "text")]
     public string? Indications { get; set; }
 
     /// <summary>
     /// 用法用量
     /// </summary>
-    [Column(TypeName = "text")]
     public string? Dosage { get; set; }
+
+    /// <summary>
+    /// 中医病名
+    /// </summary>
+    [StringLength(500)]
+    public string? TcmDisease { get; set; }
+
+    /// <summary>
+    /// 中医辨病辨证
+    /// </summary>
+    public string? TcmSyndrome { get; set; }
+
+    /// <summary>
+    /// 备注
+    /// </summary>
+    public string? Remarks { get; set; }
 
     /// <summary>
     /// 药物说明
     /// </summary>
-    [Column(TypeName = "text")]
     public string? Description { get; set; }
 
     /// <summary>
     /// 不良反应
     /// </summary>
-    [Column(TypeName = "text")]
     public string? SideEffects { get; set; }
 
     /// <summary>
     /// 注意事项
     /// </summary>
-    [Column(TypeName = "text")]
     public string? Precautions { get; set; }
 
     /// <summary>
@@ -91,14 +100,13 @@ public class DrugInfo
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// 数据源显示颜色（用于UI显示）
+    /// 数据源颜色（用于UI显示）
     /// </summary>
-    [NotMapped]
     public string DataSourceColor => DataSource switch
     {
         DataSource.LocalDatabase => "#4CAF50",
         DataSource.OnlineSearch => "#2196F3",
         DataSource.CachedDocuments => "#FF9800",
-        _ => "#757575"
+        _ => "#9E9E9E"
     };
 }

@@ -71,7 +71,7 @@ public class DrugSearcherDbContext(DbContextOptions<DrugSearcherDbContext> optio
     private void UpdateTimestamps()
     {
         var entities = ChangeTracker.Entries()
-            .Where(x => x.Entity is DrugInfo && x.State is EntityState.Added or EntityState.Modified);
+            .Where(x => x is { Entity: DrugInfo, State: EntityState.Added or EntityState.Modified });
 
         foreach (var entity in entities)
         {

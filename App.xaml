@@ -11,10 +11,11 @@
                 
                 <!-- 基础样式 -->
                 <ResourceDictionary Source="/Resources/Styles/BaseStyles.xaml" />
+                <ResourceDictionary Source="/Resources/Styles/CommonStyles.xaml"/>
 
                 <!-- 默认主题将由ThemeManager动态加载 -->
                 <ResourceDictionary Source="/Resources/Colors/BlueColors.xaml"/>
-                <ResourceDictionary Source="Resources/Themes/LightTheme.xaml" />
+                <ResourceDictionary Source="/Resources/Themes/LightTheme.xaml" />
                 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

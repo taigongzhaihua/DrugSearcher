@@ -6,6 +6,7 @@ using DrugSearcher.ViewModels;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Shell;
+using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
 
 namespace DrugSearcher.Views;
@@ -220,6 +221,23 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// 导航到数据管理页
+    /// </summary>
+    private void NavigateToDataManagementPage()
+    {
+        try
+        {
+            var dataManagementPage = ContainerAccessor.Resolve<LocalDataManagementPage>();
+            MainFrame.Navigate(dataManagementPage);
+            Debug.WriteLine("已导航到数据管理页");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"导航到数据管理页失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
     /// 处理框架导航事件
     /// </summary>
     /// <param name="sender">事件发送者</param>
@@ -228,7 +246,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            UpdateButtonVisibility(e.Content);
+            UpdateMenuItemVisibility(e.Content);
             Debug.WriteLine($"页面导航完成: {e.Content?.GetType().Name}");
         }
         catch (Exception ex)
@@ -238,29 +256,35 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 根据当前页面更新按钮可见性
+    /// 根据当前页面更新菜单项可见性
     /// </summary>
     /// <param name="currentPage">当前页面</param>
-    private void UpdateButtonVisibility(object? currentPage)
+    private void UpdateMenuItemVisibility(object? currentPage)
     {
         switch (currentPage)
         {
             case HomePage:
-                // 主页：隐藏主页按钮，显示设置按钮
+                // 主页：隐藏主页按钮
                 HomeButton.Visibility = Visibility.Collapsed;
-                SettingsButton.Visibility = Visibility.Visible;
+                SettingsMenuItem.Visibility = Visibility.Visible;
                 break;
 
             case SettingsPage:
-                // 设置页：显示主页按钮，隐藏设置按钮
+                // 设置页：显示主页按钮，隐藏设置菜单项
                 HomeButton.Visibility = Visibility.Visible;
-                SettingsButton.Visibility = Visibility.Collapsed;
+                SettingsMenuItem.Visibility = Visibility.Collapsed;
+                break;
+
+            case LocalDataManagementPage:
+                // 数据管理页：显示主页按钮
+                HomeButton.Visibility = Visibility.Visible;
+                SettingsMenuItem.Visibility = Visibility.Visible;
                 break;
 
             default:
                 // 其他页面：显示所有按钮
                 HomeButton.Visibility = Visibility.Visible;
-                SettingsButton.Visibility = Visibility.Visible;
+                SettingsMenuItem.Visibility = Visibility.Visible;
                 break;
         }
     }
@@ -405,21 +429,6 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 处理设置按钮点击
-    /// </summary>
-    private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            NavigateToSettingsPage();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"设置按钮点击处理失败: {ex.Message}");
-        }
-    }
-
-    /// <summary>
     /// 处理后退按钮点击
     /// </summary>
     private void BackButton_OnClick(object sender, RoutedEventArgs e)
@@ -454,6 +463,76 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             Debug.WriteLine($"前进按钮点击处理失败: {ex.Message}");
+        }
+    }
+
+    #endregion
+
+    #region 事件处理器 - 菜单
+
+    /// <summary>
+    /// 处理菜单按钮点击 - 显示上下文菜单
+    /// </summary>
+    private void MenuButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (sender is Button { ContextMenu: not null } button)
+            {
+                button.ContextMenu.PlacementTarget = button;
+                button.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                button.ContextMenu.IsOpen = true;
+                Debug.WriteLine("功能菜单已打开");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"菜单按钮点击处理失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理数据管理菜单项点击
+    /// </summary>
+    private void DataManagementMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            NavigateToDataManagementPage();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"数据管理菜单项点击处理失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理设置菜单项点击
+    /// </summary>
+    private void SettingsMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            NavigateToSettingsPage();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"设置菜单项点击处理失败: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// 处理关于菜单项点击
+    /// </summary>
+    private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            ShowAboutDialog();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"关于菜单项点击处理失败: {ex.Message}");
         }
     }
 
@@ -526,26 +605,6 @@ public partial class MainWindow : Window
 
     #endregion
 
-    #region 事件处理器 - 主题
-
-    /// <summary>
-    /// 处理颜色按钮点击
-    /// </summary>
-    private void ColorsButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            ColorThemePopup.IsOpen = !ColorThemePopup.IsOpen;
-            Debug.WriteLine($"颜色主题弹出框状态: {ColorThemePopup.IsOpen}");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"颜色按钮点击处理失败: {ex.Message}");
-        }
-    }
-
-    #endregion
-
     #region 辅助方法
 
     /// <summary>
@@ -610,7 +669,7 @@ public partial class MainWindow : Window
             SingleInstanceManager.Cleanup();
 
             // 清理视图模型
-            _viewModel?.Dispose();
+            _viewModel.Dispose();
 
             Debug.WriteLine("主窗口清理完成");
         }

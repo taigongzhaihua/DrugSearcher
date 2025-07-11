@@ -45,9 +45,6 @@
                             Background="{TemplateBinding Background}"
                             CornerRadius="6"
                             RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform>
-                            <ScaleTransform x:Name="ButtonScale" ScaleX="1" ScaleY="1"/>
-                        </Border.RenderTransform>
                         <ContentPresenter HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Margin="{TemplateBinding Padding}"
@@ -64,7 +61,6 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
                             <Setter TargetName="ButtonBorder" Property="Effect" Value="{StaticResource DropShadowEffect}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -77,7 +73,6 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Trigger.EnterActions>
@@ -96,6 +91,14 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PrimaryHoverBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Fluent Design 透明主题按钮样式 -->
@@ -119,9 +122,6 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="6"
                             RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform>
-                            <ScaleTransform x:Name="TransparentButtonScale" ScaleX="1" ScaleY="1"/>
-                        </Border.RenderTransform>
                         <ContentPresenter HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Margin="{TemplateBinding Padding}"
@@ -139,7 +139,6 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource HoverBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -152,7 +151,6 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource PressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
@@ -161,6 +159,14 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PressedBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Fluent Design ComboBox 样式 -->
@@ -525,5 +531,45 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!-- 标准间距 -->
+    <Thickness x:Key="SmallMargin">4</Thickness>
+    <Thickness x:Key="MediumMargin">8</Thickness>
+    <Thickness x:Key="LargeMargin">16</Thickness>
+    <Thickness x:Key="ExtraLargeMargin">24</Thickness>
 
+    <!-- 轻阴影效果 -->
+    <DropShadowEffect x:Key="LightDropShadowEffect" 
+                      BlurRadius="4" 
+                      ShadowDepth="1" 
+                      Opacity="0.1" 
+                      Color="#000000"/>
+
+    <!-- DataGrid 行样式 -->
+    <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                <Setter Property="Foreground" Value="White"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- DataGrid 列标题样式 -->
+    <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Setter Property="Padding" Value="12,8"/>
+    </Style>
 </ResourceDictionary>

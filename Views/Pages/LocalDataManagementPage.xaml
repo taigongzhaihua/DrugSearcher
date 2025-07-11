@@ -1,0 +1,365 @@
+<Page x:Class="DrugSearcher.Views.LocalDataManagementPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:converters="clr-namespace:DrugSearcher.Common.Converters"
+      xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance viewModels:LocalDataManagementViewModel}"
+      Title="本地数据管理"
+      Background="{DynamicResource BackgroundBrush}">
+
+    <Page.Resources>
+        <!-- 数据源显示模板 -->
+        <DataTemplate x:Key="DataSourceTemplate">
+            <Border Background="{Binding DataSourceColor}" 
+                    CornerRadius="12" 
+                    Padding="8,4">
+                <TextBlock Text="{Binding DataSource}" 
+                           Foreground="White" 
+                           FontSize="11" 
+                           FontWeight="Medium"/>
+            </Border>
+        </DataTemplate>
+
+        <!-- 统计卡片特定样式 -->
+        <Style x:Key="TotalStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
+            <Setter Property="Background" Value="#E3F2FD"/>
+        </Style>
+
+        <Style x:Key="TodayStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
+            <Setter Property="Background" Value="#E8F5E8"/>
+        </Style>
+
+        <Style x:Key="WeekStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
+            <Setter Property="Background" Value="#FFF3E0"/>
+        </Style>
+
+        <Style x:Key="MonthStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
+            <Setter Property="Background" Value="#FCE4EC"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="{StaticResource LargeMargin}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 页面标题 -->
+        <TextBlock Grid.Row="0" 
+                   Text="本地数据管理" 
+                   Style="{StaticResource PageTitleStyle}"/>
+
+        <!-- 统计信息卡片 -->
+        <Grid Grid.Row="1" Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource TotalStatCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="总数量" 
+                               FontSize="12" 
+                               FontWeight="Medium"
+                               Foreground="#666"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Statistics.TotalDrugs}" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#2196F3"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource TodayStatCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="今日新增" 
+                               FontSize="12" 
+                               FontWeight="Medium"
+                               Foreground="#666"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Statistics.TodayAdded}" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#4CAF50"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource WeekStatCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="本周新增" 
+                               FontSize="12" 
+                               FontWeight="Medium"
+                               Foreground="#666"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Statistics.WeekAdded}" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#FF9800"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource MonthStatCardStyle}">
+                <StackPanel>
+                    <TextBlock Text="本月新增" 
+                               FontSize="12" 
+                               FontWeight="Medium"
+                               Foreground="#666"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding Statistics.MonthAdded}" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               Foreground="#E91E63"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- 工具栏 -->
+        <Grid Grid.Row="2" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 搜索区域 -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <TextBox x:Name="SearchTextBox"
+                         Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource SearchTextBoxStyle}"
+                         Width="300">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+
+                <Button Content="搜索" 
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding SearchCommand}"/>
+
+                <Button Content="刷新" 
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding RefreshCommand}"/>
+            </StackPanel>
+
+            <!-- 操作按钮区域 -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="添加药物" 
+                        Style="{StaticResource SuccessButtonStyle}"
+                        Command="{Binding AddCommand}"/>
+
+                <Button Content="批量删除" 
+                        Style="{StaticResource DangerButtonStyle}"
+                        Command="{Binding BatchDeleteCommand}"/>
+
+                <Button Content="导入Excel" 
+                        Style="{StaticResource WarningButtonStyle}"
+                        Command="{Binding ImportExcelCommand}"/>
+
+                <Button Content="导出Excel" 
+                        Style="{StaticResource WarningButtonStyle}"
+                        Command="{Binding ExportExcelCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 数据表格 -->
+        <Border Grid.Row="3" 
+                Background="{DynamicResource SurfaceBrush}"
+                CornerRadius="8"
+                Effect="{StaticResource LightDropShadowEffect}">
+            <DataGrid x:Name="DrugDataGrid"
+                      ItemsSource="{Binding DrugItems}"
+                      SelectedItem="{Binding SelectedDrug}"
+                      Style="{StaticResource ModernDataGridStyle}"
+                      RowStyle="{StaticResource DataGridRowStyle}"
+                      ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                      SelectionChanged="DrugDataGrid_SelectionChanged">
+
+                <DataGrid.Columns>
+                    <!-- 选择列 -->
+                    <DataGridCheckBoxColumn Width="50" 
+                                            Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}"
+                                            Header="">
+                        <DataGridCheckBoxColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <CheckBox x:Name="SelectAllCheckBox" 
+                                          Checked="SelectAllCheckBox_Checked"
+                                          Unchecked="SelectAllCheckBox_Unchecked"/>
+                            </DataTemplate>
+                        </DataGridCheckBoxColumn.HeaderTemplate>
+                    </DataGridCheckBoxColumn>
+
+                    <!-- 药物名称 -->
+                    <DataGridTextColumn Header="药品名称" 
+                                        Binding="{Binding DrugName}" 
+                                        Width="150" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                                <Setter Property="FontWeight" Value="Medium"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 规格 -->
+                    <DataGridTextColumn Header="规格" 
+                                        Binding="{Binding Specification}" 
+                                        Width="100" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 用法用量 -->
+                    <DataGridTextColumn Header="用法用量" 
+                                        Binding="{Binding Dosage}" 
+                                        Width="120" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 适应症 -->
+                    <DataGridTextColumn Header="适应症" 
+                                        Binding="{Binding Indications}" 
+                                        Width="150" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                                <Setter Property="TextWrapping" Value="Wrap"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 备注 -->
+                    <DataGridTextColumn Header="备注" 
+                                        Binding="{Binding Remarks}" 
+                                        Width="100" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 数据来源 -->
+                    <DataGridTemplateColumn Header="数据来源" Width="90">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentPresenter Content="{Binding}" 
+                                                  ContentTemplate="{StaticResource DataSourceTemplate}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- 创建时间 -->
+                    <DataGridTextColumn Header="创建时间" 
+                                        Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}" 
+                                        Width="140" 
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
+                                <Setter Property="FontFamily" Value="Consolas, Courier New"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+                    <!-- 操作列 -->
+                    <DataGridTemplateColumn Header="操作" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" 
+                                            HorizontalAlignment="Center">
+                                    <Button Content="编辑" 
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4"
+                                            FontSize="12"
+                                            Margin="2,0"/>
+
+                                    <Button Content="删除" 
+                                            Style="{StaticResource DangerButtonStyle}"
+                                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            Padding="8,4"
+                                            FontSize="12"
+                                            Margin="2,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- 分页控件 -->
+        <Grid Grid.Row="4" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 记录信息 -->
+            <TextBlock Grid.Column="0" 
+                       VerticalAlignment="Center"
+                       FontSize="14"
+                       Foreground="{DynamicResource SecondaryTextBrush}">
+                <Run Text="共"/>
+                <Run Text="{Binding TotalRecords}" FontWeight="Medium"/>
+                <Run Text="条记录，第"/>
+                <Run Text="{Binding CurrentPage}" FontWeight="Medium"/>
+                <Run Text="/"/>
+                <Run Text="{Binding TotalPages}" FontWeight="Medium"/>
+                <Run Text="页"/>
+            </TextBlock>
+
+            <!-- 分页按钮 -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Content="上一页" 
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding PreviousPageCommand}"/>
+
+                <Button Content="下一页" 
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding NextPageCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 状态栏 -->
+        <Border Grid.Row="5" 
+                Style="{StaticResource StatusBarStyle}"
+                Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding StatusMessage}" 
+                           FontSize="13" 
+                           Foreground="{DynamicResource SecondaryTextBrush}"
+                           VerticalAlignment="Center"/>
+
+                <ProgressBar Grid.Column="1" 
+                             Width="200" 
+                             Height="4" 
+                             IsIndeterminate="{Binding IsLoading}" 
+                             Visibility="{Binding IsLoading, Converter={x:Static converters:Converters.BooleanToVisibilityConverter}}"
+                             Foreground="{DynamicResource PrimaryBrush}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

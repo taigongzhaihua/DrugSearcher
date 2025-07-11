@@ -162,6 +162,16 @@ public static class ContainerConfig
             .AsSelf()
             .SingleInstance();
 
+        // 注册本地数据管理ViewModel
+        builder.RegisterType<LocalDataManagementViewModel>()
+            .AsSelf()
+            .SingleInstance();
+
+        // 注册药物编辑对话框ViewModel
+        builder.RegisterType<DrugEditDialogViewModel>()
+            .AsSelf()
+            .InstancePerDependency();
+
     }
 
     /// <summary>
@@ -183,6 +193,16 @@ public static class ContainerConfig
         builder.RegisterType<HomePage>()
             .AsSelf()
             .SingleInstance();
+
+        // 注册本地数据管理页面
+        builder.RegisterType<LocalDataManagementPage>()
+            .AsSelf()
+            .SingleInstance();
+
+        // 注册药物编辑对话框
+        builder.RegisterType<DrugEditDialog>()
+            .AsSelf()
+            .InstancePerDependency(); // 对话框通常是临时的，使用 InstancePerDependency
 
     }
 

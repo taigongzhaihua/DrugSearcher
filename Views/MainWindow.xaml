@@ -4,12 +4,276 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
+        xmlns:local="clr-namespace:DrugSearcher.Common.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}"
         Height="780"
         Width="1100"
         Style="{StaticResource BaseWindowStyle}"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}">
+
+    <Window.Resources>
+        <!-- ContextMenu 样式 -->
+        <Style x:Key="FunctionContextMenuStyle" TargetType="ContextMenu">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Effect" Value="{StaticResource DropShadowEffect}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}"
+                                Effect="{TemplateBinding Effect}">
+                            <StackPanel IsItemsHost="True"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- MenuItem 样式 -->
+        <Style x:Key="FunctionMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinWidth" Value="180"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- 图标 -->
+                                <TextBlock Grid.Column="0"
+                                           Text="{TemplateBinding Tag}"
+                                           FontFamily="{DynamicResource IconFont}"
+                                           FontSize="16"
+                                           Margin="0,0,12,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryBrush}"/>
+
+                                <!-- 文本 -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{TemplateBinding Header}"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- 子菜单箭头 -->
+                                <TextBlock Grid.Column="2"
+                                           Text="&#xe619;"
+                                           FontFamily="{DynamicResource IconFont}"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Visibility="{Binding HasItems, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static local:Converters.BooleanToVisibilityConverter}}"/>
+
+                                <!-- 子菜单弹出框 -->
+                                <Popup x:Name="PART_Popup"
+                                       IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Placement="Right"
+                                       AllowsTransparency="True"
+                                       PopupAnimation="Slide">
+                                    <Border Background="{DynamicResource SurfaceBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="8"
+                                            Effect="{StaticResource DropShadowEffect}">
+                                        <StackPanel IsItemsHost="True"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource HoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource PressedBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 分隔线样式 -->
+        <Style x:Key="MenuSeparatorStyle" TargetType="Separator">
+            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Height" Value="1"/>
+            <Setter Property="Margin" Value="8,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Separator">
+                        <Border Background="{TemplateBinding Background}" 
+                                Height="{TemplateBinding Height}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 主题颜色选择模板 -->
+        <DataTemplate x:Key="ThemeColorTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 标题 -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"
+                           Text="选择主题颜色"
+                           FontSize="14"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,8"/>
+
+                <!-- 明暗模式切换 -->
+                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                        Content="{Binding ThemeButtonText, Source={x:Static Application.Current}}"
+                        Command="{Binding SwitchThemeCommand, Source={x:Static Application.Current}}"
+                        Style="{StaticResource TransparentThemeButtonStyle}"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,8"/>
+
+                <!-- 颜色选择网格 -->
+                <UniformGrid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+                             Columns="4" Rows="2"
+                             Margin="0,0,0,0">
+
+                    <!-- 蓝色主题 -->
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="蓝色主题"
+                                 Tag="Blue"
+                                 IsChecked="{Binding ColorSelectionStates[Blue], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Blue"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#2196F3"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <!-- 其他颜色按钮... -->
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="粉色主题"
+                                 Tag="Pink"
+                                 IsChecked="{Binding ColorSelectionStates[Pink], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Pink"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#E91E63"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="青色主题"
+                                 Tag="Cyan"
+                                 IsChecked="{Binding ColorSelectionStates[Cyan], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Cyan"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#00BCD4"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="绿色主题"
+                                 Tag="Green"
+                                 IsChecked="{Binding ColorSelectionStates[Green], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Green"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#4CAF50"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="紫色主题"
+                                 Tag="Purple"
+                                 IsChecked="{Binding ColorSelectionStates[Purple], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Purple"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#9C27B0"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="橙色主题"
+                                 Tag="Orange"
+                                 IsChecked="{Binding ColorSelectionStates[Orange], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Orange"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#FF9800"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="红色主题"
+                                 Tag="Red"
+                                 IsChecked="{Binding ColorSelectionStates[Red], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Red"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#F44336"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+
+                    <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
+                                 GroupName="ThemeColors"
+                                 ToolTip="靛蓝色主题"
+                                 Tag="Indigo"
+                                 IsChecked="{Binding ColorSelectionStates[Indigo], Source={x:Static Application.Current}}"
+                                 Command="{Binding SwitchThemeColorCommand, Source={x:Static Application.Current}}"
+                                 CommandParameter="Indigo"
+                                 Margin="2">
+                        <RadioButton.Content>
+                            <Ellipse Width="24" Height="24" Fill="#3F51B5"/>
+                        </RadioButton.Content>
+                    </RadioButton>
+                </UniformGrid>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
 
     <Grid>
         <!-- 窗口顶部工具栏 -->
@@ -53,23 +317,138 @@
                             WindowChrome.IsHitTestVisibleInChrome="True" />
                 </StackPanel>
 
-                <!-- 设置按钮 -->
-                <Button x:Name="SettingsButton"
-                        Content="{Binding SettingsButtonText}"
+                <!-- 功能菜单按钮 -->
+                <Button x:Name="MenuButton"
+                        Content="&#xe616;"
                         Style="{DynamicResource TransparentThemeButtonStyle}"
-                        Click="SettingsButton_OnClick"
-                        Margin="0,0,5,0"
-                        ToolTip="设置"
-                        WindowChrome.IsHitTestVisibleInChrome="True" />
-
-                <!-- 颜色主题按钮 -->
-                <Button x:Name="ColorsButton"
-                        Content="&#xe614;"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
-                        Click="ColorsButton_OnClick"
+                        Click="MenuButton_OnClick"
                         Margin="0,0,10,0"
-                        ToolTip="{Binding ThemeTooltip}"
-                        WindowChrome.IsHitTestVisibleInChrome="True" />
+                        ToolTip="功能菜单"
+                        WindowChrome.IsHitTestVisibleInChrome="True">
+
+                    <!-- 功能菜单 -->
+                    <Button.ContextMenu>
+                        <ContextMenu x:Name="FunctionContextMenu" 
+                                     Style="{StaticResource FunctionContextMenuStyle}">
+
+                            <!-- 菜单标题 -->
+                            <MenuItem Header="功能菜单" 
+                                      IsEnabled="False"
+                                      FontWeight="Bold"
+                                      Foreground="{DynamicResource PrimaryBrush}"/>
+
+                            <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+
+                            <!-- 数据管理 -->
+                            <MenuItem Header="本地数据管理"
+                                      Tag="&#xe623;"
+                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Click="DataManagementMenuItem_Click"
+                                      ToolTip="本地数据管理"/>
+
+                            <!-- 设置 -->
+                            <MenuItem x:Name="SettingsMenuItem"
+                                      Header="设置"
+                                      Tag="{Binding SettingsButtonText}"
+                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Click="SettingsMenuItem_Click"
+                                      ToolTip="应用设置"/>
+
+                            <!-- 主题设置 -->
+                            <MenuItem Header="主题设置"
+                                      Tag="&#xe614;"
+                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      ToolTip="主题和外观设置">
+
+                                <!-- 主题子菜单 -->
+                                <MenuItem.Items>
+                                    <!-- 明暗模式切换 -->
+                                    <MenuItem Header="切换明暗模式"
+                                              Tag="{Binding ThemeButtonText}"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeCommand}"
+                                              ToolTip="{Binding ThemeTooltip}"/>
+
+                                    <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+
+                                    <!-- 颜色主题选择 -->
+                                    <MenuItem Header="蓝色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Blue"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Blue]}"/>
+
+                                    <MenuItem Header="粉色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Pink"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Pink]}"/>
+
+                                    <MenuItem Header="青色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Cyan"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Cyan]}"/>
+
+                                    <MenuItem Header="绿色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Green"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Green]}"/>
+
+                                    <MenuItem Header="紫色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Purple"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Purple]}"/>
+
+                                    <MenuItem Header="橙色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Orange"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Orange]}"/>
+
+                                    <MenuItem Header="红色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Red"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Red]}"/>
+
+                                    <MenuItem Header="靛蓝色主题"
+                                              Tag="●"
+                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Command="{Binding SwitchThemeColorCommand}"
+                                              CommandParameter="Indigo"
+                                              IsCheckable="True"
+                                              IsChecked="{Binding ColorSelectionStates[Indigo]}"/>
+                                </MenuItem.Items>
+                            </MenuItem>
+
+                            <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+
+                            <!-- 关于 -->
+                            <MenuItem Header="关于"
+                                      Tag="&#xe621;"
+                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Click="AboutMenuItem_Click"
+                                      ToolTip="关于应用程序"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
             </StackPanel>
 
             <!-- 窗口控制按钮组 -->
@@ -102,196 +481,6 @@
                         WindowChrome.IsHitTestVisibleInChrome="True" />
             </StackPanel>
         </StackPanel>
-
-        <!-- 颜色主题选择弹出框 -->
-        <Popup x:Name="ColorThemePopup"
-               Placement="Bottom"
-               PlacementTarget="{Binding ElementName=ColorsButton}"
-               StaysOpen="False"
-               AllowsTransparency="True"
-               PopupAnimation="Slide">
-
-            <Border Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Margin="5"
-                    Effect="{StaticResource DropShadowEffect}">
-
-                <Grid Margin="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- 弹出框标题 -->
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                               Text="选择主题颜色"
-                               FontSize="14"
-                               FontWeight="Medium"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Center"
-                               Margin="0,0,0,0" />
-
-                    <!-- 明暗模式切换按钮 -->
-                    <Button Grid.Row="0" Grid.Column="1"
-                            Content="{Binding ThemeButtonText}"
-                            Style="{StaticResource TransparentThemeButtonStyle}"
-                            Command="{Binding SwitchThemeCommand}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="12,0,0,0"
-                            ToolTip="{Binding ThemeTooltip}"
-                            WindowChrome.IsHitTestVisibleInChrome="True" />
-
-                    <!-- 颜色选择网格 -->
-                    <UniformGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                 Columns="4" Rows="2"
-                                 Margin="0,8,0,0">
-
-                        <!-- 蓝色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="蓝色主题"
-                                     Tag="Blue"
-                                     IsChecked="{Binding ColorSelectionStates[Blue]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Blue"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#2196F3" 
-                                         />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 粉色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="粉色主题"
-                                     Tag="Pink"
-                                     IsChecked="{Binding ColorSelectionStates[Pink]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Pink"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#E91E63" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 青色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="青色主题"
-                                     Tag="Cyan"
-                                     IsChecked="{Binding ColorSelectionStates[Cyan]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Cyan"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#00BCD4" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 绿色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="绿色主题"
-                                     Tag="Green"
-                                     IsChecked="{Binding ColorSelectionStates[Green]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Green"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#4CAF50" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 紫色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="紫色主题"
-                                     Tag="Purple"
-                                     IsChecked="{Binding ColorSelectionStates[Purple]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Purple"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#9C27B0" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 橙色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="橙色主题"
-                                     Tag="Orange"
-                                     IsChecked="{Binding ColorSelectionStates[Orange]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Orange"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#FF9800" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 红色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="红色主题"
-                                     Tag="Red"
-                                     IsChecked="{Binding ColorSelectionStates[Red]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Red"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#F44336" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-
-                        <!-- 靛蓝色主题 -->
-                        <RadioButton Style="{DynamicResource ColorPickerRadioButtonStyle}"
-                                     GroupName="ThemeColors"
-                                     ToolTip="靛蓝色主题"
-                                     Tag="Indigo"
-                                     IsChecked="{Binding ColorSelectionStates[Indigo]}"
-                                     Command="{Binding SwitchThemeColorCommand}"
-                                     CommandParameter="Indigo"
-                                     Margin="2">
-                            <RadioButton.Content>
-                                <Ellipse Width="24" Height="24" 
-                                         Fill="#3F51B5" 
-                                         UseLayoutRounding="True"
-                                         SnapsToDevicePixels="True" />
-                            </RadioButton.Content>
-                        </RadioButton>
-                    </UniformGrid>
-                </Grid>
-            </Border>
-        </Popup>
 
         <!-- 主要内容区域 -->
         <Grid Margin="0">

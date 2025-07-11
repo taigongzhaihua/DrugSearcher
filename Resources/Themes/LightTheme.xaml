@@ -56,5 +56,15 @@
     <SolidColorBrush x:Key="PrimaryPressedBrush" Color="{StaticResource PrimaryDarkHoverColor}"/>
     <SolidColorBrush x:Key="ScrollBarBrush" Color="{StaticResource ScrollBarColor}"/>
     <SolidColorBrush x:Key="ScrollBarHoverBrush" Color="{StaticResource ScrollBarHoverColor}"/>
+    <!-- 在 LightTheme.xaml 末尾添加 -->
 
+    <!-- DataGrid 相关颜色 -->
+    <Color x:Key="DataGridTextColor">#212121</Color>
+    <Color x:Key="DataGridSelectedTextColor">#FFFFFF</Color>
+    <Color x:Key="DataGridAlternateRowColor">#FAFAFA</Color>
+
+    <!-- 画刷 -->
+    <SolidColorBrush x:Key="DataGridTextBrush" Color="{StaticResource DataGridTextColor}"/>
+    <SolidColorBrush x:Key="DataGridSelectedTextBrush" Color="{StaticResource DataGridSelectedTextColor}"/>
+    <SolidColorBrush x:Key="DataGridAlternateRowBrush" Color="{StaticResource DataGridAlternateRowColor}"/>
 </ResourceDictionary>

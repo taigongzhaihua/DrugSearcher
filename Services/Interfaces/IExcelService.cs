@@ -21,4 +21,9 @@ public interface IExcelService
     /// 验证Excel文件格式
     /// </summary>
     Task<bool> ValidateExcelFormatAsync(string filePath);
+
+    /// <summary>
+    /// 获取Excel文件的详细验证信息
+    /// </summary>
+    Task<ExcelValidationResult> ValidateExcelDetailAsync(string filePath);
 }

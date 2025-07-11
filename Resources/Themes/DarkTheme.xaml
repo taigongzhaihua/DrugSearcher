@@ -56,4 +56,13 @@
     <SolidColorBrush x:Key="ScrollBarBrush" Color="{StaticResource ScrollBarColor}"/>
     <SolidColorBrush x:Key="ScrollBarHoverBrush" Color="{StaticResource ScrollBarHoverColor}"/>
 
+    <!-- DataGrid 相关颜色 -->
+    <Color x:Key="DataGridTextColor">#FFFFFF</Color>
+    <Color x:Key="DataGridSelectedTextColor">#FFFFFF</Color>
+    <Color x:Key="DataGridAlternateRowColor">#252525</Color>
+
+    <!-- 画刷 -->
+    <SolidColorBrush x:Key="DataGridTextBrush" Color="{StaticResource DataGridTextColor}"/>
+    <SolidColorBrush x:Key="DataGridSelectedTextBrush" Color="{StaticResource DataGridSelectedTextColor}"/>
+    <SolidColorBrush x:Key="DataGridAlternateRowBrush" Color="{StaticResource DataGridAlternateRowColor}"/>
 </ResourceDictionary>

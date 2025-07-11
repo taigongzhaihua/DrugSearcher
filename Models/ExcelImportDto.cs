@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace DrugSearcher.Models;
 
 /// <summary>
@@ -6,8 +8,9 @@ namespace DrugSearcher.Models;
 public class ExcelImportDto
 {
     /// <summary>
-    /// 药物名称
+    /// 药品名称
     /// </summary>
+    [Required]
     public string DrugName { get; set; } = string.Empty;
 
     /// <summary>
@@ -16,9 +19,9 @@ public class ExcelImportDto
     public string? Specification { get; set; }
 
     /// <summary>
-    /// 生产厂家
+    /// 用法用量
     /// </summary>
-    public string? Manufacturer { get; set; }
+    public string? Dosage { get; set; }
 
     /// <summary>
     /// 适应症
@@ -26,27 +29,44 @@ public class ExcelImportDto
     public string? Indications { get; set; }
 
     /// <summary>
-    /// 用法用量
+    /// 中医病名
     /// </summary>
-    public string? Dosage { get; set; }
+    public string? TcmDisease { get; set; }
 
     /// <summary>
-    /// 中医证型
+    /// 中医辨病辨证
     /// </summary>
     public string? TcmSyndrome { get; set; }
 
     /// <summary>
-    /// 获取合并后的适应症（包含中医证型）
+    /// 备注
+    /// </summary>
+    public string? Remarks { get; set; }
+
+    /// <summary>
+    /// 生产厂家（Excel中没有此字段，设为空）
+    /// </summary>
+    public string? Manufacturer { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 获取合并的适应症信息（包含中医相关信息）
     /// </summary>
     public string GetMergedIndications()
     {
-        var result = Indications ?? string.Empty;
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(Indications))
+            parts.Add($"适应症：{Indications}");
+
+        if (!string.IsNullOrWhiteSpace(TcmDisease))
+            parts.Add($"中医病名：{TcmDisease}");
+
         if (!string.IsNullOrWhiteSpace(TcmSyndrome))
-        {
-            result += string.IsNullOrWhiteSpace(result) ?
-                $"中医证型：{TcmSyndrome}" :
-                $"\n\n中医证型：{TcmSyndrome}";
-        }
-        return result;
+            parts.Add($"中医辨病辨证：{TcmSyndrome}");
+
+        if (!string.IsNullOrWhiteSpace(Remarks))
+            parts.Add($"备注：{Remarks}");
+
+        return string.Join("；", parts);
     }
 }
