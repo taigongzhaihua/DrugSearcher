@@ -17,6 +17,7 @@ public class YaoZsOnlineDrugService : IOnlineDrugService
     private readonly ILogger<YaoZsOnlineDrugService> _logger;
     private readonly DrugCrawlerConfiguration _config;
     private readonly SemaphoreSlim _semaphore;
+    private readonly RobotsTxtChecker _robotsChecker;
     private DateTime _lastRequestTime = DateTime.MinValue;
     private readonly object _lockObject = new();
 
@@ -31,6 +32,7 @@ public class YaoZsOnlineDrugService : IOnlineDrugService
         _logger = logger;
         _config = config;
         _semaphore = new SemaphoreSlim(_config.MaxConcurrentRequests);
+        _robotsChecker = new RobotsTxtChecker(_httpClient, _config.UserAgent);
 
         // 配置HttpClient
         _httpClient.Timeout = TimeSpan.FromMilliseconds(_config.RequestTimeoutMs);
@@ -104,6 +106,13 @@ public class YaoZsOnlineDrugService : IOnlineDrugService
 
                 var url = $"{_config.BaseUrl}{externalId}/";
                 _logger.LogDebug("请求药物详情: {Url}", url);
+
+                // 检查robots.txt
+                if (_config.RespectRobotsTxt && await _robotsChecker.IsDisallowedAsync(url))
+                {
+                    _logger.LogWarning("URL被robots.txt禁止访问: {Url}", url);
+                    return null;
+                }
 
                 var response = await _httpClient.GetAsync(url);
                 
@@ -196,10 +205,10 @@ public class YaoZsOnlineDrugService : IOnlineDrugService
     /// <summary>
     /// 获取可用的药物总数
     /// </summary>
-    public async Task<int> GetAvailableDrugCountAsync()
+    public Task<int> GetAvailableDrugCountAsync()
     {
         // 根据配置返回预期的总数
-        return await Task.FromResult(_config.EndId - _config.StartId + 1);
+        return Task.FromResult(_config.EndId - _config.StartId + 1);
     }
 
     /// <summary>

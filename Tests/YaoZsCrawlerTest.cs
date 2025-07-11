@@ -1,6 +1,6 @@
+using DrugSearcher.Configuration;
 using DrugSearcher.Models;
 using DrugSearcher.Services;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -16,32 +16,15 @@ public class YaoZsCrawlerTest
         // 设置依赖注入
         var services = new ServiceCollection();
         
-        // 配置日志
-        services.AddLogging(builder =>
+        // 添加爬虫服务
+        services.AddCrawlerServices(config =>
         {
-            builder.AddConsole();
-            builder.SetMinimumLevel(LogLevel.Information);
+            config.RequestIntervalMs = 2000; // 2秒间隔，更加礼貌
+            config.MaxConcurrentRequests = 2; // 降低并发数
+            config.EnableLogging = true;
+            config.StartId = 1;
+            config.EndId = 10; // 测试前10个ID
         });
-
-        // 添加HttpClient
-        services.AddHttpClient<YaoZsOnlineDrugService>();
-        
-        // 添加内存缓存
-        services.AddMemoryCache();
-        
-        // 配置爬虫设置
-        var config = new DrugCrawlerConfiguration
-        {
-            RequestIntervalMs = 2000, // 2秒间隔，更加礼貌
-            MaxConcurrentRequests = 2, // 降低并发数
-            EnableLogging = true,
-            StartId = 1,
-            EndId = 10 // 测试前10个ID
-        };
-        services.AddSingleton(config);
-        
-        // 添加服务
-        services.AddScoped<IOnlineDrugService, YaoZsOnlineDrugService>();
         
         var serviceProvider = services.BuildServiceProvider();
         
