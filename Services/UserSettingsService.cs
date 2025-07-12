@@ -101,7 +101,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// 获取当前用户ID
     /// </summary>
     /// <returns>用户ID，如果是全局设置则返回null</returns>
-    private string? GetCurrentUserId()
+    private static string? GetCurrentUserId()
     {
         // 这里可以根据你的认证系统实现
         // 目前返回null表示全局设置

@@ -156,6 +156,11 @@ public static class ContainerConfig
             return httpClient;
         }).As<HttpClient>().InstancePerLifetimeScope();
 
+        // 快捷键服务 - 全局单例
+        builder.RegisterType<HotKeyService>()
+            .As<IHotKeyService>()
+            .SingleInstance();
+
         // 设置相关服务 - 全局单例
         builder.RegisterType<DefaultSettingsProvider>()
             .As<IDefaultSettingsProvider>()
@@ -275,6 +280,14 @@ public static class ContainerConfig
             .AsSelf()
             .SingleInstance();
 
+        builder.Register(context =>
+            {
+                // 这里我们需要从容器中解析 MainWindow
+                var mainWindow = context.Resolve<MainWindow>();
+                return new HotKeyManager(mainWindow);
+            })
+            .AsSelf()
+            .SingleInstance();
         // 其他管理器可以在这里添加
         // builder.RegisterType<ConfigurationManager>()
         //     .AsSelf()

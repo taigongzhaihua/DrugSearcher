@@ -46,9 +46,9 @@ public class DrugSearchService(
 
             // 去重、排序和限制结果数量
             var deduplicatedResults = DeduplicateResults(allResults);
-            var sortedResults = SortResults(deduplicatedResults, criteria.SearchTerm ?? string.Empty);
+            var sortedResults = SortResults(deduplicatedResults);
 
-            return sortedResults.Take(criteria.MaxResults ?? 100).ToList();
+            return [.. sortedResults.Take(criteria.MaxResults ?? 100)];
         }
         catch (Exception ex)
         {
@@ -77,7 +77,7 @@ public class DrugSearchService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"获取药物详情时发生错误，ID: {id}, 数据源: {dataSource}");
+            logger.LogError(ex, "获取药物详情时发生错误，ID: {Id}, 数据源: {DataSource}", id, dataSource);
             return null;
         }
     }
@@ -119,16 +119,18 @@ public class DrugSearchService(
             }
 
             // 去重、排序并限制数量
-            return suggestions
-                .Distinct()
-                .Where(s => s.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(s => s)
-                .Take(10)
-                .ToList();
+            return
+            [
+                .. suggestions
+                    .Distinct()
+                    .Where(s => s.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(s => s)
+                    .Take(10)
+            ];
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"获取搜索建议失败，关键词: {keyword}");
+            logger.LogError(ex, "获取搜索建议失败，关键词: {keyword}", keyword);
             return [];
         }
     }
@@ -141,17 +143,20 @@ public class DrugSearchService(
         try
         {
             var localDrugs = await localDrugService.SearchDrugsAsync(searchTerm);
-            return localDrugs.Select(drug => new UnifiedDrugSearchResult
-            {
-                DrugInfo = drug,
-                MatchScore = CalculateMatchScore(drug, searchTerm),
-                MatchedFields = GetMatchedFields(drug, searchTerm),
-                IsExactMatch = IsExactMatch(drug, searchTerm)
-            }).ToList();
+            return
+            [
+                .. localDrugs.Select(drug => new UnifiedDrugSearchResult
+                {
+                    DrugInfo = drug,
+                    MatchScore = CalculateMatchScore(drug, searchTerm),
+                    MatchedFields = GetMatchedFields(drug, searchTerm),
+                    IsExactMatch = IsExactMatch(drug, searchTerm)
+                })
+            ];
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"搜索本地药物失败，搜索词: {searchTerm}");
+            logger.LogError(ex, "搜索本地药物失败，搜索词: {searchTerm}", searchTerm);
             return [];
         }
     }
@@ -167,17 +172,20 @@ public class DrugSearchService(
                 return [];
 
             var onlineDrugs = await onlineDrugService.SearchOnlineDrugsAsync(searchTerm);
-            return onlineDrugs.Select(drug => new UnifiedDrugSearchResult
-            {
-                DrugInfo = drug,
-                MatchScore = CalculateMatchScore(drug, searchTerm),
-                MatchedFields = GetMatchedFields(drug, searchTerm),
-                IsExactMatch = IsExactMatch(drug, searchTerm)
-            }).ToList();
+            return
+            [
+                .. onlineDrugs.Select(drug => new UnifiedDrugSearchResult
+                {
+                    DrugInfo = drug,
+                    MatchScore = CalculateMatchScore(drug, searchTerm),
+                    MatchedFields = GetMatchedFields(drug, searchTerm),
+                    IsExactMatch = IsExactMatch(drug, searchTerm)
+                })
+            ];
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"搜索在线药物失败，搜索词: {searchTerm}");
+            logger.LogError(ex, "搜索在线药物失败，搜索词: {searchTerm}", searchTerm);
             return [];
         }
     }
@@ -193,17 +201,20 @@ public class DrugSearchService(
                 return [];
 
             var cachedDrugs = await cachedDrugService.SearchCachedDrugsAsync(searchTerm);
-            return cachedDrugs.Select(drug => new UnifiedDrugSearchResult
-            {
-                DrugInfo = drug,
-                MatchScore = CalculateMatchScore(drug, searchTerm),
-                MatchedFields = GetMatchedFields(drug, searchTerm),
-                IsExactMatch = IsExactMatch(drug, searchTerm)
-            }).ToList();
+            return
+            [
+                .. cachedDrugs.Select(drug => new UnifiedDrugSearchResult
+                {
+                    DrugInfo = drug,
+                    MatchScore = CalculateMatchScore(drug, searchTerm),
+                    MatchedFields = GetMatchedFields(drug, searchTerm),
+                    IsExactMatch = IsExactMatch(drug, searchTerm)
+                })
+            ];
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, $"搜索缓存药物失败，搜索词: {searchTerm}");
+            logger.LogError(ex, "搜索缓存药物失败，搜索词: {searchTerm}", searchTerm);
             return [];
         }
     }
@@ -211,7 +222,7 @@ public class DrugSearchService(
     /// <summary>
     /// 计算匹配度
     /// </summary>
-    private double CalculateMatchScore(BaseDrugInfo drug, string searchTerm)
+    private static double CalculateMatchScore(BaseDrugInfo drug, string searchTerm)
     {
         if (string.IsNullOrWhiteSpace(searchTerm))
             return 0.0;
@@ -242,7 +253,7 @@ public class DrugSearchService(
     /// <summary>
     /// 获取匹配的字段
     /// </summary>
-    private List<string> GetMatchedFields(BaseDrugInfo drug, string searchTerm)
+    private static List<string> GetMatchedFields(BaseDrugInfo drug, string searchTerm)
     {
         var matchedFields = new List<string>();
         if (string.IsNullOrWhiteSpace(searchTerm))
@@ -271,7 +282,7 @@ public class DrugSearchService(
     /// <summary>
     /// 判断是否为精确匹配
     /// </summary>
-    private bool IsExactMatch(BaseDrugInfo drug, string searchTerm)
+    private static bool IsExactMatch(BaseDrugInfo drug, string searchTerm)
     {
         return drug.DrugName.Equals(searchTerm, StringComparison.OrdinalIgnoreCase);
     }
@@ -279,30 +290,34 @@ public class DrugSearchService(
     /// <summary>
     /// 去重结果
     /// </summary>
-    private List<UnifiedDrugSearchResult> DeduplicateResults(List<UnifiedDrugSearchResult> results)
+    private static List<UnifiedDrugSearchResult> DeduplicateResults(List<UnifiedDrugSearchResult> results)
     {
         // 基于药物名称、规格和制造商进行去重，保留数据源优先级最高的
-        return results
-            .GroupBy(r => new
-            {
-                r.DrugInfo.DrugName,
-                r.DrugInfo.Specification,
-                r.DrugInfo.Manufacturer
-            })
-            .Select(g => g.OrderBy(r => r.DataSourcePriority).ThenByDescending(r => r.MatchScore).First())
-            .ToList();
+        return
+        [
+            .. results
+                .GroupBy(r => new
+                {
+                    r.DrugInfo.DrugName,
+                    r.DrugInfo.Specification,
+                    r.DrugInfo.Manufacturer
+                })
+                .Select(g => g.OrderBy(r => r.DataSourcePriority).ThenByDescending(r => r.MatchScore).First())
+        ];
     }
 
     /// <summary>
     /// 排序结果
     /// </summary>
-    private List<UnifiedDrugSearchResult> SortResults(List<UnifiedDrugSearchResult> results, string searchTerm)
+    private static List<UnifiedDrugSearchResult> SortResults(List<UnifiedDrugSearchResult> results)
     {
-        return results
-            .OrderByDescending(r => r.IsExactMatch)
-            .ThenByDescending(r => r.MatchScore)
-            .ThenBy(r => r.DataSourcePriority)
-            .ThenBy(r => r.DrugInfo.DrugName)
-            .ToList();
+        return
+        [
+            .. results
+                .OrderByDescending(r => r.IsExactMatch)
+                .ThenByDescending(r => r.MatchScore)
+                .ThenBy(r => r.DataSourcePriority)
+                .ThenBy(r => r.DrugInfo.DrugName)
+        ];
     }
 }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DrugSearcher.Helpers;
 using DrugSearcher.Models;
 using DrugSearcher.Services;
 using System.Collections.ObjectModel;
@@ -19,6 +20,7 @@ public partial class HomePageViewModel : ObservableObject
         _drugSearchService = drugSearchService;
         SearchResults = [];
         SearchSuggestions = [];
+        MarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(new LocalDrugInfo());
 
         // 设置默认值
         IsLocalDbEnabled = true;
@@ -82,113 +84,14 @@ public partial class HomePageViewModel : ObservableObject
 
     // 中医信息属性
     [ObservableProperty]
-    private bool _hasTcmInfo;
-
-    [ObservableProperty]
     private string _tcmDisease = string.Empty;
 
     [ObservableProperty]
     private string _tcmSyndrome = string.Empty;
 
+    // Markdown 内容字典
     [ObservableProperty]
-    private string _tcmRemarks = string.Empty;
-
-    // 详细信息属性 - 带有是否有内容的标识
-    [ObservableProperty]
-    private string _drugDescription = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasDrugDescription;
-
-    [ObservableProperty]
-    private string _indications = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasIndications;
-
-    [ObservableProperty]
-    private string _dosage = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasDosage;
-
-    [ObservableProperty]
-    private string _sideEffects = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasSideEffects;
-
-    [ObservableProperty]
-    private string _precautions = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasPrecautions;
-
-    [ObservableProperty]
-    private string _contraindications = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasContraindications;
-
-    [ObservableProperty]
-    private string _pregnancyAndLactation = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasPregnancyAndLactation;
-
-    [ObservableProperty]
-    private string _pediatricUse = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasPediatricUse;
-
-    [ObservableProperty]
-    private string _geriatricUse = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasGeriatricUse;
-
-    [ObservableProperty]
-    private string _drugInteractions = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasDrugInteractions;
-
-    [ObservableProperty]
-    private string _pharmacology = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasPharmacology;
-
-    [ObservableProperty]
-    private string _pharmacokinetics = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasPharmacokinetics;
-
-    [ObservableProperty]
-    private string _storage = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasStorage;
-
-    [ObservableProperty]
-    private string _shelfLife = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasShelfLife;
-
-    [ObservableProperty]
-    private string _appearance = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasAppearance;
-
-    [ObservableProperty]
-    private string _mainIngredients = string.Empty;
-
-    [ObservableProperty]
-    private bool _hasMainIngredients;
+    private Dictionary<string, string> _markdownContents;
 
     public ObservableCollection<UnifiedDrugSearchResult> SearchResults { get; }
     public ObservableCollection<string> SearchSuggestions { get; }
@@ -394,7 +297,8 @@ public partial class HomePageViewModel : ObservableObject
             TradeName = string.Empty;
 
             // 设置中医信息
-            SetTcmInfo(localDrug);
+            TcmDisease = localDrug.TcmDisease ?? string.Empty;
+            TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
         }
         else if (drugInfo is OnlineDrugInfo onlineDrug)
         {
@@ -402,115 +306,25 @@ public partial class HomePageViewModel : ObservableObject
             TradeName = onlineDrug.TradeName ?? string.Empty;
 
             // 清空中医信息
-            ClearTcmInfo();
+            TcmDisease = string.Empty;
+            TcmSyndrome = string.Empty;
         }
         else
         {
             GenericName = string.Empty;
             TradeName = string.Empty;
-            ClearTcmInfo();
+            TcmDisease = string.Empty;
+            TcmSyndrome = string.Empty;
         }
-    }
-
-    private void SetTcmInfo(LocalDrugInfo localDrug)
-    {
-        TcmDisease = localDrug.TcmDisease ?? string.Empty;
-        TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
-        TcmRemarks = localDrug.Remarks ?? string.Empty;
-
-        // 判断是否有中医信息
-        HasTcmInfo = !string.IsNullOrWhiteSpace(TcmDisease) ||
-                     !string.IsNullOrWhiteSpace(TcmSyndrome) ||
-                     !string.IsNullOrWhiteSpace(TcmRemarks);
-    }
-
-    private void ClearTcmInfo()
-    {
-        TcmDisease = string.Empty;
-        TcmSyndrome = string.Empty;
-        TcmRemarks = string.Empty;
-        HasTcmInfo = false;
     }
 
     private void UpdateDetailInfo(BaseDrugInfo drugInfo)
     {
-        // 通用信息
-        SetDetailField(drugInfo.Indications, value => { Indications = value; HasIndications = !string.IsNullOrWhiteSpace(value); });
-        SetDetailField(drugInfo.Dosage, value => { Dosage = value; HasDosage = !string.IsNullOrWhiteSpace(value); });
-        SetDetailField(drugInfo.AdverseReactions, value => { SideEffects = value; HasSideEffects = !string.IsNullOrWhiteSpace(value); });
-        SetDetailField(drugInfo.Precautions, value => { Precautions = value; HasPrecautions = !string.IsNullOrWhiteSpace(value); });
+        // 使用 Helper 类生成 Markdown 内容
+        var newMarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(drugInfo);
 
-        // 根据不同的数据源显示不同的详细信息
-        if (drugInfo is LocalDrugInfo localDrug)
-        {
-            // 设置本地药品特有字段
-            SetDetailField(localDrug.Description, value => { DrugDescription = value; HasDrugDescription = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.Manufacturer, value => { ManufacturerInfo = value; });
-            SetDetailField(localDrug.GenericName, value => { GenericName = value; });
-            SetDetailField(localDrug.Specification, value => { Specification = value; });
-            HasTcmInfo = false;
-            SetDetailField(localDrug.TcmDisease, value => { TcmDisease = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.TcmSyndrome, value => { TcmSyndrome = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.Remarks, value => { TcmRemarks = value; HasTcmInfo = HasTcmInfo || !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.AdverseReactions, value => { SideEffects = value; HasSideEffects = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.Precautions, value => { Precautions = value; HasPrecautions = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.Indications, value => { Indications = value; HasIndications = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(localDrug.Dosage, value => { Dosage = value; HasDosage = !string.IsNullOrWhiteSpace(value); });
-
-
-
-            // 清空在线数据特有字段
-            ClearOnlineSpecificFields();
-        }
-        else if (drugInfo is OnlineDrugInfo onlineDrug)
-        {
-            SetDetailField(onlineDrug.MainIngredients, value => { MainIngredients = value; HasMainIngredients = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.Appearance, value => { Appearance = value; HasAppearance = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.Contraindications, value => { Contraindications = value; HasContraindications = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.PregnancyAndLactation, value => { PregnancyAndLactation = value; HasPregnancyAndLactation = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.PediatricUse, value => { PediatricUse = value; HasPediatricUse = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.GeriatricUse, value => { GeriatricUse = value; HasGeriatricUse = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.DrugInteractions, value => { DrugInteractions = value; HasDrugInteractions = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.PharmacologyToxicology, value => { Pharmacology = value; HasPharmacology = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.Pharmacokinetics, value => { Pharmacokinetics = value; HasPharmacokinetics = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.Storage, value => { Storage = value; HasStorage = !string.IsNullOrWhiteSpace(value); });
-            SetDetailField(onlineDrug.ShelfLife, value => { ShelfLife = value; HasShelfLife = !string.IsNullOrWhiteSpace(value); });
-
-            // 清空本地数据特有字段
-            DrugDescription = string.Empty;
-            HasDrugDescription = false;
-        }
-    }
-
-    private void SetDetailField(string? value, Action<string> setter)
-    {
-        setter(value ?? string.Empty);
-    }
-
-    private void ClearOnlineSpecificFields()
-    {
-        MainIngredients = string.Empty;
-        HasMainIngredients = false;
-        Appearance = string.Empty;
-        HasAppearance = false;
-        Contraindications = string.Empty;
-        HasContraindications = false;
-        PregnancyAndLactation = string.Empty;
-        HasPregnancyAndLactation = false;
-        PediatricUse = string.Empty;
-        HasPediatricUse = false;
-        GeriatricUse = string.Empty;
-        HasGeriatricUse = false;
-        DrugInteractions = string.Empty;
-        HasDrugInteractions = false;
-        Pharmacology = string.Empty;
-        HasPharmacology = false;
-        Pharmacokinetics = string.Empty;
-        HasPharmacokinetics = false;
-        Storage = string.Empty;
-        HasStorage = false;
-        ShelfLife = string.Empty;
-        HasShelfLife = false;
+        // 更新字典（这会触发 UI 更新）
+        MarkdownContents = newMarkdownContents;
     }
 
     private void SetLoadingState(bool isLoading)
@@ -532,6 +346,7 @@ public partial class HomePageViewModel : ObservableObject
     private void HideDetailPanel()
     {
         IsDetailPanelVisible = false;
+        MarkdownContents.Clear();
     }
 
     #endregion

@@ -23,7 +23,7 @@ public partial class CrawlerPageViewModel : ObservableObject
         _onlineDrugService = onlineDrugService;
         _logger = logger;
 
-        CrawlLogs = new ObservableCollection<CrawlLogEntry>();
+        CrawlLogs = [];
 
         // 设置默认值
         StartId = 1;
@@ -31,7 +31,7 @@ public partial class CrawlerPageViewModel : ObservableObject
         BatchSize = 10;
         DelayMs = 1000;
 
-        UpdateStatistics();
+        _ = UpdateStatistics();
     }
 
     #region 属性
@@ -150,7 +150,7 @@ public partial class CrawlerPageViewModel : ObservableObject
     {
         if (_crawlCancellationTokenSource != null)
         {
-            _crawlCancellationTokenSource.Cancel();
+            await _crawlCancellationTokenSource.CancelAsync();
             IsCrawling = false;
             CrawlButtonText = "开始爬取";
             CanStartCrawl = true;

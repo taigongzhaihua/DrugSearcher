@@ -375,7 +375,7 @@ public static class SystemThemeHelper
     /// <summary>
     /// 系统主题信息结构
     /// </summary>
-    public struct SystemThemeInfo
+    public readonly struct SystemThemeInfo
     {
         /// <summary>
         /// 应用主题是否为深色（如果无法检测则为null）

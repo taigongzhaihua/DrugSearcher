@@ -8,6 +8,8 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
@@ -37,15 +39,16 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="0,0,8,8"
+                                CornerRadius="4"
+                                HorizontalAlignment="Stretch"
                                 KeyboardNavigation.TabNavigation="Local"
                                 KeyboardNavigation.DirectionalNavigation="Contained"
                                 KeyboardNavigation.TabIndex="2">
                             <ContentPresenter x:Name="PART_SelectedContentHost"
                                               ContentSource="SelectedContent"
-                                              Margin="0"
+                                              Margin="2"
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                              HorizontalAlignment="Stretch"/>
+                                              HorizontalAlignment="Left"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -59,14 +62,27 @@
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"></Setter>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="16,12"/>
+        <Setter Property="Padding" Value="12,10"/>
         <Setter Property="Margin" Value="0,0,2,0"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding}" 
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   LineHeight="18"/>
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
@@ -76,7 +92,7 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8,8,0,0"
-                                Margin="0,4,0,0"
+                                Margin="1,2,1,0"
                                 RenderTransformOrigin="0.5,0.5">
                             <Border.RenderTransform>
                                 <ScaleTransform x:Name="TabScale" ScaleX="1" ScaleY="1"/>
@@ -88,7 +104,7 @@
                                         Height="3"
                                         Background="{DynamicResource PrimaryBrush}"
                                         VerticalAlignment="Bottom"
-                                        CornerRadius="1.5,1.5,0,0"
+                                        CornerRadius="1.5"
                                         Opacity="0"
                                         Margin="8,0,8,0"/>
 
@@ -409,7 +425,7 @@
         <Setter Property="Margin" Value="0,0,2,0"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -470,6 +486,6 @@
 
     <!-- 默认样式设置 -->
     <Style TargetType="TabControl" BasedOn="{StaticResource FluentTabControlStyle}"/>
-    <Style TargetType="TabItem" BasedOn="{StaticResource SimpleTabItemStyle}"/>
+    <Style TargetType="TabItem" BasedOn="{StaticResource FluentTabItemStyle}"/>
 
 </ResourceDictionary>

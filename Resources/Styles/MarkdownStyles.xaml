@@ -1,0 +1,218 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf">
+
+    <!-- 现有的颜色定义保持不变 -->
+    <SolidColorBrush x:Key="MarkdownPrimaryTextBrush" Color="#333333"/>
+    <SolidColorBrush x:Key="MarkdownSecondaryTextBrush" Color="#666666"/>
+    <SolidColorBrush x:Key="MarkdownAccentBrush" Color="#2c3e50"/>
+    <SolidColorBrush x:Key="MarkdownCodeBrush" Color="#e74c3c"/>
+    <SolidColorBrush x:Key="MarkdownCodeBackgroundBrush" Color="#f8f9fa"/>
+    <SolidColorBrush x:Key="MarkdownQuoteBackgroundBrush" Color="#f8f9fa"/>
+    <SolidColorBrush x:Key="MarkdownQuoteBorderBrush" Color="#3498db"/>
+
+    <!-- 覆盖 Markdig.Wpf 的默认样式 -->
+    
+    <!-- 文档样式 -->
+    <Style TargetType="{x:Type FlowDocument}" x:Key="{x:Static markdig:Styles.DocumentStyleKey}">
+        <Setter Property="FontFamily" Value="宋体, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, Monospace Neon"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="LineHeight" Value="22"/>
+    </Style>
+
+    <!-- 标题样式 -->
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="0,20,0,10"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,2"/>
+        <Setter Property="Padding" Value="0,0,0,8"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,16,0,8"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="0,0,0,4"/>
+        <Setter Property="FontFamily" Value="宋体, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, Monospace Neon"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,12,0,6"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Margin" Value="0,10,0,5"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading5StyleKey}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Margin" Value="0,8,0,4"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading6StyleKey}">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Margin" Value="0,6,0,3"/>
+        <Setter Property="FontStyle" Value="Italic"/>
+    </Style>
+
+    <!-- 代码样式 -->
+    <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownCodeBrush}"/>
+        <Setter Property="FontFamily" Value="宋体"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.CodeBlockStyleKey}">
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontFamily" Value="宋体"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="Margin" Value="0,8,0,8"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="4,1"/>
+        
+    </Style>
+
+    <!-- 引用块样式 -->
+    <Style TargetType="{x:Type Section}" x:Key="{x:Static markdig:Styles.QuoteBlockStyleKey}">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="4,0,0,0"/>
+        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Padding" Value="16,8,16,8"/>
+        <Setter Property="Margin" Value="0,8,0,8"/>
+    </Style>
+
+    <!-- 超链接样式 -->
+    <Style TargetType="{x:Type Hyperlink}" x:Key="{x:Static markdig:Styles.HyperlinkStyleKey}">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="TextDecorations" Value="None"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline"/>
+                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- 表格样式 -->
+    <Style TargetType="{x:Type Table}" x:Key="{x:Static markdig:Styles.TableStyleKey}">
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CellSpacing" Value="0"/>
+        <Setter Property="Margin" Value="0,8,0,8"/>
+    </Style>
+
+    <Style TargetType="{x:Type TableCell}" x:Key="{x:Static markdig:Styles.TableCellStyleKey}">
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    </Style>
+
+    <Style TargetType="{x:Type TableRow}" x:Key="{x:Static markdig:Styles.TableHeaderStyleKey}">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+    </Style>
+
+    <!-- 分隔线样式 -->
+    <Style TargetType="{x:Type Line}" x:Key="{x:Static markdig:Styles.ThematicBreakStyleKey}">
+        <Setter Property="Stretch" Value="Fill"/>
+        <Setter Property="Stroke" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="Margin" Value="0,16,0,16"/>
+    </Style>
+
+    <!-- 任务列表样式 -->
+    <Style TargetType="{x:Type CheckBox}" x:Key="{x:Static markdig:Styles.TaskListStyleKey}">
+        <Setter Property="Margin" Value="0,0,8,-2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="IsEnabled" Value="False"/>
+    </Style>
+
+    <!-- 高亮文本样式 -->
+    <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.MarkedStyleKey}">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- 删除线样式 -->
+    <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.StrikeThroughStyleKey}">
+        <Setter Property="TextBlock.TextDecorations" Value="Strikethrough"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+    </Style>
+
+    <!-- 下划线样式 -->
+    <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.InsertedStyleKey}">
+        <Setter Property="TextBlock.TextDecorations" Value="Underline"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+
+    <!-- 上标和下标样式 -->
+    <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.SubscriptStyleKey}">
+        <Setter Property="Typography.Variants" Value="Subscript"/>
+        <Setter Property="FontSize" Value="10"/>
+    </Style>
+
+    <Style TargetType="{x:Type Span}" x:Key="{x:Static markdig:Styles.SuperscriptStyleKey}">
+        <Setter Property="Typography.Variants" Value="Superscript"/>
+        <Setter Property="FontSize" Value="10"/>
+    </Style>
+
+    <!-- 图片样式 -->
+    <Style TargetType="{x:Type Image}" x:Key="{x:Static markdig:Styles.ImageStyleKey}">
+        <Setter Property="MaxHeight" Value="{Binding RelativeSource={RelativeSource Self}, Path=Source.(BitmapSource.PixelHeight)}"/>
+        <Setter Property="MaxWidth" Value="{Binding RelativeSource={RelativeSource Self}, Path=Source.(BitmapSource.PixelWidth)}"/>
+        <Setter Property="Margin" Value="0,8,0,8"/>
+    </Style>
+
+    <!-- 列表样式 -->
+    <Style TargetType="{x:Type List}">
+        <Setter Property="Margin" Value="24,8,0,8"/>
+        <Setter Property="Padding" Value="0,0,0,0"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    </Style>
+
+    <!-- MarkdownViewer 默认样式 -->
+    <Style TargetType="{x:Type markdig:MarkdownViewer}">
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="markdig:MarkdownViewer">
+                    <FlowDocumentScrollViewer Document="{TemplateBinding Document}"
+                                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                              ScrollViewer.CanContentScroll="False"
+                                              Background="{TemplateBinding Background}"
+                                              Foreground="{TemplateBinding Foreground}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

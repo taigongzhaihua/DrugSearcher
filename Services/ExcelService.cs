@@ -26,8 +26,10 @@ public class ExcelService : IExcelService
 
             try
             {
-                using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                IWorkbook workbook = Path.GetExtension(tempFilePath).ToLower() == ".xlsx"
+                using var fileStream =
+                    new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                IWorkbook workbook = Path.GetExtension(tempFilePath).Equals(".xlsx"
+                    , StringComparison.CurrentCultureIgnoreCase)
                     ? new XSSFWorkbook(fileStream)
                     : new HSSFWorkbook(fileStream);
 
@@ -88,6 +90,8 @@ public class ExcelService : IExcelService
         return result;
     }
 
+    private static readonly string[] function = ["药品名称"];
+
     /// <summary>
     /// 验证Excel文件格式
     /// </summary>
@@ -109,7 +113,8 @@ public class ExcelService : IExcelService
 
                 try
                 {
-                    using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var fileStream =
+                        new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     IWorkbook workbook = extension == ".xlsx"
                         ? new XSSFWorkbook(fileStream)
                         : new HSSFWorkbook(fileStream);
@@ -135,7 +140,7 @@ public class ExcelService : IExcelService
                     }
 
                     // 只验证必需的列是否存在
-                    var requiredColumns = new[] { "药品名称" };
+                    var requiredColumns = function;
                     var hasRequiredColumns = requiredColumns.All(col => headerText.Contains(col));
 
                     // 显式关闭工作簿
@@ -165,6 +170,8 @@ public class ExcelService : IExcelService
             return false;
         }
     }
+
+    private static readonly string[] requiredColumnsAction = ["药品名称"];
 
     /// <summary>
     /// 获取Excel文件的详细验证信息
@@ -197,7 +204,8 @@ public class ExcelService : IExcelService
 
                 try
                 {
-                    using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var fileStream =
+                        new FileStream(tempFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     IWorkbook workbook = extension == ".xlsx"
                         ? new XSSFWorkbook(fileStream)
                         : new HSSFWorkbook(fileStream);
@@ -243,9 +251,9 @@ public class ExcelService : IExcelService
                     result.DetectedColumns = headerText;
 
                     // 检查必需的列
-                    var requiredColumns = new[] { "药品名称" };
+                    var requiredColumns = requiredColumnsAction;
                     var missingRequired = requiredColumns.Where(col => !headerText.Contains(col)).ToList();
-                    if (missingRequired.Any())
+                    if (missingRequired.Count != 0)
                     {
                         result.IsValid = false;
                         result.ErrorMessage = $"缺少必需的列：{string.Join(", ", missingRequired)}";
@@ -254,7 +262,7 @@ public class ExcelService : IExcelService
                     }
 
                     // 检查可选的列
-                    var optionalColumns = new[] { "规格", "用法用量", "适应症", "中医病名", "中医辨病辨证", "备注" };
+                    var optionalColumns = OptionalColumnsAction;
                     var missingOptional = optionalColumns.Where(col => !headerText.Contains(col)).ToList();
                     result.MissingOptionalColumns = missingOptional;
 
@@ -278,7 +286,7 @@ public class ExcelService : IExcelService
                     result.DataRowCount = dataRowCount;
                     result.IsValid = true;
 
-                    if (missingOptional.Any())
+                    if (missingOptional.Count != 0)
                     {
                         result.WarningMessage = $"以下可选列未找到：{string.Join(", ", missingOptional)}，这些数据将为空";
                     }
@@ -311,6 +319,13 @@ public class ExcelService : IExcelService
 
         return result;
     }
+
+    private static readonly string[] ExportToExcelAction =
+    [
+        "药品名称", "通用名称", "规格", "生产厂家", "批准文号", "适应症", "用法用量", "中医病名", "中医辨病辨证", "备注", "创建时间", "更新时间"
+    ];
+
+    private static readonly string[] OptionalColumnsAction = ["规格", "用法用量", "适应症", "中医病名", "中医辨病辨证", "备注"];
 
     /// <summary>
     /// 导出药物数据到Excel
@@ -351,7 +366,7 @@ public class ExcelService : IExcelService
 
                 // 创建表头
                 var headerRow = sheet.CreateRow(0);
-                var headers = new[] { "药品名称", "通用名称", "规格", "生产厂家", "批准文号", "适应症", "用法用量", "中医病名", "中医辨病辨证", "备注", "创建时间", "更新时间" };
+                var headers = ExportToExcelAction;
 
                 for (var i = 0; i < headers.Length; i++)
                 {

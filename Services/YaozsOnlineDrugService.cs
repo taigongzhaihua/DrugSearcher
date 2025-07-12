@@ -4,13 +4,14 @@ using DrugSearcher.Repositories;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace DrugSearcher.Services;
 
 /// <summary>
 /// 药智数在线药物服务实现（使用仓储模式）
 /// </summary>
-public class YaozsOnlineDrugService : IOnlineDrugService
+public partial class YaozsOnlineDrugService : IOnlineDrugService
 {
     private readonly HttpClient _httpClient;
     private readonly IOnlineDrugRepository _onlineDrugRepository;
@@ -163,7 +164,7 @@ public class YaozsOnlineDrugService : IOnlineDrugService
                 return drugInfo;
             }
 
-            _logger.LogDebug($"找到 {rowNodes.Count} 个 row 元素，ID: {id}");
+            _logger.LogDebug("找到 {rowNodes.Count} 个 row 元素，ID: {id}", rowNodes.Count, id);
 
             // 提取所有key-value对
             var dataDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -171,15 +172,11 @@ public class YaozsOnlineDrugService : IOnlineDrugService
             foreach (var rowNode in rowNodes)
             {
                 var keyValuePair = ExtractKeyValueFromRow(rowNode);
-                if (keyValuePair.HasValue)
-                {
-                    var (key, value) = keyValuePair.Value;
-                    if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(value))
-                    {
-                        dataDict[key] = value;
-                        _logger.LogDebug($"提取到数据 - {key}: {value.Substring(0, Math.Min(50, value.Length))}...");
-                    }
-                }
+                if (!keyValuePair.HasValue) continue;
+                var (key, value) = keyValuePair.Value;
+                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) continue;
+                dataDict[key] = value;
+                _logger.LogDebug("提取到数据 - {key}: {value}...", key, value[..Math.Min(50, value.Length)]);
             }
 
             if (dataDict.Count == 0)
@@ -236,7 +233,7 @@ public class YaozsOnlineDrugService : IOnlineDrugService
 
             if (labelNode == null || spanNode == null)
             {
-                _logger.LogDebug($"Row元素缺少label或span: {rowNode.OuterHtml.Substring(0, Math.Min(100, rowNode.OuterHtml.Length))}");
+                _logger.LogDebug($"Row元素缺少label或span: {rowNode.OuterHtml[..Math.Min(100, rowNode.OuterHtml.Length)]}");
                 return null;
             }
 
@@ -274,12 +271,7 @@ public class YaozsOnlineDrugService : IOnlineDrugService
             var innerHTML = spanNode.InnerHtml;
 
             // 将<br>、<br/>、<br />标签替换为换行符
-            innerHTML = System.Text.RegularExpressions.Regex.Replace(
-                innerHTML,
-                @"<br\s*/?>\s*",
-                "\n",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase
-            );
+            innerHTML = innerHTMLRegex().Replace(innerHTML, "\n");
 
             // 创建临时HTML节点来解码HTML实体
             var tempDoc = new HtmlAgilityPack.HtmlDocument();
@@ -289,8 +281,8 @@ public class YaozsOnlineDrugService : IOnlineDrugService
             var text = tempDoc.DocumentNode.SelectSingleNode("//div")?.InnerText ?? "";
 
             // 清理多余的空白字符
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"[ \t]+", " ");
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n\s*\n", "\n");
+            text = SpaceRegex().Replace(text, " ");
+            text = SpaceLineRegex().Replace(text, "\n");
 
             return text.Trim();
         }
@@ -305,13 +297,13 @@ public class YaozsOnlineDrugService : IOnlineDrugService
     /// <summary>
     /// 清理文本内容
     /// </summary>
-    private string CleanText(string text)
+    private static string CleanText(string text)
     {
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         // 标准化空白字符
-        text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ");
+        text = SimpleSpaceRegex().Replace(text, " ");
 
         return text.Trim();
     }
@@ -319,7 +311,7 @@ public class YaozsOnlineDrugService : IOnlineDrugService
     /// <summary>
     /// 将提取的数据映射到药物信息对象
     /// </summary>
-    private void MapDataToDrugInfo(Dictionary<string, string> dataDict, OnlineDrugInfo drugInfo)
+    private static void MapDataToDrugInfo(Dictionary<string, string> dataDict, OnlineDrugInfo drugInfo)
     {
         // 药物名称的多种可能键名
         drugInfo.DrugName = GetValueByKeys(dataDict, "通用名称", "药品名称", "品名", "名称") ?? "未知药物";
@@ -397,7 +389,7 @@ public class YaozsOnlineDrugService : IOnlineDrugService
     /// <summary>
     /// 根据多个可能的键名获取值
     /// </summary>
-    private string? GetValueByKeys(Dictionary<string, string> dataDict, params string[] keys)
+    private static string? GetValueByKeys(Dictionary<string, string> dataDict, params string[] keys)
     {
         foreach (var key in keys)
         {
@@ -626,4 +618,13 @@ public class YaozsOnlineDrugService : IOnlineDrugService
             return [];
         }
     }
+
+    [GeneratedRegex(@"<br\s*/?>\s*", RegexOptions.IgnoreCase, "zh-CN")]
+    private static partial System.Text.RegularExpressions.Regex innerHTMLRegex();
+    [GeneratedRegex(@"[ \t]+")]
+    private static partial Regex SpaceRegex();
+    [GeneratedRegex(@"\n\s*\n")]
+    private static partial Regex SpaceLineRegex();
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex SimpleSpaceRegex();
 }

@@ -80,7 +80,7 @@
                                  Text="{Binding StartId}"
                                  Style="{StaticResource FormTextBoxStyle}"
                                  IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="0,0,20,0"/>
+                                 Margin="10,10,20,10"/>
 
                         <!-- 结束ID -->
                         <TextBlock Grid.Row="0" Grid.Column="2"
@@ -90,7 +90,8 @@
                         <TextBox Grid.Row="0" Grid.Column="3"
                                  Text="{Binding EndId}"
                                  Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                 Margin="10,10,20,10"/>
 
                         <!-- 批次大小 -->
                         <TextBlock Grid.Row="1" Grid.Column="0"
@@ -101,7 +102,7 @@
                                  Text="{Binding BatchSize}"
                                  Style="{StaticResource FormTextBoxStyle}"
                                  IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="0,0,20,0"/>
+                                 Margin="10,10,20,10"/>
 
                         <!-- 请求间隔 -->
                         <TextBlock Grid.Row="1" Grid.Column="2"
@@ -111,7 +112,8 @@
                         <TextBox Grid.Row="1" Grid.Column="3"
                                  Text="{Binding DelayMs}"
                                  Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                 Margin="10,10,20,10"/>
                     </Grid>
 
                     <!-- 快速设置按钮 -->

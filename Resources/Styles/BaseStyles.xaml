@@ -534,12 +534,15 @@
 
     <Style TargetType="TextBlock" x:Key="DefaultTextStyle">
         <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
         <Setter Property="FontWeight" Value="Normal"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="LineHeight" Value="30"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="FontFamily" Value="宋体"></Setter>
     </Style>
 
-    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DefaultTextStyle}"/>
+
     <!-- 标准间距 -->
     <Thickness x:Key="SmallMargin">4</Thickness>
     <Thickness x:Key="MediumMargin">8</Thickness>

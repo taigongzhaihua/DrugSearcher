@@ -11,11 +11,12 @@ public class BooleanToVisibilityConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
+        return value switch
         {
-            return boolValue ? Visibility.Visible : Visibility.Collapsed;
-        }
-        return Visibility.Collapsed;
+            bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
+            string strValue => string.IsNullOrEmpty(strValue) ? Visibility.Collapsed : Visibility.Visible,
+            _ => Visibility.Collapsed
+        };
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

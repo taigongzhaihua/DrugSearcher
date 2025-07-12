@@ -31,4 +31,5 @@ public static class Converters
     /// 小于比较转换器
     /// </summary>
     public static readonly IValueConverter LessThanConverter = new LessThanValueConverter();
+
 }

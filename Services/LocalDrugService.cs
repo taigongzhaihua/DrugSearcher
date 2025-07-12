@@ -33,10 +33,9 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
             return [];
 
         var drugs = await drugRepository.SearchAsync(keyword);
-        return drugs.Select(d => d.DrugName)
+        return [.. drugs.Select(d => d.DrugName)
             .Distinct()
-            .Take(10)
-            .ToList();
+            .Take(10)];
     }
 
     /// <summary>
@@ -65,12 +64,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     public async Task<LocalDrugInfo> UpdateDrugAsync(LocalDrugInfo localDrugInfo)
     {
         var existing = await drugRepository.GetByIdAsync(localDrugInfo.Id);
-        if (existing == null)
-        {
-            throw new InvalidOperationException("药物不存在");
-        }
-
-        return await drugRepository.UpdateAsync(localDrugInfo);
+        return existing == null ? throw new InvalidOperationException("药物不存在") : await drugRepository.UpdateAsync(localDrugInfo);
     }
 
     /// <summary>

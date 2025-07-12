@@ -2,9 +2,11 @@
 using DrugSearcher.Constants;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
+using DrugSearcher.Services.Interfaces;
 using DrugSearcher.ViewModels;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shell;
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
@@ -22,7 +24,7 @@ public partial class MainWindow
     private TrayManager? _trayManager;
     private readonly IUserSettingsService? _settingsService;
     private readonly MainWindowViewModel _viewModel;
-
+    private readonly IHotKeyService? _hotKeyService;
     #endregion
 
     #region 构造函数
@@ -48,6 +50,8 @@ public partial class MainWindow
 
             // 初始化窗口设置
             InitializeWindow();
+            // 延迟初始化快捷键服务
+            Loaded += OnWindowLoaded;
 
             Debug.WriteLine("主窗口初始化完成");
         }
@@ -61,6 +65,26 @@ public partial class MainWindow
     #endregion
 
     #region 初始化方法
+
+
+    // 窗口加载完成后初始化快捷键
+    private void OnWindowLoaded(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // 从容器解析快捷键服务
+            if (ContainerAccessor.IsInitialized)
+            {
+                var hotKeyService = ContainerAccessor.Resolve<IHotKeyService>();
+                InitializeHotKeys(hotKeyService);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"初始化快捷键服务失败: {ex.Message}");
+        }
+    }
+
 
     /// <summary>
     /// 初始化窗口设置
@@ -158,6 +182,33 @@ public partial class MainWindow
         catch (Exception ex)
         {
             Debug.WriteLine($"托盘管理器初始化失败: {ex.Message}");
+        }
+    }
+    /// <summary>
+    /// 初始化快捷键
+    /// </summary>
+    private void InitializeHotKeys(IHotKeyService? hotKeyService)
+    {
+        if (hotKeyService == null) return;
+
+        try
+        {
+            // 注册默认快捷键
+            hotKeyService.RegisterDefaultHotKeys();
+
+            // 订阅快捷键事件
+            hotKeyService.ShowMainWindowRequested += OnShowMainWindowRequested;
+            hotKeyService.QuickSearchRequested += OnQuickSearchRequested;
+            hotKeyService.SearchRequested += OnSearchRequested;
+            hotKeyService.RefreshRequested += OnRefreshRequested;
+            hotKeyService.SettingsRequested += OnSettingsRequested;
+            hotKeyService.ExitRequested += OnExitRequested;
+
+            Debug.WriteLine("快捷键初始化完成");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"快捷键初始化失败: {ex.Message}");
         }
     }
 
@@ -629,6 +680,48 @@ public partial class MainWindow
 
     #endregion
 
+    #region 事件处理器 - 快捷键
+
+    // 快捷键事件处理方法
+    private void OnShowMainWindowRequested()
+    {
+        _ = ShowFromTrayAsync();
+    }
+
+    private void OnQuickSearchRequested()
+    {
+        _ = ShowFromTrayAsync();
+        NavigateToHomePage();
+    }
+
+    private void OnSearchRequested()
+    {
+        // 触发搜索功能
+    }
+
+    private void OnRefreshRequested()
+    {
+        // 刷新当前页面
+        if (MainFrame.Content is Page currentPage)
+        {
+            MainFrame.Refresh();
+        }
+    }
+
+    private void OnSettingsRequested()
+    {
+        NavigateToSettingsPage();
+    }
+
+    private void OnExitRequested()
+    {
+        Close();
+    }
+
+
+
+    #endregion
+
     #region 辅助方法
 
     /// <summary>
@@ -673,6 +766,27 @@ public partial class MainWindow
             Debug.WriteLine($"显示关于对话框失败: {ex.Message}");
         }
     }
+    private void CleanupHotKeys()
+    {
+        if (_hotKeyService == null) return;
+
+        try
+        {
+            _hotKeyService.ShowMainWindowRequested -= OnShowMainWindowRequested;
+            _hotKeyService.QuickSearchRequested -= OnQuickSearchRequested;
+            _hotKeyService.SearchRequested -= OnSearchRequested;
+            _hotKeyService.RefreshRequested -= OnRefreshRequested;
+            _hotKeyService.SettingsRequested -= OnSettingsRequested;
+            _hotKeyService.ExitRequested -= OnExitRequested;
+
+            _hotKeyService.Dispose();
+            Debug.WriteLine("快捷键已清理");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"清理快捷键失败: {ex.Message}");
+        }
+    }
 
     #endregion
 
@@ -689,6 +803,7 @@ public partial class MainWindow
             // 清理托盘管理器
             CleanupTrayManager();
 
+            CleanupHotKeys();  // 添加这一行
             // 清理单实例管理器
             SingleInstanceManager.Cleanup();
 

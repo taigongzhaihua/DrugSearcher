@@ -595,6 +595,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             Debug.WriteLine($"释放 MainWindowViewModel 资源失败: {ex.Message}");
         }
+        GC.SuppressFinalize(this);
     }
 
     #endregion
