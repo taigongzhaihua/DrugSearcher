@@ -263,22 +263,22 @@ public static class SystemThemeHelper
             }
 
             var registryValueObject = key.GetValue(valueName);
-            if (registryValueObject == null)
+            switch (registryValueObject)
             {
-                Debug.WriteLine($"注册表值不存在: {valueName}");
-                return null;
+                case null:
+                    Debug.WriteLine($"注册表值不存在: {valueName}");
+                    return null;
+                case int registryValue:
+                    {
+                        // 0表示深色主题，1表示浅色主题
+                        var isDark = registryValue == DarkThemeValue;
+                        Debug.WriteLine($"注册表值 {valueName}: {registryValue} ({(isDark ? "深色" : "浅色")})");
+                        return isDark;
+                    }
+                default:
+                    Debug.WriteLine($"注册表值类型不正确: {registryValueObject.GetType()}");
+                    return null;
             }
-
-            if (registryValueObject is int registryValue)
-            {
-                // 0表示深色主题，1表示浅色主题
-                var isDark = registryValue == DarkThemeValue;
-                Debug.WriteLine($"注册表值 {valueName}: {registryValue} ({(isDark ? "深色" : "浅色")})");
-                return isDark;
-            }
-
-            Debug.WriteLine($"注册表值类型不正确: {registryValueObject.GetType()}");
-            return null;
         }
         catch (Exception ex)
         {

@@ -3,6 +3,8 @@ using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
+using System.Windows.Input;
 
 namespace DrugSearcher.Services;
 
@@ -68,6 +70,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
         [
             ..CreateTraySettings(),
             ..CreateUiSettings(),
+            ..CreateHotKeySettings(),
             ..CreateApplicationSettings()
         ];
     }
@@ -173,7 +176,80 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             }
         ];
     }
+    /// <summary>
+    /// 创建快捷键相关设置定义
+    /// </summary>
+    private static List<SettingDefinition> CreateHotKeySettings()
+    {
+        return
+        [
+            new SettingDefinition
+        {
+            Key = SettingKeys.HotKeyShowMainWindow,
+            ValueType = typeof(string), // 改为string类型，存储JSON
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F1, ModifierKeys.Alt)),
+            Description = "显示主窗口的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null // 移除验证器，在DynamicSettingsService中处理
+        },
 
+        new SettingDefinition
+        {
+            Key = SettingKeys.HotKeyQuickSearch,
+            ValueType = typeof(string),
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F2, ModifierKeys.Control | ModifierKeys.Alt)),
+            Description = "快速搜索的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null
+        },
+
+        new SettingDefinition
+        {
+            Key = SettingKeys.HotKeySearch,
+            ValueType = typeof(string),
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F, ModifierKeys.Control)),
+            Description = "搜索的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null
+        },
+
+        new SettingDefinition
+        {
+            Key = SettingKeys.HotKeyRefresh,
+            ValueType = typeof(string),
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F5, ModifierKeys.None)),
+            Description = "刷新的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null
+        },
+
+        new SettingDefinition
+        {
+            Key = SettingKeys.HotKeySettings,
+            ValueType = typeof(string),
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.S, ModifierKeys.Control)),
+            Description = "设置的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null
+        },
+
+        new SettingDefinition
+        {
+            Key = SettingKeys.HotKeyExit,
+            ValueType = typeof(string),
+            DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.Q, ModifierKeys.Control)),
+            Description = "退出的快捷键",
+            Category = SettingCategories.HotKey,
+            IsReadOnly = false,
+            Validator = null
+        }
+        ];
+    }
     /// <summary>
     /// 创建应用程序相关设置定义
     /// </summary>
@@ -226,10 +302,12 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// <returns>是否有效</returns>
     private static bool ValidateFontSize(object? value)
     {
-        if (value is not int fontSize)
-            return false;
-
-        return fontSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize;
+        return value switch
+        {
+            double doubleSize => doubleSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
+            int intSize => intSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
+            _ => false
+        };
     }
 
     /// <summary>

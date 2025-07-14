@@ -9,8 +9,8 @@ namespace DrugSearcher.Services;
 public class DrugSearchService(
     ILocalDrugService localDrugService,
     ILogger<DrugSearchService> logger,
-    IOnlineDrugService? onlineDrugService = null,
-    ICachedDrugService? cachedDrugService = null)
+    IOnlineDrugService? onlineDrugService,
+    ICachedDrugService? cachedDrugService)
 {
     /// <summary>
     /// 统一搜索药物
@@ -67,6 +67,7 @@ public class DrugSearchService(
     {
         try
         {
+#pragma warning disable CS8602 // 解引用可能出现空引用。
             return dataSource switch
             {
                 DataSource.LocalDatabase => await localDrugService.GetDrugDetailAsync(id),
@@ -74,6 +75,7 @@ public class DrugSearchService(
                 DataSource.CachedDocuments => await cachedDrugService?.GetCachedDrugDetailAsync(id),
                 _ => null
             };
+#pragma warning restore CS8602 // 解引用可能出现空引用。
         }
         catch (Exception ex)
         {

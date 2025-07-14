@@ -23,4 +23,12 @@ public static class SettingKeys
     public const string SearchTimeout = "search.timeout";
     public const string MaxResults = "search.max_results";
     public const string CacheEnabled = "search.cache_enabled";
+
+    // 快捷键相关设置
+    public const string HotKeyShowMainWindow = "hotkey.show_main_window";
+    public const string HotKeyQuickSearch = "hotkey.quick_search";
+    public const string HotKeySearch = "hotkey.search";
+    public const string HotKeyRefresh = "hotkey.refresh";
+    public const string HotKeySettings = "hotkey.settings";
+    public const string HotKeyExit = "hotkey.exit";
 }

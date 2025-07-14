@@ -17,13 +17,14 @@ public static partial class DrugInfoMarkdownHelper
         var markdownDict = new Dictionary<string, string>();
         InitDictonary(markdownDict);
 
-        if (drugInfo is LocalDrugInfo localDrug)
+        switch (drugInfo)
         {
-            ConvertLocalDrugInfo(localDrug, markdownDict);
-        }
-        else if (drugInfo is OnlineDrugInfo onlineDrug)
-        {
-            ConvertOnlineDrugInfo(onlineDrug, markdownDict);
+            case LocalDrugInfo localDrug:
+                ConvertLocalDrugInfo(localDrug, markdownDict);
+                break;
+            case OnlineDrugInfo onlineDrug:
+                ConvertOnlineDrugInfo(onlineDrug, markdownDict);
+                break;
         }
 
         // 生成全部详情
@@ -225,7 +226,7 @@ public static partial class DrugInfoMarkdownHelper
         var fullContent = sb.ToString().TrimEnd();
         if (fullContent.EndsWith("---"))
         {
-            fullContent = fullContent.Substring(0, fullContent.Length - 3).TrimEnd();
+            fullContent = fullContent[..^3].TrimEnd();
         }
 
         markdownDict["FullDetails"] = fullContent;
@@ -273,13 +274,13 @@ public static partial class DrugInfoMarkdownHelper
             if (!string.IsNullOrEmpty(trimmedLine))
             {
                 // 如果行以数字开头，格式化为列表
-                if (Regex.IsMatch(trimmedLine, @"^\d+[\.\)、]"))
+                if (Number4Regex().IsMatch(trimmedLine))
                 {
-                    var formattedLine = Regex.Replace(trimmedLine, @"^(\d+)[\.\)、]\s*", "$1. ");
+                    var formattedLine = Number5Regex().Replace(trimmedLine, "$1. ");
                     sb.AppendLine(formattedLine);
                 }
                 // 如果行以符号开头，保持原样
-                else if (trimmedLine.StartsWith("-") || trimmedLine.StartsWith("•") || trimmedLine.StartsWith("*"))
+                else if (trimmedLine.StartsWith('-') || trimmedLine.StartsWith('•') || trimmedLine.StartsWith('*'))
                 {
                     sb.AppendLine(trimmedLine);
                 }
@@ -317,18 +318,16 @@ public static partial class DrugInfoMarkdownHelper
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
-            if (!string.IsNullOrEmpty(trimmedLine))
+            if (string.IsNullOrEmpty(trimmedLine)) continue;
+            // 处理数字列表
+            if (Number4Regex().IsMatch(trimmedLine))
             {
-                // 处理数字列表
-                if (Regex.IsMatch(trimmedLine, @"^\d+[\.\)、]"))
-                {
-                    var formattedLine = Regex.Replace(trimmedLine, @"^\(?(\d+)[\.\)、]\s*", "$1. ");
-                    sb.AppendLine($"> {formattedLine}");
-                }
-                else
-                {
-                    sb.AppendLine($"> - {trimmedLine}");
-                }
+                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. ");
+                sb.AppendLine($"> {formattedLine}");
+            }
+            else
+            {
+                sb.AppendLine($"> - {trimmedLine}");
             }
         }
 
@@ -343,7 +342,7 @@ public static partial class DrugInfoMarkdownHelper
         if (string.IsNullOrWhiteSpace(precautions))
             return string.Empty;
 
-        var preprocessedText = Regex.Replace(PreprocessText(precautions), @"(。)\s*(\d+)[\.\)、]\s*", "$1\n$2. ");
+        var preprocessedText = PreprocessText(precautions);
         var sb = new StringBuilder();
         sb.AppendLine("> ⚡ **注意**");
         sb.AppendLine("> ---");
@@ -352,18 +351,16 @@ public static partial class DrugInfoMarkdownHelper
         foreach (var line in lines)
         {
             var trimmedLine = line.Trim();
-            if (!string.IsNullOrEmpty(trimmedLine))
+            if (string.IsNullOrEmpty(trimmedLine)) continue;
+            // 处理数字列表
+            if (Number4Regex().IsMatch(trimmedLine))
             {
-                // 处理数字列表
-                if (Regex.IsMatch(trimmedLine, @"^\d+[\.\)、]"))
-                {
-                    var formattedLine = Regex.Replace(trimmedLine, @"^(\d+)[\.\)、]\s*", "$1. ");
-                    sb.AppendLine($"> {formattedLine}");
-                }
-                else
-                {
-                    sb.AppendLine($"> {trimmedLine}");
-                }
+                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
+                sb.AppendLine($"> {formattedLine}");
+            }
+            else
+            {
+                sb.AppendLine($"> {trimmedLine}");
             }
         }
 
@@ -390,9 +387,9 @@ public static partial class DrugInfoMarkdownHelper
             if (!string.IsNullOrEmpty(trimmedLine))
             {
                 // 处理数字列表
-                if (Regex.IsMatch(trimmedLine, @"^\d+[\.\)、]"))
+                if (Number4Regex().IsMatch(trimmedLine))
                 {
-                    var formattedLine = Regex.Replace(trimmedLine, @"(\d+)[\.\)、]\s*", "$1. ");
+                    var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
                     sb.AppendLine($"> {formattedLine}");
                 }
                 else
@@ -459,9 +456,9 @@ public static partial class DrugInfoMarkdownHelper
             var trimmedLine = line.Trim();
             if (string.IsNullOrEmpty(trimmedLine)) continue;
             // 处理数字列表
-            if (Regex.IsMatch(trimmedLine, @"^\d+[\.\)、]"))
+            if (Number4Regex().IsMatch(trimmedLine))
             {
-                var formattedLine = Regex.Replace(trimmedLine, @"^(\d+)[\.\)、]\s*", "");
+                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
 
                 if (formattedLine.Contains("禁止") || formattedLine.Contains("避免") || formattedLine.Contains("不可"))
                 {
@@ -522,15 +519,23 @@ public static partial class DrugInfoMarkdownHelper
 
         return sb.ToString().Trim();
     }
+    [GeneratedRegex(@"\n\s*\n")]
+    private static partial Regex SpaceLineRegex();
 
     [GeneratedRegex(@"(?:[。；;]\s*|\s+|^)[\t\s\|]*(\d+[\.、])(?<!\d)\s*")]
     private static partial Regex NumberRegex();
+
     [GeneratedRegex(@"\|?\((\d+)\)")]
     private static partial Regex Number2Regex();
+
     [GeneratedRegex(@"\|?[①②③④⑤⑥⑦⑧⑨⑩⑾⑿⒀⒁⒂⒃⒄⒅⒆⒇㈠㈡㈢㈣㈤㈥㈦㈧㈨㈩⒈⒉⒊⒋⒌⒍⒎⒏⒐⒑⒒⒓⒔⒕⒖⒗⒘⒙⒚⒛⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽]")]
     private static partial Regex Number3Regex();
-    [GeneratedRegex(@"\n\s*\n")]
-    private static partial Regex SpaceLineRegex();
+
+    [GeneratedRegex(@"^\d+[\.\)、]")]
+    private static partial Regex Number4Regex();
+
+    [GeneratedRegex(@"^(\d+)[\.\)、]\s*")]
+    private static partial Regex Number5Regex();
 
     #endregion
 }

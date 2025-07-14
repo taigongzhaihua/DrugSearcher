@@ -130,7 +130,7 @@ public partial class CrawlerPageViewModel : ObservableObject
             return;
         }
 
-        if (BatchSize <= 0 || BatchSize > 50)
+        if (BatchSize is <= 0 or > 50)
         {
             MessageBox.Show("批次大小应在1-50之间", "参数错误", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;

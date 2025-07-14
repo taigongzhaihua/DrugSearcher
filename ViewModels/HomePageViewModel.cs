@@ -290,31 +290,31 @@ public partial class HomePageViewModel : ObservableObject
         var matchedFields = string.Join(", ", drugResult.MatchedFields);
         MatchInfo = $"匹配度: {matchScore}% | 匹配字段: {matchedFields}";
 
-        // 根据不同的数据源显示不同的信息
-        if (drugInfo is LocalDrugInfo localDrug)
+        switch (drugInfo)
         {
-            GenericName = localDrug.GenericName ?? string.Empty;
-            TradeName = string.Empty;
+            // 根据不同的数据源显示不同的信息
+            case LocalDrugInfo localDrug:
+                GenericName = localDrug.GenericName ?? string.Empty;
+                TradeName = string.Empty;
 
-            // 设置中医信息
-            TcmDisease = localDrug.TcmDisease ?? string.Empty;
-            TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
-        }
-        else if (drugInfo is OnlineDrugInfo onlineDrug)
-        {
-            GenericName = string.Empty;
-            TradeName = onlineDrug.TradeName ?? string.Empty;
+                // 设置中医信息
+                TcmDisease = localDrug.TcmDisease ?? string.Empty;
+                TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
+                break;
+            case OnlineDrugInfo onlineDrug:
+                GenericName = string.Empty;
+                TradeName = onlineDrug.TradeName ?? string.Empty;
 
-            // 清空中医信息
-            TcmDisease = string.Empty;
-            TcmSyndrome = string.Empty;
-        }
-        else
-        {
-            GenericName = string.Empty;
-            TradeName = string.Empty;
-            TcmDisease = string.Empty;
-            TcmSyndrome = string.Empty;
+                // 清空中医信息
+                TcmDisease = string.Empty;
+                TcmSyndrome = string.Empty;
+                break;
+            default:
+                GenericName = string.Empty;
+                TradeName = string.Empty;
+                TcmDisease = string.Empty;
+                TcmSyndrome = string.Empty;
+                break;
         }
     }
 

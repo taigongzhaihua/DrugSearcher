@@ -2,7 +2,7 @@ using DrugSearcher.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace DrugSearcher.Services.Interfaces;
+namespace DrugSearcher.Services;
 
 public class DatabaseInitializationService(
     IDrugDbContextFactory drugDbContextFactory,

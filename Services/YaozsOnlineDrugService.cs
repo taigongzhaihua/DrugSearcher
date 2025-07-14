@@ -409,7 +409,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
 
         _logger.LogInformation($"开始批量爬取药物信息，范围: {startId}-{endId}, 批次大小: {batchSize}, 延迟: {delayMs}ms");
 
-        for (int id = startId; id <= endId; id++)
+        for (var id = startId; id <= endId; id++)
         {
             var currentId = id;
             var task = Task.Run(async () =>
@@ -528,7 +528,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
 
         var result = new CrawlResult();
 
-        for (int i = 0; i < failedIds.Count; i++)
+        for (var i = 0; i < failedIds.Count; i++)
         {
             var id = failedIds[i];
             var drugInfo = await CrawlSingleDrugInfoAsync(id);

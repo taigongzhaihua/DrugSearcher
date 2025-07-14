@@ -2,7 +2,6 @@
 using DrugSearcher.Constants;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
-using DrugSearcher.Services.Interfaces;
 using DrugSearcher.ViewModels;
 using System.Diagnostics;
 using System.Windows;
@@ -24,7 +23,7 @@ public partial class MainWindow
     private TrayManager? _trayManager;
     private readonly IUserSettingsService? _settingsService;
     private readonly MainWindowViewModel _viewModel;
-    private readonly IHotKeyService? _hotKeyService;
+    private IHotKeyService? _hotKeyService;
     #endregion
 
     #region 构造函数
@@ -203,6 +202,8 @@ public partial class MainWindow
             hotKeyService.RefreshRequested += OnRefreshRequested;
             hotKeyService.SettingsRequested += OnSettingsRequested;
             hotKeyService.ExitRequested += OnExitRequested;
+
+            _hotKeyService = hotKeyService;
 
             Debug.WriteLine("快捷键初始化完成");
         }
@@ -702,7 +703,7 @@ public partial class MainWindow
     private void OnRefreshRequested()
     {
         // 刷新当前页面
-        if (MainFrame.Content is Page currentPage)
+        if (MainFrame.Content is Page)
         {
             MainFrame.Refresh();
         }

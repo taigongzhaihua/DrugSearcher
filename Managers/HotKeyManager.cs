@@ -11,18 +11,20 @@ namespace DrugSearcher.Managers;
 /// <summary>
 /// 快捷键管理器，支持全局和局部快捷键注册
 /// </summary>
-public class HotKeyManager : IDisposable
+public partial class HotKeyManager : IDisposable
 {
     #region Win32 API 声明
 
-    [DllImport("user32.dll")]
-    private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
-    [DllImport("user32.dll")]
-    private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool UnregisterHotKey(IntPtr hWnd, int id);
 
-    [DllImport("user32.dll")]
-    private static extern short GetAsyncKeyState(int vKey);
+    [LibraryImport("user32.dll")]
+    private static partial short GetAsyncKeyState(int vKey);
 
     #endregion
 
@@ -35,11 +37,11 @@ public class HotKeyManager : IDisposable
 
     #region 私有字段
 
-    private readonly Dictionary<int, HotKeyInfo> _globalHotKeys = new();
-    private readonly Dictionary<string, LocalHotKeyInfo> _localHotKeys = new();
+    private readonly Dictionary<int, HotKeyInfo> _globalHotKeys = [];
+    private readonly Dictionary<string, LocalHotKeyInfo> _localHotKeys = [];
     private readonly Window _ownerWindow;
     private readonly WindowInteropHelper _interopHelper;
-    private readonly HwndSource _hwndSource;
+    private readonly HwndSource? _hwndSource;
     private int _nextHotKeyId = 1;
     private bool _disposed;
 
@@ -59,10 +61,7 @@ public class HotKeyManager : IDisposable
         try
         {
             _hwndSource = HwndSource.FromHwnd(_interopHelper.Handle);
-            if (_hwndSource != null)
-            {
-                _hwndSource.AddHook(WndProc);
-            }
+            _hwndSource?.AddHook(WndProc);
 
             // 注册窗口键盘事件
             _ownerWindow.KeyDown += OnWindowKeyDown;
@@ -91,8 +90,7 @@ public class HotKeyManager : IDisposable
     /// <returns>快捷键ID，失败返回-1</returns>
     public int RegisterGlobalHotKey(Key key, ModifierKeys modifiers, Action callback, string description = "")
     {
-        if (callback == null)
-            throw new ArgumentNullException(nameof(callback));
+        ArgumentNullException.ThrowIfNull(callback);
 
         try
         {
@@ -186,8 +184,7 @@ public class HotKeyManager : IDisposable
         if (string.IsNullOrEmpty(name))
             throw new ArgumentNullException(nameof(name));
 
-        if (callback == null)
-            throw new ArgumentNullException(nameof(callback));
+        ArgumentNullException.ThrowIfNull(callback);
 
         try
         {
@@ -517,10 +514,7 @@ public class HotKeyManager : IDisposable
             ClearAllLocalHotKeys();
 
             // 移除事件处理
-            if (_hwndSource != null)
-            {
-                _hwndSource.RemoveHook(WndProc);
-            }
+            _hwndSource?.RemoveHook(WndProc);
 
             _ownerWindow.KeyDown -= OnWindowKeyDown;
             _ownerWindow.KeyUp -= OnWindowKeyUp;

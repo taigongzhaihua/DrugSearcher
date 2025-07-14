@@ -1,7 +1,7 @@
-using DrugSearcher.Models;
 using System.Windows.Input;
+using DrugSearcher.Models;
 
-namespace DrugSearcher.Services.Interfaces;
+namespace DrugSearcher.Services;
 
 /// <summary>
 /// 快捷键服务接口

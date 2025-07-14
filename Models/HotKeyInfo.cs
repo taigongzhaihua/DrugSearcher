@@ -1,4 +1,3 @@
-using System;
 using System.Windows.Input;
 
 namespace DrugSearcher.Models;
@@ -12,6 +11,11 @@ public class HotKeyInfo
     /// 快捷键ID（仅用于全局快捷键）
     /// </summary>
     public int Id { get; set; }
+
+    /// <summary>
+    /// 名称
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// 键值
@@ -39,32 +43,35 @@ public class HotKeyInfo
     public bool IsGlobal { get; set; }
 
     /// <summary>
+    /// 是否可用
+    /// </summary>
+    public bool IsEnabled { get; set; }
+
+    /// <summary>
     /// 获取快捷键显示名称
     /// </summary>
-    public string DisplayName
+    public string DisplayName => GetDisplayText(Key, Modifiers);
+
+    /// <summary>
+    /// 获取快捷键的显示文本
+    /// </summary>
+    public static string GetDisplayText(Key key, ModifierKeys modifiers)
     {
-        get
-        {
-            var parts = new List<string>();
+        var parts = new List<string>();
 
-            if ((Modifiers & ModifierKeys.Control) != 0)
-                parts.Add("Ctrl");
+        if (modifiers.HasFlag(ModifierKeys.Control))
+            parts.Add("Ctrl");
+        if (modifiers.HasFlag(ModifierKeys.Alt))
+            parts.Add("Alt");
+        if (modifiers.HasFlag(ModifierKeys.Shift))
+            parts.Add("Shift");
+        if (modifiers.HasFlag(ModifierKeys.Windows))
+            parts.Add("Win");
 
-            if ((Modifiers & ModifierKeys.Alt) != 0)
-                parts.Add("Alt");
+        parts.Add(key.ToString());
 
-            if ((Modifiers & ModifierKeys.Shift) != 0)
-                parts.Add("Shift");
-
-            if ((Modifiers & ModifierKeys.Windows) != 0)
-                parts.Add("Win");
-
-            parts.Add(Key.ToString());
-
-            return string.Join(" + ", parts);
-        }
+        return string.Join(" + ", parts);
     }
-
     public override string ToString()
     {
         return $"{DisplayName} - {Description}";
@@ -79,15 +86,40 @@ public class LocalHotKeyInfo : HotKeyInfo
     /// <summary>
     /// 快捷键名称
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public new string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// 是否启用
     /// </summary>
-    public bool IsEnabled { get; set; } = true;
+    public new bool IsEnabled { get; set; } = true;
 
     public override string ToString()
     {
         return $"{Name}: {DisplayName} - {Description} ({(IsEnabled ? "启用" : "禁用")})";
+    }
+}
+
+
+/// <summary>
+/// 快捷键设置
+/// </summary>
+public class HotKeySetting
+{
+    public Key Key { get; set; }
+    public ModifierKeys Modifiers { get; set; }
+    public bool IsEnabled { get; set; } = true;
+
+    public HotKeySetting() { }
+
+    public HotKeySetting(Key key, ModifierKeys modifiers, bool isEnabled = true)
+    {
+        Key = key;
+        Modifiers = modifiers;
+        IsEnabled = isEnabled;
+    }
+
+    public override string ToString()
+    {
+        return HotKeyInfo.GetDisplayText(Key, Modifiers);
     }
 }

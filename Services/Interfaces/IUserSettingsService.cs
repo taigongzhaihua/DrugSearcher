@@ -5,7 +5,7 @@ namespace DrugSearcher.Services;
 public interface IUserSettingsService
 {
     // 通用设置操作
-    Task<T> GetSettingAsync<T>(string key, T defaultValue = default!);
+    Task<T?> GetSettingAsync<T>(string key, T? defaultValue = default!);
     Task SetSettingAsync<T>(string key, T value);
     Task<bool> HasSettingAsync(string key);
     Task DeleteSettingAsync(string key);

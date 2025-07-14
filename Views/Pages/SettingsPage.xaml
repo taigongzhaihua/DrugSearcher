@@ -1,197 +1,346 @@
 ﻿<Page x:Class="DrugSearcher.Views.SettingsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
-      xmlns:enums="clr-namespace:DrugSearcher.Enums"
-      mc:Ignorable="d" 
+      xmlns:models="clr-namespace:DrugSearcher.Models"
+      xmlns:converters="clr-namespace:DrugSearcher.Converters"
+      xmlns:selectors="clr-namespace:DrugSearcher.Views.Selectors"
+      xmlns:controls="clr-namespace:DrugSearcher.Views.Controls"
+      mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="900"
       d:DataContext="{d:DesignInstance viewModels:SettingsPageViewModel}"
       Title="设置">
 
     <Page.Resources>
-        <!-- Fluent Design 设置卡片样式 -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!-- 反转布尔值转换器 -->
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:SafeDictionaryAccessConverter x:Key="SafeDictionaryAccessConverter" />
+        <converters:DictionaryContainsKeyConverter x:Key="DictionaryContainsKeyConverter" />
+        <converters:ObjectToDoubleConverter x:Key="ObjectToDoubleConverter"/>
+        <converters:HotKeyConverter x:Key="HotKeyConverter"/>
+        <!-- 设置模板选择器 -->
+
+
+        <!-- 设置卡片样式 -->
         <Style x:Key="FluentSettingsCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="0.8"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="16,12"/>
-            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="0.8" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="Margin" Value="0,0,0,12" />
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect ShadowDepth="1" BlurRadius="6" Opacity="0.1" Color="Black"/>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="6" Opacity="0.1" Color="Black" />
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- Fluent Design 设置组样式 -->
+        <!-- 设置组样式 -->
         <Style x:Key="FluentSettingsGroupStyle" TargetType="StackPanel">
-            <Setter Property="Margin" Value="0,0,0,24"/>
+            <Setter Property="Margin" Value="0,0,0,24" />
         </Style>
 
         <!-- 设置组标题样式 -->
         <Style x:Key="SettingsGroupHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-            <Setter Property="Margin" Value="0"/>
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="Margin" Value="0" />
         </Style>
 
         <!-- 设置项标题样式 -->
         <Style x:Key="SettingTitleStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Medium"/>
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
 
         <!-- 设置项描述样式 -->
         <Style x:Key="SettingDescriptionStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Margin" Value="0,4,10,0"/>
-            <Setter Property="LineHeight" Value="18"/>
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,4,10,0" />
+            <Setter Property="LineHeight" Value="18" />
         </Style>
 
-        <!-- 次要按钮样式 -->
-        <Style x:Key="FluentSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentThemeButtonStyle}">
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="Padding" Value="13,11"/>
-            <Setter Property="FontSize" Value="14"></Setter>
-        </Style>
-
-
-        <!-- Fluent Design 切换开关样式 -->
-        <Style x:Key="FluentToggleSwitchStyle" TargetType="CheckBox">
-            <Setter Property="Width" Value="44"/>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="CheckBox">
+        <selectors:SettingTemplateSelector x:Key="SettingTemplateSelector">
+            <!-- 开关模板 -->
+            <selectors:SettingTemplateSelector.ToggleTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
                         <Grid>
-                            <Border x:Name="BackgroundBorder"
-                                    Width="40"
-                                    Height="21"
-                                    Background="{DynamicResource BorderBrush}"
-                                    CornerRadius="10"
-                                    HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                            <Ellipse x:Name="ToggleThumb"
-                                     Width="14"
-                                     Height="14"
-                                     Fill="White"
-                                     HorizontalAlignment="Left" VerticalAlignment="Center"
-                                     Margin="3,0,0,0"
-                                     RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform>
-                                    <TranslateTransform x:Name="ThumbTransform" X="0"/>
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Effect>
-                                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.3"/>
-                                </Ellipse.Effect>
-                            </Ellipse>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ThumbTransform"
-                                                           Storyboard.TargetProperty="X"
-                                                           To="20"
-                                                           Duration="0:0:0.2"/>
-                                            <ColorAnimation Storyboard.TargetName="BackgroundBorder"
-                                                          Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                          Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ThumbTransform"
-                                                           Storyboard.TargetProperty="X"
-                                                           To="0"
-                                                           Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                                <Setter TargetName="BackgroundBorder" Property="Background" Value="{DynamicResource PrimaryBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ToggleThumb" Property="Fill" Value="#F0F0F0"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}" Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <CheckBox Grid.Column="1"
+                                      Style="{StaticResource FluentToggleSwitchStyle}"
+                                      IsChecked="{Binding Value, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                      Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                      CommandParameter="{Binding}"
+                                      VerticalAlignment="Center">
+                            </CheckBox>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.ToggleTemplate>
+
+            <!-- 修复下拉框模板 -->
+            <selectors:SettingTemplateSelector.ComboBoxTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <ComboBox Grid.Column="1"
+                                      Style="{StaticResource FluentComboBoxStyle}"
+                                      ItemsSource="{Binding AdditionalData[ItemsSource]}"
+                                      SelectedValue="{Binding Value, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                      DisplayMemberPath="{Binding Path=AdditionalData, Converter={StaticResource SafeDictionaryAccessConverter}, ConverterParameter=DisplayMemberPath}"
+                                      SelectedValuePath="{Binding Path=AdditionalData, Converter={StaticResource SafeDictionaryAccessConverter}, ConverterParameter=SelectedValuePath}"
+                                      VerticalAlignment="Center">
+                                <!-- 添加交互触发器 -->
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ComboBox>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.ComboBoxTemplate>
+            <!-- 滑块模板 -->
+            <selectors:SettingTemplateSelector.SliderTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Slider Grid.Column="0"
+                                            Value="{Binding Value, Mode=TwoWay, Converter={StaticResource ObjectToDoubleConverter}}" 
+                                            Minimum="{Binding Path=AdditionalData, Converter={StaticResource SafeDictionaryAccessConverter}, ConverterParameter=Minimum}"
+                                            Maximum="{Binding Path=AdditionalData, Converter={StaticResource SafeDictionaryAccessConverter}, ConverterParameter=Maximum}"
+                                            TickFrequency="{Binding Path=AdditionalData, Converter={StaticResource SafeDictionaryAccessConverter}, ConverterParameter=TickFrequency}"
+                                            IsSnapToTickEnabled="True"
+                                            IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,12,0">
+
+                                        <!-- 使用值变更事件而不是点击事件 -->
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="ValueChanged">
+                                                <i:InvokeCommandAction Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                                       CommandParameter="{Binding}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Slider>
+
+                                    <Border Grid.Column="1"
+                                            Background="{DynamicResource SurfaceBrush}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="8,4"
+                                            MinWidth="40">
+                                        <TextBlock Text="{Binding Value}"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   TextAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.SliderTemplate>
+
+            <!-- 文本框模板 -->
+            <selectors:SettingTemplateSelector.TextBoxTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <TextBox Grid.Column="1"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     Text="{Binding Value, Mode=TwoWay}"
+                                     IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                     VerticalAlignment="Center">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter"
+                                                Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}" />
+                                </TextBox.InputBindings>
+                            </TextBox>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.TextBoxTemplate>
+
+            <!-- 按钮模板 -->
+            <selectors:SettingTemplateSelector.ButtonTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                    Content="{Binding Value}"
+                                    Style="{StaticResource FluentSecondaryButtonStyle}"
+                                    Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                    VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.ButtonTemplate>
+
+            <!-- 快捷键模板 -->
+            <selectors:SettingTemplateSelector.HotKeyTemplate>
+                <DataTemplate DataType="models:DynamicSettingItem">
+                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding Description}"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
+                            </StackPanel>
+
+                            <controls:HotKeyInputControl Grid.Column="1"
+                                                         Value="{Binding Value, Mode=TwoWay, Converter={StaticResource HotKeyConverter}}"
+                                                         Command="{Binding DataContext.UpdateHotKeySettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                         CommandParameter="{Binding}"
+                                                         IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
+                                                         VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:SettingTemplateSelector.HotKeyTemplate>
+        </selectors:SettingTemplateSelector>
     </Page.Resources>
 
     <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- 页面头部 -->
-        <Border Grid.Row="0" 
+        <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="32,24">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- 页面标题和副标题 -->
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="设置"
                                FontSize="28"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                               Foreground="{DynamicResource PrimaryTextBrush}" />
                     <TextBlock Text="个性化您的应用体验"
                                FontSize="14"
                                Foreground="{DynamicResource SecondaryTextBrush}"
-                               Margin="0,4,0,0"/>
+                               Margin="0,4,0,0" />
                 </StackPanel>
 
-                <!-- 搜索框 -->
                 <TextBox Grid.Column="1"
-                         x:Name="SearchBox"
                          Width="280" VerticalAlignment="Center"
                          Style="{StaticResource BaseTextBoxStyle}"
-                         Tag="搜索设置..."
-                         TextChanged="SearchBox_TextChanged">
+                         Text="{Binding SearchText, Mode=TwoWay}"
+                         Tag="搜索设置...">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Escape" Command="{Binding ClearSearchCommand}"/>
+                        <KeyBinding Key="Escape" Command="{Binding ClearSearchCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
             </Grid>
         </Border>
 
         <!-- 主要内容区域 -->
-        <ScrollViewer Grid.Row="1" 
-                      VerticalScrollBarVisibility="Auto" 
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
                       Padding="32,24"
                       Background="Transparent">
-            <StackPanel x:Name="SettingsContainer" MaxWidth="800" HorizontalAlignment="Center">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Center">
 
                 <!-- 加载指示器 -->
-                <ProgressBar IsIndeterminate="True" 
+                <ProgressBar IsIndeterminate="True"
                              Height="3"
                              Margin="0,0,0,24"
                              Background="Transparent"
                              Foreground="{DynamicResource PrimaryBrush}"
-                             Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                             Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                 <!-- 状态消息 -->
                 <Border Background="{DynamicResource PrimaryBrush}"
@@ -202,334 +351,86 @@
                     <TextBlock Text="{Binding StatusMessage}"
                                Foreground="White"
                                FontSize="14"
-                               FontWeight="Medium"/>
+                               FontWeight="Medium" />
                 </Border>
 
-                <!-- 系统托盘设置 -->
-                <StackPanel x:Name="TraySettingsGroup" Style="{StaticResource FluentSettingsGroupStyle}">
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <TextBlock Text="&#xe61e;" 
-                                       FontFamily="{DynamicResource IconFont}" 
-                                       FontSize="24" 
-                                       Foreground="{DynamicResource PrimaryBrush}"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,12,0"/>
-                            <TextBlock Text="系统托盘" Style="{StaticResource SettingsGroupHeaderStyle}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                        <Button Grid.Column="1"
-                                Content="重置分类"
-                                Style="{StaticResource FluentSecondaryButtonStyle}"
-                                Command="{Binding ResetCategoryCommand}"
-                                CommandParameter="托盘"/>
-                    </Grid>
-
-                    <!-- 关闭时最小化到托盘 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="关闭时最小化到托盘" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="点击关闭按钮时将窗口最小化到系统托盘，而不是完全退出应用程序。可以通过托盘图标重新打开窗口。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox Grid.Column="1" 
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
-                                      IsChecked="{Binding MinimizeToTrayOnClose}"
-                                      VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 显示托盘图标 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="显示系统托盘图标" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="在系统托盘区域显示应用程序图标，方便快速访问和控制应用程序。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox Grid.Column="1" 
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
-                                      IsChecked="{Binding ShowTrayIcon}"
-                                      VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 显示托盘通知 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="显示托盘通知" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="允许应用程序通过系统托盘显示重要通知和状态更新。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox Grid.Column="1" 
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
-                                      IsChecked="{Binding ShowTrayNotifications}"
-                                      VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                </StackPanel>
-
-                <!-- 外观设置 -->
-                <StackPanel x:Name="UiSettingsGroup" Style="{StaticResource FluentSettingsGroupStyle}">
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <TextBlock Text="&#xe61f;" 
-                                       FontFamily="{DynamicResource IconFont}" 
-                                       FontSize="24" 
-                                       Foreground="{DynamicResource PrimaryBrush}"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,12,0"/>
-                            <TextBlock Text="外观" Style="{StaticResource SettingsGroupHeaderStyle}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                        <Button Grid.Column="1"
-                                Content="重置分类"
-                                Style="{StaticResource FluentSecondaryButtonStyle}"
-                                Command="{Binding ResetCategoryCommand}"
-                                CommandParameter="界面"/>
-                    </Grid>
-
-                    <!-- 主题模式 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="主题模式" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="选择应用程序的外观主题。浅色模式适合白天使用，深色模式有助于减少眼疲劳，系统模式将跟随操作系统设置。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <ComboBox Grid.Column="1" 
-                                      Style="{StaticResource FluentComboBoxStyle}"
-                                      ItemsSource="{Binding AvailableThemeModes}"
-                                      SelectedItem="{Binding ThemeMode}"
-                                      VerticalAlignment="Center">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate DataType="enums:ThemeMode">
-                                        <TextBlock Text="{Binding}"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </Grid>
-                    </Border>
-
-                    <!-- 主题颜色 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="主题颜色" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="选择应用程序的强调色，这将影响按钮、链接和其他交互元素的颜色。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <ComboBox Grid.Column="1" 
-                                      Style="{StaticResource FluentComboBoxStyle}"
-                                      ItemsSource="{Binding AvailableThemeColors}"
-                                      SelectedItem="{Binding ThemeColor}"
-                                      VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- 字体大小 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="字体大小" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="调整界面文字的显示大小，范围从 8 到 72 像素。较大的字体有助于提高可读性。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <Grid>
+                <!-- 动态设置组 -->
+                <ItemsControl ItemsSource="{Binding FilteredGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="models:DynamicSettingGroup">
+                            <StackPanel Style="{StaticResource FluentSettingsGroupStyle}">
+                                <!-- 分组标题 -->
+                                <Grid Margin="0,0,0,16">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Slider Grid.Column="0"
-                                            Value="{Binding FontSize}" 
-                                            Minimum="8" 
-                                            Maximum="72"
-                                            TickFrequency="2"
-                                            IsSnapToTickEnabled="True"
-                                            VerticalAlignment="Center"
-                                            Margin="0,0,12,0"/>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Icon}"
+                                                   FontFamily="{DynamicResource IconFont}"
+                                                   FontSize="24"
+                                                   Foreground="{DynamicResource PrimaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,12,0" />
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   Style="{StaticResource SettingsGroupHeaderStyle}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
 
-                                    <Border Grid.Column="1"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4"
-                                            Padding="8,4"
-                                            MinWidth="40">
-                                        <TextBlock Text="{Binding FontSize}" 
-                                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                                   TextAlignment="Center"/>
-                                    </Border>
+                                    <Button Grid.Column="1"
+                                            Content="重置分类"
+                                            Style="{StaticResource FluentSecondaryButtonStyle}"
+                                            Command="{Binding DataContext.ResetGroupCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding Name}"
+                                            Visibility="{Binding CanReset, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 </Grid>
+
+                                <!-- 设置项 -->
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplateSelector>
+                                        <StaticResource ResourceKey="SettingTemplateSelector" />
+                                    </ItemsControl.ItemTemplateSelector>
+                                </ItemsControl>
                             </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <!-- 界面语言 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="200"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="界面语言" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="选择应用程序界面的显示语言。更改后可能需要重启应用程序才能完全生效。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <ComboBox Grid.Column="1" 
-                                      Style="{StaticResource FluentComboBoxStyle}"
-                                      ItemsSource="{Binding AvailableLanguages}"
-                                      SelectedItem="{Binding Language}"
-                                      VerticalAlignment="Center">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayName}"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </Grid>
-                    </Border>
-                </StackPanel>
-
-                <!-- 应用程序设置 -->
-                <StackPanel x:Name="AppSettingsGroup" Style="{StaticResource FluentSettingsGroupStyle}">
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <TextBlock Text="&#xe621;" 
-                                       FontFamily="{DynamicResource IconFont}" 
-                                       FontSize="24" 
-                                       Foreground="{DynamicResource PrimaryBrush}"
-                                       VerticalAlignment="Center"
-                                       Margin="0,0,12,0"/>
-                            <TextBlock Text="应用程序" Style="{StaticResource SettingsGroupHeaderStyle}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                        <Button Grid.Column="1"
-                                Content="重置分类"
-                                Style="{StaticResource FluentSecondaryButtonStyle}"
-                                Command="{Binding ResetCategoryCommand}"
-                                CommandParameter="应用"/>
-                    </Grid>
-
-                    <!-- 开机自启动 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="开机自启动" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="启用后，应用程序将在系统启动时自动运行，无需手动打开。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
-                            </StackPanel>
-
-                            <CheckBox Grid.Column="1" 
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
-                                      IsChecked="{Binding AutoStartup}"
-                                      VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- 数据管理 -->
                 <StackPanel Style="{StaticResource FluentSettingsGroupStyle}">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <TextBlock Text="&#xe620;" 
-                                   FontFamily="{DynamicResource IconFont}" 
-                                   FontSize="24" 
+                        <TextBlock Text="&#xe620;"
+                                   FontFamily="{DynamicResource IconFont}"
+                                   FontSize="24"
                                    Foreground="{DynamicResource PrimaryBrush}"
                                    VerticalAlignment="Center"
-                                   Margin="0,0,12,0"/>
-                        <TextBlock Text="数据管理" Style="{StaticResource SettingsGroupHeaderStyle}"/>
+                                   Margin="0,0,12,0" />
+                        <TextBlock Text="数据管理" Style="{StaticResource SettingsGroupHeaderStyle}" />
                     </StackPanel>
 
                     <!-- 导入导出设置 -->
                     <Border Style="{StaticResource FluentSettingsCardStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="备份与恢复" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="导出当前设置到文件进行备份，或从备份文件中恢复设置。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
+                                <TextBlock Text="备份与恢复" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="导出当前设置到文件进行备份，或从备份文件中恢复设置。"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <Button Content="导出设置"
                                         Style="{StaticResource FluentSecondaryButtonStyle}"
                                         Command="{Binding ExportSettingsCommand}"
-                                        Margin="0,0,8,0"
-                                        Padding="12,6"/>
+                                        Margin="0,0,8,0" />
                                 <Button Content="导入设置"
                                         Style="{StaticResource FluentSecondaryButtonStyle}"
-                                        Command="{Binding ImportSettingsCommand}"
-                                        Padding="12,6"/>
+                                        Command="{Binding ImportSettingsCommand}" />
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -538,14 +439,14 @@
                     <Border Style="{StaticResource FluentSettingsCardStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="重置所有设置" Style="{StaticResource SettingTitleStyle}"/>
-                                <TextBlock Text="将所有设置恢复为默认值。此操作不可撤销，请谨慎操作。" 
-                                           Style="{StaticResource SettingDescriptionStyle}"/>
+                                <TextBlock Text="重置所有设置" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="将所有设置恢复为默认值。此操作不可撤销，请谨慎操作。"
+                                           Style="{StaticResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <Button Grid.Column="1"
@@ -553,14 +454,13 @@
                                     Style="{StaticResource FluentSecondaryButtonStyle}"
                                     Command="{Binding ResetAllSettingsCommand}"
                                     Foreground="#D13438"
-                                    BorderBrush="#D13438"
-                                    Padding="12,6"/>
+                                    BorderBrush="#D13438" />
                         </Grid>
                     </Border>
                 </StackPanel>
 
                 <!-- 底部间距 -->
-                <Border Height="32"/>
+                <Border Height="32" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

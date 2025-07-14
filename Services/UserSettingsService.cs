@@ -186,7 +186,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// <param name="key">设置键</param>
     /// <param name="defaultValue">默认值</param>
     /// <returns>设置值</returns>
-    public async Task<T> GetSettingAsync<T>(string key, T defaultValue = default!)
+    public async Task<T?> GetSettingAsync<T>(string key, T? defaultValue = default)
     {
         ValidateSettingKey(key);
         await EnsureInitializedAsync();
@@ -231,7 +231,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// <param name="key">设置键</param>
     /// <param name="defaultValue">默认值</param>
     /// <returns>设置值</returns>
-    public T GetSetting<T>(string key, T defaultValue = default!)
+    public T? GetSetting<T>(string key, T? defaultValue = default)
     {
         if (!_isInitialized)
             return defaultValue;
@@ -782,14 +782,12 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// <param name="value">设置值</param>
     private void ValidateSettingValue<T>(string key, T value)
     {
-        if (_settingDefinitions.TryGetValue(key, out var definition))
-        {
-            if (definition.IsReadOnly)
-                throw new InvalidOperationException($"设置 '{key}' 是只读的");
+        if (!_settingDefinitions.TryGetValue(key, out var definition)) return;
+        if (definition.IsReadOnly)
+            throw new InvalidOperationException($"设置 '{key}' 是只读的");
 
-            if (definition.Validator != null && !definition.Validator(value))
-                throw new ArgumentException($"设置值 '{value}' 不符合验证规则");
-        }
+        if (definition.Validator != null && !definition.Validator(value))
+            throw new ArgumentException($"设置值 '{value}' 不符合验证规则");
     }
 
     /// <summary>

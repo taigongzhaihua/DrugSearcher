@@ -3,7 +3,6 @@ using DrugSearcher.Data;
 using DrugSearcher.Managers;
 using DrugSearcher.Repositories;
 using DrugSearcher.Services;
-using DrugSearcher.Services.Interfaces;
 using DrugSearcher.ViewModels;
 using DrugSearcher.Views;
 using Microsoft.EntityFrameworkCore;
@@ -33,11 +32,17 @@ public static class ContainerConfig
             RegisterDatabaseServices(builder);
             RegisterRepositories(builder);
             RegisterBusinessServices(builder);
+            RegisterSettingsServices(builder); // 新增：注册设置服务
             RegisterViewModels(builder);
             RegisterViews(builder);
             RegisterManagers(builder);
 
-            return builder.Build();
+            var container = builder.Build();
+
+            // 初始化动态设置系统
+            InitializeDynamicSettings(container);
+
+            return container;
         }
         catch (Exception ex)
         {
@@ -128,6 +133,7 @@ public static class ContainerConfig
             .As<IDrugDbContextFactory>()
             .SingleInstance();
     }
+
     /// <summary>
     /// 注册仓储层
     /// </summary>
@@ -151,23 +157,16 @@ public static class ContainerConfig
         // 注册 HttpClient
         builder.Register(_ =>
         {
-            var httpClient = new HttpClient();
-            httpClient.Timeout = TimeSpan.FromMinutes(5); // 设置超时时间
+            var httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(5) // 设置超时时间
+            };
             return httpClient;
         }).As<HttpClient>().InstancePerLifetimeScope();
 
         // 快捷键服务 - 全局单例
         builder.RegisterType<HotKeyService>()
             .As<IHotKeyService>()
-            .SingleInstance();
-
-        // 设置相关服务 - 全局单例
-        builder.RegisterType<DefaultSettingsProvider>()
-            .As<IDefaultSettingsProvider>()
-            .SingleInstance();
-
-        builder.RegisterType<UserSettingsService>()
-            .As<IUserSettingsService>()
             .SingleInstance();
 
         // 数据处理服务 - 根据使用场景选择生命周期
@@ -194,6 +193,27 @@ public static class ContainerConfig
 
         builder.RegisterType<DatabaseInitializationService>()
             .As<IDatabaseInitializationService>()
+            .SingleInstance();
+    }
+
+    /// <summary>
+    /// 注册设置相关服务
+    /// </summary>
+    private static void RegisterSettingsServices(ContainerBuilder builder)
+    {
+        // 注册默认设置提供程序
+        builder.RegisterType<DefaultSettingsProvider>()
+            .As<IDefaultSettingsProvider>()
+            .SingleInstance();
+
+        // 注册用户设置服务 - 全局单例
+        builder.RegisterType<UserSettingsService>()
+            .As<IUserSettingsService>()
+            .SingleInstance();
+
+        // 注册动态设置服务 - 全局单例
+        builder.RegisterType<DynamicSettingsService>()
+            .As<IDynamicSettingsService>()
             .SingleInstance();
     }
 
@@ -230,7 +250,6 @@ public static class ContainerConfig
         builder.RegisterType<CrawlerPageViewModel>()
             .AsSelf()
             .SingleInstance();
-
     }
 
     /// <summary>
@@ -267,7 +286,6 @@ public static class ContainerConfig
         builder.RegisterType<CrawlerPage>()
             .AsSelf()
             .SingleInstance(); // 爬虫页面通常是全局单例
-
     }
 
     /// <summary>
@@ -281,17 +299,51 @@ public static class ContainerConfig
             .SingleInstance();
 
         builder.Register(context =>
-            {
-                // 这里我们需要从容器中解析 MainWindow
-                var mainWindow = context.Resolve<MainWindow>();
-                return new HotKeyManager(mainWindow);
-            })
+        {
+            // 这里我们需要从容器中解析 MainWindow
+            var mainWindow = context.Resolve<MainWindow>();
+            return new HotKeyManager(mainWindow);
+        })
             .AsSelf()
             .SingleInstance();
         // 其他管理器可以在这里添加
         // builder.RegisterType<ConfigurationManager>()
         //     .AsSelf()
         //     .SingleInstance();
+    }
+
+    /// <summary>
+    /// 初始化动态设置系统
+    /// </summary>
+    private static void InitializeDynamicSettings(IContainer container)
+    {
+        try
+        {
+            var dynamicSettingsService = container.Resolve<IDynamicSettingsService>();
+
+            // 可选：注册搜索设置（如果你需要的话）
+            // dynamicSettingsService.RegisterSearchSettings();
+
+            // 异步加载设置值
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await dynamicSettingsService.LoadSettingsAsync();
+                    System.Diagnostics.Debug.WriteLine("动态设置系统初始化完成");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"动态设置系统加载失败: {ex.Message}");
+                }
+            });
+
+            System.Diagnostics.Debug.WriteLine("动态设置服务注册完成");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"初始化动态设置失败: {ex.Message}");
+        }
     }
 
     /// <summary>

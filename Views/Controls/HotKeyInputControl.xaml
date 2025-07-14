@@ -1,0 +1,78 @@
+<UserControl x:Class="DrugSearcher.Views.Controls.HotKeyInputControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:DrugSearcher.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="32" d:DesignWidth="200"
+             Focusable="True"
+             IsTabStop="True">
+    <UserControl.Resources>
+
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <!-- 自定义样式 -->
+        <Style x:Key="HotKeyBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="MinWidth" Value="160" />
+            <Setter Property="Focusable" Value="True" />
+
+            <Style.Triggers>
+                <!-- 焦点状态 -->
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                    <Setter Property="BorderThickness" Value="1.5" />
+                </Trigger>
+                <!-- 录制状态 - 使用DataTrigger绑定到UserControl的属性 -->
+                <DataTrigger Binding="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                    <Setter Property="BorderThickness" Value="1.5" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="{DynamicResource SurfaceColor}" Opacity="0.1"/>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <!-- 悬停状态 -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Border x:Name="MainBorder" Style="{StaticResource HotKeyBorderStyle}"
+            KeyboardNavigation.IsTabStop="True">
+
+        <Grid>
+            <TextBlock x:Name="DisplayTextBlock"
+                       Text="{Binding DisplayText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Foreground="{DynamicResource PrimaryTextBrush}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       TextTrimming="CharacterEllipsis"
+                       Visibility="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+            <TextBlock Text="请按下快捷键..."
+                       Foreground="{DynamicResource PrimaryBrush}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Visibility="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <Button x:Name="ClearButton"
+                    Style="{DynamicResource TransparentThemeButtonStyle}"
+                    Content="✕"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding HasValue, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Click="ClearButton_Click"
+                    ToolTip="清除快捷键"
+                    Focusable="False" />
+        </Grid>
+    </Border>
+</UserControl>
