@@ -194,6 +194,10 @@ public static class ContainerConfig
         builder.RegisterType<DatabaseInitializationService>()
             .As<IDatabaseInitializationService>()
             .SingleInstance();
+
+        builder.RegisterType<VersionService>()
+            .As<IVersionService>()
+            .SingleInstance();
     }
 
     /// <summary>
@@ -250,6 +254,10 @@ public static class ContainerConfig
         builder.RegisterType<CrawlerPageViewModel>()
             .AsSelf()
             .SingleInstance();
+
+        builder.RegisterType<AboutPageViewModel>()
+            .AsSelf()
+            .SingleInstance();
     }
 
     /// <summary>
@@ -286,6 +294,10 @@ public static class ContainerConfig
         builder.RegisterType<CrawlerPage>()
             .AsSelf()
             .SingleInstance(); // 爬虫页面通常是全局单例
+
+        builder.RegisterType<AboutPage>()
+            .AsSelf()
+            .SingleInstance();
     }
 
     /// <summary>

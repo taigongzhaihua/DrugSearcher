@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
+      xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1200" 
       d:DataContext="{viewModels:CrawlerPageViewModel}"
@@ -43,12 +44,12 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,20,0">
             
             <!-- 爬取控制区域 -->
-            <Border Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="20"
-                    Margin="0,0,0,20">
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20">
                 <StackPanel>
                     <TextBlock Text="爬取控制"
                                FontSize="18"
@@ -170,12 +171,12 @@
             </Border>
 
             <!-- 进度显示区域 -->
-            <Border Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="20"
-                    Margin="0,0,0,20">
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20">
                 <StackPanel>
                     <TextBlock Text="爬取进度"
                                FontSize="18"
@@ -271,12 +272,12 @@
         <!-- 右侧统计区域 -->
         <StackPanel Grid.Row="1" Grid.Column="1">
             <!-- 数据统计 -->
-            <Border Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="20"
-                    Margin="0,0,0,20">
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20">
                 <StackPanel>
                     <TextBlock Text="数据统计"
                                FontSize="18"
@@ -342,7 +343,7 @@
 
         <!-- 日志区域 -->
         <Border Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0"
-                Background="{DynamicResource SurfaceBrush}"
+                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
                 CornerRadius="8"

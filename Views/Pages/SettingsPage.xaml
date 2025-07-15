@@ -9,6 +9,7 @@
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
       xmlns:selectors="clr-namespace:DrugSearcher.Views.Selectors"
       xmlns:controls="clr-namespace:DrugSearcher.Views.Controls"
+      xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="900"
       d:DataContext="{d:DesignInstance viewModels:SettingsPageViewModel}"
@@ -20,7 +21,6 @@
         <!-- 反转布尔值转换器 -->
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:SafeDictionaryAccessConverter x:Key="SafeDictionaryAccessConverter" />
-        <converters:DictionaryContainsKeyConverter x:Key="DictionaryContainsKeyConverter" />
         <converters:ObjectToDoubleConverter x:Key="ObjectToDoubleConverter"/>
         <converters:HotKeyConverter x:Key="HotKeyConverter"/>
         <!-- 设置模板选择器 -->
@@ -28,7 +28,7 @@
 
         <!-- 设置卡片样式 -->
         <Style x:Key="FluentSettingsCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
+            <Setter Property="behaviors:ThemeBehavior.Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="0.8" />
             <Setter Property="CornerRadius" Value="4" />
@@ -286,7 +286,7 @@
         </selectors:SettingTemplateSelector>
     </Page.Resources>
 
-    <Grid Background="{DynamicResource BackgroundBrush}">
+    <Grid behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -294,7 +294,7 @@
 
         <!-- 页面头部 -->
         <Border Grid.Row="0"
-                Background="{DynamicResource SurfaceBrush}"
+                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="32,24">

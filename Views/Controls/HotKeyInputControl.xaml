@@ -18,10 +18,10 @@
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="4" />
-            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Padding" Value="8,4,6,4" />
             <Setter Property="MinWidth" Value="160" />
             <Setter Property="Focusable" Value="True" />
+            <Setter Property="CornerRadius" Value="4"/>
 
             <Style.Triggers>
                 <!-- 焦点状态 -->
@@ -66,6 +66,7 @@
 
             <Button x:Name="ClearButton"
                     Style="{DynamicResource TransparentThemeButtonStyle}"
+                    Margin="0"
                     Content="✕"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"

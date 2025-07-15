@@ -6,10 +6,11 @@
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
       xmlns:model="clr-namespace:DrugSearcher.Models"
+      xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewModels:LocalDataManagementViewModel}"
       Title="本地数据管理"
-      Background="{DynamicResource BackgroundBrush}">
+      behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}">
 
     <Page.Resources>
         <!-- 数据源显示模板 -->
@@ -172,7 +173,7 @@
 
         <!-- 数据表格 -->
         <Border Grid.Row="3" 
-                Background="{DynamicResource SurfaceBrush}"
+                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
                 CornerRadius="8"
                 Effect="{StaticResource LightDropShadowEffect}">
             <DataGrid x:Name="DrugDataGrid"

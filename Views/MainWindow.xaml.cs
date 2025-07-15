@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shell;
 using Button = System.Windows.Controls.Button;
-using MessageBox = System.Windows.MessageBox;
 
 namespace DrugSearcher.Views;
 
@@ -288,6 +287,7 @@ public partial class MainWindow
             Debug.WriteLine($"导航到数据管理页失败: {ex.Message}");
         }
     }
+
     private void NavigateToCrawlerPage()
     {
         try
@@ -301,6 +301,24 @@ public partial class MainWindow
             Debug.WriteLine($"导航到爬虫页失败: {ex.Message}");
         }
     }
+
+    /// <summary>
+    /// 导航到关于页
+    /// </summary>
+    private void NavigateToAboutPage()
+    {
+        try
+        {
+            var aboutPage = ContainerAccessor.Resolve<AboutPage>();
+            MainFrame.Navigate(aboutPage);
+            Debug.WriteLine("已导航到关于页");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"显示关于对话框失败: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// 处理框架导航事件
     /// </summary>
@@ -325,26 +343,37 @@ public partial class MainWindow
     /// <param name="currentPage">当前页面</param>
     private void UpdateMenuItemVisibility(object? currentPage)
     {
+        List<FrameworkElement> pages =
+        [
+            HomeButton,SettingsMenuItem,CrawlMenuItem,LoacalDataMenuItem,AboutMenuItem
+        ];
+        foreach (var element in pages)
+        {
+            element.Visibility = Visibility.Visible;
+        }
+
         switch (currentPage)
         {
             case HomePage:
                 // 主页：隐藏主页按钮
                 HomeButton.Visibility = Visibility.Collapsed;
-                SettingsMenuItem.Visibility = Visibility.Visible;
                 break;
 
             case SettingsPage:
                 // 设置页：显示主页按钮，隐藏设置菜单项
-                HomeButton.Visibility = Visibility.Visible;
                 SettingsMenuItem.Visibility = Visibility.Collapsed;
                 break;
 
             case LocalDataManagementPage:
                 // 数据管理页：显示主页按钮
-                HomeButton.Visibility = Visibility.Visible;
-                SettingsMenuItem.Visibility = Visibility.Visible;
+                LoacalDataMenuItem.Visibility = Visibility.Collapsed;
                 break;
-
+            case CrawlerPage:
+                CrawlMenuItem.Visibility = Visibility.Collapsed;
+                break;
+            case AboutPage:
+                AboutMenuItem.Visibility = Visibility.Collapsed;
+                break;
             default:
                 // 其他页面：显示所有按钮
                 HomeButton.Visibility = Visibility.Visible;
@@ -464,7 +493,7 @@ public partial class MainWindow
         try
         {
             await ShowFromTrayAsync();
-            ShowAboutDialog();
+            NavigateToAboutPage();
             Debug.WriteLine("已响应托盘关于请求");
         }
         catch (Exception ex)
@@ -604,7 +633,7 @@ public partial class MainWindow
     {
         try
         {
-            ShowAboutDialog();
+            NavigateToAboutPage();
         }
         catch (Exception ex)
         {
@@ -745,28 +774,7 @@ public partial class MainWindow
         }
     }
 
-    /// <summary>
-    /// 显示关于对话框
-    /// </summary>
-    private static void ShowAboutDialog()
-    {
-        try
-        {
-            var aboutMessage = $"DrugSearcher\n" +
-                              $"版本: 1.0.0\n" +
-                              $"构建时间: {DateTime.Now:yyyy-MM-dd}\n\n" +
-                              $"一个现代化的药物搜索应用程序";
 
-            MessageBox.Show(aboutMessage, "关于 DrugSearcher",
-                          MessageBoxButton.OK, MessageBoxImage.Information);
-
-            Debug.WriteLine("关于对话框已显示");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"显示关于对话框失败: {ex.Message}");
-        }
-    }
     private void CleanupHotKeys()
     {
         if (_hotKeyService == null) return;
