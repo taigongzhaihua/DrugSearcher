@@ -30,25 +30,25 @@ namespace DrugSearcher.ViewModels
         /// 当前版本信息
         /// </summary>
         [ObservableProperty]
-        private VersionInfo? currentVersion;
+        private VersionInfo? _currentVersion;
 
         /// <summary>
         /// 更新检查结果
         /// </summary>
         [ObservableProperty]
-        private UpdateCheckResult? updateCheckResult;
+        private UpdateCheckResult? _updateCheckResult;
 
         /// <summary>
         /// 是否正在检查更新
         /// </summary>
         [ObservableProperty]
-        private bool isCheckingUpdate;
+        private bool _isCheckingUpdate;
 
         /// <summary>
         /// 状态消息
         /// </summary>
         [ObservableProperty]
-        private string statusMessage = string.Empty;
+        private string _statusMessage = string.Empty;
 
         #endregion
 

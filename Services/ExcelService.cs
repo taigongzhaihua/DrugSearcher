@@ -90,7 +90,7 @@ public class ExcelService : IExcelService
         return result;
     }
 
-    private static readonly string[] function = ["药品名称"];
+    private static readonly string[] Function = ["药品名称"];
 
     /// <summary>
     /// 验证Excel文件格式
@@ -140,7 +140,7 @@ public class ExcelService : IExcelService
                     }
 
                     // 只验证必需的列是否存在
-                    var requiredColumns = function;
+                    var requiredColumns = Function;
                     var hasRequiredColumns = requiredColumns.All(col => headerText.Contains(col));
 
                     // 显式关闭工作簿
@@ -171,7 +171,7 @@ public class ExcelService : IExcelService
         }
     }
 
-    private static readonly string[] requiredColumnsAction = ["药品名称"];
+    private static readonly string[] RequiredColumnsAction = ["药品名称"];
 
     /// <summary>
     /// 获取Excel文件的详细验证信息
@@ -251,7 +251,7 @@ public class ExcelService : IExcelService
                     result.DetectedColumns = headerText;
 
                     // 检查必需的列
-                    var requiredColumns = requiredColumnsAction;
+                    var requiredColumns = RequiredColumnsAction;
                     var missingRequired = requiredColumns.Where(col => !headerText.Contains(col)).ToList();
                     if (missingRequired.Count != 0)
                     {

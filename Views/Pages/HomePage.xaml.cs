@@ -10,7 +10,6 @@ public partial class HomePage
     public HomePage(HomePageViewModel viewModel)
     {
         InitializeComponent();
-        // DataContext 已在 XAML 中设置
         DataContext = viewModel;
     }
 }

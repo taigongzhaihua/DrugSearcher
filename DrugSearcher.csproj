@@ -13,6 +13,9 @@
 	<ItemGroup>
 		<None Remove="Resources\app.ico" />
 		<None Remove="Resources\Fonts\iconfont.ttf" />
+		<None Remove="Resources\JavaScript-Dark.xshd" />
+		<None Remove="Resources\JavaScript-Light.xshd" />
+		<None Remove="Resources\JavaScript.xshd" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,15 +25,28 @@
 		<Resource Include="Resources\Fonts\iconfont.ttf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
+		<EmbeddedResource Include="Resources\JavaScript-Dark.xshd">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\JavaScript-Light.xshd">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<Resource Include="Resources\JavaScript.xshd">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Resource>
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Autofac" Version="8.3.0" />
 		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+		<PackageReference Include="AvalonEdit" Version="6.3.1.120" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
 		<PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
 		<PackageReference Include="Markdig.Wpf" Version="0.5.0.1" />
+		<PackageReference Include="Microsoft.ClearScript" Version="7.5.0" />
+		<PackageReference Include="Microsoft.ClearScript.Complete" Version="7.5.0" />
+		<PackageReference Include="Microsoft.ClearScript.V8" Version="7.5.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
 		  <PrivateAssets>all</PrivateAssets>

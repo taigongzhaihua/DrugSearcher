@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="JavaScript" extensions=".js" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="Green" />
+  <Color name="String" foreground="Blue" />
+  <Color name="Keywords" foreground="Blue" fontWeight="bold" />
+  <Color name="NumberLiteral" foreground="DarkBlue" />
+  <Color name="Punctuation" foreground="DarkGreen" />
+  <Color name="MethodCall" foreground="MidnightBlue" fontWeight="bold" />
+  
+  <RuleSet>
+    <Span color="Comment" multiline="true">
+      <Begin>/\*</Begin>
+      <End>\*/</End>
+    </Span>
+    
+    <Span color="Comment">
+      <Begin>//</Begin>
+    </Span>
+    
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    
+    <Keywords color="Keywords">
+      <Word>var</Word>
+      <Word>let</Word>
+      <Word>const</Word>
+      <Word>function</Word>
+      <Word>return</Word>
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>while</Word>
+      <Word>do</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>switch</Word>
+      <Word>case</Word>
+      <Word>default</Word>
+      <Word>try</Word>
+      <Word>catch</Word>
+      <Word>finally</Word>
+      <Word>throw</Word>
+      <Word>new</Word>
+      <Word>this</Word>
+      <Word>typeof</Word>
+      <Word>instanceof</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>null</Word>
+      <Word>undefined</Word>
+    </Keywords>
+    
+    <Keywords color="MethodCall">
+      <Word>addResult</Word>
+      <Word>addWarning</Word>
+      <Word>addNormalResult</Word>
+      <Word>round</Word>
+      <Word>clamp</Word>
+      <Word>isValidNumber</Word>
+      <Word>safeParseFloat</Word>
+      <Word>safeParseInt</Word>
+      <Word>parseFloat</Word>
+      <Word>parseInt</Word>
+      <Word>Math</Word>
+      <Word>console</Word>
+    </Keywords>
+    
+    <Rule color="NumberLiteral">
+      \b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?
+    </Rule>
+    
+    <Rule color="Punctuation">
+      [?,.;()\[\]{}+\-/%*&lt;&gt;^+~!|&amp;]+
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>

@@ -17,7 +17,7 @@ public class DrugSearchService(
     /// </summary>
     /// <param name="criteria">搜索条件</param>
     /// <returns>统一的搜索结果列表</returns>
-    public async Task<List<UnifiedDrugSearchResult>> SearchDrugsAsync(DrugSearchCriteria criteria)
+    public async Task<List<UnifiedDrugSearchResult?>> SearchDrugsAsync(DrugSearchCriteria criteria)
     {
         var allResults = new List<UnifiedDrugSearchResult>();
 

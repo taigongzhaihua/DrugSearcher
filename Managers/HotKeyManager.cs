@@ -30,8 +30,8 @@ public partial class HotKeyManager : IDisposable
 
     #region 常量定义
 
-    private const int WM_HOTKEY = 0x0312;
-    private const int MAX_HOTKEY_ID = 0xBFFF;
+    private const int WmHotkey = 0x0312;
+    private const int MaxHotkeyId = 0xBFFF;
 
     #endregion
 
@@ -328,7 +328,7 @@ public partial class HotKeyManager : IDisposable
     /// </summary>
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WM_HOTKEY)
+        if (msg == WmHotkey)
         {
             var hotKeyId = wParam.ToInt32();
 
@@ -396,12 +396,12 @@ public partial class HotKeyManager : IDisposable
     /// <returns>快捷键ID</returns>
     private int GetNextHotKeyId()
     {
-        while (_globalHotKeys.ContainsKey(_nextHotKeyId) && _nextHotKeyId <= MAX_HOTKEY_ID)
+        while (_globalHotKeys.ContainsKey(_nextHotKeyId) && _nextHotKeyId <= MaxHotkeyId)
         {
             _nextHotKeyId++;
         }
 
-        if (_nextHotKeyId > MAX_HOTKEY_ID)
+        if (_nextHotKeyId > MaxHotkeyId)
         {
             throw new InvalidOperationException("已达到最大快捷键注册数量");
         }

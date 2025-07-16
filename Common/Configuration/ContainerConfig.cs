@@ -51,6 +51,7 @@ public static class ContainerConfig
         }
     }
 
+
     /// <summary>
     /// 注册日志服务
     /// </summary>
@@ -147,6 +148,9 @@ public static class ContainerConfig
         builder.RegisterType<OnlineDrugRepositoryAdapter>()
             .As<IOnlineDrugRepository>()
             .InstancePerLifetimeScope();
+        builder.RegisterType<DosageCalculatorRepositoryAdapter>()
+            .As<IDosageCalculatorRepository>()
+            .InstancePerLifetimeScope();
     }
 
     /// <summary>
@@ -197,6 +201,14 @@ public static class ContainerConfig
 
         builder.RegisterType<VersionService>()
             .As<IVersionService>()
+            .SingleInstance();
+
+        builder.RegisterType<JavaScriptDosageCalculatorService>()
+            .AsSelf()
+            .SingleInstance();
+
+        builder.RegisterType<DosageCalculatorAiService>()
+            .AsSelf()
             .SingleInstance();
     }
 
@@ -258,6 +270,10 @@ public static class ContainerConfig
         builder.RegisterType<AboutPageViewModel>()
             .AsSelf()
             .SingleInstance();
+
+        builder.RegisterType<DosageParameterViewModel>()
+            .AsSelf()
+            .InstancePerLifetimeScope();
     }
 
     /// <summary>
@@ -311,11 +327,11 @@ public static class ContainerConfig
             .SingleInstance();
 
         builder.Register(context =>
-        {
-            // 这里我们需要从容器中解析 MainWindow
-            var mainWindow = context.Resolve<MainWindow>();
-            return new HotKeyManager(mainWindow);
-        })
+            {
+                // 这里我们需要从容器中解析 MainWindow
+                var mainWindow = context.Resolve<MainWindow>();
+                return new HotKeyManager(mainWindow);
+            })
             .AsSelf()
             .SingleInstance();
         // 其他管理器可以在这里添加

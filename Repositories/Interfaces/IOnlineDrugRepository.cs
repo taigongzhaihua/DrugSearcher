@@ -1,5 +1,5 @@
-using DrugSearcher.Models;
 using DrugSearcher.Enums;
+using DrugSearcher.Models;
 
 namespace DrugSearcher.Repositories;
 

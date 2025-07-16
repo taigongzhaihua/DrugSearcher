@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="/Resources/Styles/CommonStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/TabControlStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/MarkdownStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/GroupBoxStyles.xaml"/>
 
                 <!-- 默认主题将由ThemeManager动态加载 -->
                 <ResourceDictionary Source="/Resources/Colors/BlueColors.xaml"/>

@@ -9,18 +9,12 @@ namespace DrugSearcher.Services
     /// <summary>
     /// 版本信息服务实现
     /// </summary>
-    public class VersionService : IVersionService
+    public class VersionService(HttpClient httpClient) : IVersionService
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _updateCheckUrl;
+        private readonly HttpClient _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        private const string UpdateCheckUrl = "https://api.github.com/repos/taigongzhaihua/drugsearcher/releases/latest";
         private VersionInfo? _cachedCurrentVersion;
-        private readonly object _cacheLock = new();
-
-        public VersionService(HttpClient httpClient)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _updateCheckUrl = "https://api.github.com/repos/taigongzhaihua/drugsearcher/releases/latest";
-        }
+        private readonly Lock _cacheLock = new();
 
         /// <summary>
         /// 获取当前版本信息
@@ -101,7 +95,7 @@ namespace DrugSearcher.Services
 
                 try
                 {
-                    var response = await _httpClient.GetStringAsync(_updateCheckUrl, cts.Token);
+                    var response = await _httpClient.GetStringAsync(UpdateCheckUrl, cts.Token);
                     var releaseInfo = JsonSerializer.Deserialize<GitHubRelease>(response);
 
                     if (releaseInfo != null)
@@ -378,7 +372,7 @@ namespace DrugSearcher.Services
 
                     if (endIndex > startIndex)
                     {
-                        var section = body.Substring(startIndex, endIndex - startIndex);
+                        var section = body[startIndex..endIndex];
                         var items = section.Split(['-', '*'], StringSplitOptions.RemoveEmptyEntries);
 
                         foreach (var item in items)

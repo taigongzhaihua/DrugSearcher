@@ -268,14 +268,14 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         try
         {
             // 获取span的innerHTML
-            var innerHTML = spanNode.InnerHtml;
+            var innerHtml = spanNode.InnerHtml;
 
             // 将<br>、<br/>、<br />标签替换为换行符
-            innerHTML = innerHTMLRegex().Replace(innerHTML, "\n");
+            innerHtml = InnerHtmlRegex().Replace(innerHtml, "\n");
 
             // 创建临时HTML节点来解码HTML实体
             var tempDoc = new HtmlAgilityPack.HtmlDocument();
-            tempDoc.LoadHtml($"<div>{innerHTML}</div>");
+            tempDoc.LoadHtml($"<div>{innerHtml}</div>");
 
             // 获取纯文本内容（会自动解码HTML实体）
             var text = tempDoc.DocumentNode.SelectSingleNode("//div")?.InnerText ?? "";
@@ -620,7 +620,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
     }
 
     [GeneratedRegex(@"<br\s*/?>\s*", RegexOptions.IgnoreCase, "zh-CN")]
-    private static partial System.Text.RegularExpressions.Regex innerHTMLRegex();
+    private static partial Regex InnerHtmlRegex();
     [GeneratedRegex(@"[ \t]+")]
     private static partial Regex SpaceRegex();
     [GeneratedRegex(@"\n\s*\n")]

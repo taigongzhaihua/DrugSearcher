@@ -15,6 +15,7 @@ public class BooleanToVisibilityConverter : IValueConverter
         {
             bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
             string strValue => string.IsNullOrEmpty(strValue) ? Visibility.Collapsed : Visibility.Visible,
+            > 0 => Visibility.Visible,
             _ => Visibility.Collapsed
         };
     }

@@ -18,6 +18,11 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
     /// </summary>
     public DbSet<OnlineDrugInfo> OnlineDrugInfos { get; set; }
 
+    /// <summary>
+    /// 剂量计算器表
+    /// </summary>
+    public DbSet<DosageCalculator> DosageCalculators { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -27,6 +32,9 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
 
         // 配置在线药物信息实体
         ConfigureOnlineDrugInfo(modelBuilder);
+
+        // 配置剂量计算器实体
+        ConfigureDosageCalculator(modelBuilder);
     }
 
     private static void ConfigureLocalDrugInfo(ModelBuilder modelBuilder)
@@ -99,6 +107,52 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
         });
     }
 
+    private static void ConfigureDosageCalculator(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<DosageCalculator>(entity =>
+        {
+            // 设置表名
+            entity.ToTable("DosageCalculators");
+
+            // 配置索引
+            entity.HasIndex(e => e.DrugIdentifier)
+                .HasDatabaseName("IX_DosageCalculators_DrugIdentifier");
+
+            entity.HasIndex(e => e.DataSource)
+                .HasDatabaseName("IX_DosageCalculators_DataSource");
+
+            entity.HasIndex(e => e.OriginalDrugId)
+                .HasDatabaseName("IX_DosageCalculators_OriginalDrugId");
+
+            entity.HasIndex(e => e.DrugName)
+                .HasDatabaseName("IX_DosageCalculators_DrugName");
+
+            entity.HasIndex(e => e.IsActive)
+                .HasDatabaseName("IX_DosageCalculators_IsActive");
+
+            entity.HasIndex(e => e.CreatedAt)
+                .HasDatabaseName("IX_DosageCalculators_CreatedAt");
+
+            // 配置复合索引
+            entity.HasIndex(e => new { e.DataSource, e.OriginalDrugId })
+                .HasDatabaseName("IX_DosageCalculators_DataSource_OriginalDrugId");
+
+            entity.HasIndex(e => new { e.DrugIdentifier, e.IsActive })
+                .HasDatabaseName("IX_DosageCalculators_DrugIdentifier_IsActive");
+
+            // 配置自动更新时间
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
+
+            // 配置枚举到字符串的转换
+            entity.Property(e => e.DataSource)
+                .HasConversion<string>();
+        });
+    }
+
     /// <summary>
     /// 保存更改时自动更新UpdatedAt字段
     /// </summary>
@@ -123,7 +177,7 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
     private void UpdateTimestamps()
     {
         var entities = ChangeTracker.Entries()
-            .Where(x => x.Entity is LocalDrugInfo or OnlineDrugInfo && 
+            .Where(x => x.Entity is LocalDrugInfo or OnlineDrugInfo or DosageCalculator &&
                        x.State is EntityState.Added or EntityState.Modified);
 
         foreach (var entity in entities)
@@ -140,6 +194,12 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
                     if (entity.State == EntityState.Added)
                         onlineDrug.CreatedAt = DateTime.Now;
                     onlineDrug.UpdatedAt = DateTime.Now;
+                    break;
+
+                case DosageCalculator calculator:
+                    if (entity.State == EntityState.Added)
+                        calculator.CreatedAt = DateTime.Now;
+                    calculator.UpdatedAt = DateTime.Now;
                     break;
             }
         }

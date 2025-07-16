@@ -1,0 +1,647 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DrugSearcher.Models;
+using DrugSearcher.Services;
+using ICSharpCode.AvalonEdit.Document;
+using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Windows;
+using MessageBox = System.Windows.MessageBox;
+
+namespace DrugSearcher.ViewModels;
+
+public partial class CalculatorEditorViewModel : ObservableObject
+{
+    private readonly JavaScriptDosageCalculatorService _calculatorService;
+    private readonly ILogger<CalculatorEditorViewModel> _logger;
+    private readonly BaseDrugInfo _drugInfo;
+    private readonly DosageCalculator? _editingCalculator;
+    private readonly bool _isEditing;
+
+    public CalculatorEditorViewModel(
+        JavaScriptDosageCalculatorService calculatorService,
+        ILogger<CalculatorEditorViewModel> logger,
+        BaseDrugInfo drugInfo,
+        DosageCalculator? editingCalculator = null)
+    {
+        _calculatorService = calculatorService;
+        _logger = logger;
+        _drugInfo = drugInfo;
+        _editingCalculator = editingCalculator;
+        _isEditing = editingCalculator != null;
+
+        Parameters = [];
+        CodeDocument = new TextDocument();
+
+        InitializeCalculator();
+    }
+
+    #region Properties
+
+    [ObservableProperty]
+    private string _calculatorName = string.Empty;
+
+    [ObservableProperty]
+    private string _description = string.Empty;
+
+    [ObservableProperty]
+    private string _calculationCode = string.Empty;
+
+    [ObservableProperty]
+    private TextDocument _codeDocument;
+
+    [ObservableProperty]
+    private bool _isSaving;
+
+    [ObservableProperty]
+    private bool _isTesting;
+
+    [ObservableProperty]
+    private string _statusMessage = string.Empty;
+
+    [ObservableProperty]
+    private DosageParameterViewModel? _selectedParameter;
+
+    public ObservableCollection<DosageParameterViewModel> Parameters { get; }
+
+    public string WindowTitle => _isEditing ? $"编辑计算器 - {_drugInfo.DrugName}" : $"创建计算器 - {_drugInfo.DrugName}";
+
+    public string SaveButtonText => _isEditing ? "保存修改" : "创建计算器";
+
+    public bool IsEditing => _isEditing;
+
+    #endregion
+
+    #region Commands
+
+    [RelayCommand]
+    private void AddParameter()
+    {
+        var parameter = new DosageParameterViewModel
+        {
+            Name = GenerateParameterName(),
+            DisplayName = "新参数",
+            DataType = ParameterTypes.Number,
+            Unit = "",
+            IsRequired = false,
+            DefaultValue = 0,
+            Description = "请输入参数描述"
+        };
+
+        Parameters.Add(parameter);
+        SelectedParameter = parameter;
+        StatusMessage = "已添加新参数";
+    }
+
+    [RelayCommand]
+    private void RemoveParameter()
+    {
+        if (SelectedParameter != null)
+        {
+            Parameters.Remove(SelectedParameter);
+            SelectedParameter = Parameters.FirstOrDefault();
+            StatusMessage = "已删除参数";
+        }
+    }
+
+    [RelayCommand]
+    private void DuplicateParameter()
+    {
+        if (SelectedParameter != null)
+        {
+            var newParam = new DosageParameterViewModel
+            {
+                Name = GenerateParameterName(),
+                DisplayName = SelectedParameter.DisplayName + " (副本)",
+                DataType = SelectedParameter.DataType,
+                Unit = SelectedParameter.Unit,
+                IsRequired = SelectedParameter.IsRequired,
+                DefaultValue = SelectedParameter.DefaultValue,
+                MinValue = SelectedParameter.MinValue,
+                MaxValue = SelectedParameter.MaxValue,
+                Options = SelectedParameter.Options.ToArray(),
+                Description = SelectedParameter.Description
+            };
+
+            var index = Parameters.IndexOf(SelectedParameter);
+            Parameters.Insert(index + 1, newParam);
+            SelectedParameter = newParam;
+            StatusMessage = "已复制参数";
+        }
+    }
+
+    [RelayCommand]
+    private void MoveParameterUp()
+    {
+        if (SelectedParameter != null)
+        {
+            var index = Parameters.IndexOf(SelectedParameter);
+            if (index > 0)
+            {
+                Parameters.Move(index, index - 1);
+                StatusMessage = "参数已上移";
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void MoveParameterDown()
+    {
+        if (SelectedParameter != null)
+        {
+            var index = Parameters.IndexOf(SelectedParameter);
+            if (index < Parameters.Count - 1)
+            {
+                Parameters.Move(index, index + 1);
+                StatusMessage = "参数已下移";
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task TestCalculator()
+    {
+        if (!ValidateCalculator())
+        {
+            return;
+        }
+
+        IsTesting = true;
+        StatusMessage = "正在测试计算器...";
+
+        try
+        {
+            // 从代码编辑器获取最新代码
+            CalculationCode = CodeDocument.Text;
+
+            // 创建测试参数
+            var testParams = new Dictionary<string, object>();
+            foreach (var param in Parameters)
+            {
+                var testValue = GetTestValue(param);
+                testParams[param.Name] = testValue;
+            }
+
+            // 执行测试
+            var request = new DosageCalculationRequest
+            {
+                CalculationCode = CalculationCode,
+                Parameters = testParams
+            };
+
+            var results = await _calculatorService.TestCalculationAsync(request);
+
+            if (results.Any())
+            {
+                var resultLines = results.Select(r =>
+                {
+                    var line = $"• {r.Description}: {r.Dose} {r.Unit}";
+                    if (!string.IsNullOrEmpty(r.Frequency))
+                        line += $", {r.Frequency}";
+                    if (!string.IsNullOrEmpty(r.Duration))
+                        line += $", {r.Duration}";
+                    if (!string.IsNullOrEmpty(r.Notes))
+                        line += $" ({r.Notes})";
+                    if (r.IsWarning)
+                        line += $" [警告: {r.WarningMessage}]";
+                    return line;
+                });
+
+                StatusMessage = $"✓ 测试成功！结果：\n{string.Join("\n", resultLines)}";
+            }
+            else
+            {
+                StatusMessage = "⚠ 测试完成，但无结果输出。请检查代码是否调用了addResult相关函数。";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"✗ 测试失败: {ex.Message}";
+            _logger.LogError(ex, "计算器测试失败");
+        }
+        finally
+        {
+            IsTesting = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveCalculator()
+    {
+        if (!ValidateCalculator())
+        {
+            return;
+        }
+
+        IsSaving = true;
+        StatusMessage = "正在保存计算器...";
+
+        try
+        {
+            // 从代码编辑器获取最新代码
+            CalculationCode = CodeDocument.Text;
+
+            var calculator = CreateCalculatorFromViewModel();
+
+            if (_isEditing)
+            {
+                calculator.Id = _editingCalculator!.Id;
+                calculator.CreatedAt = _editingCalculator.CreatedAt;
+                calculator.CreatedBy = _editingCalculator.CreatedBy;
+                calculator.UpdatedAt = DateTime.Now;
+
+                await _calculatorService.UpdateCalculatorAsync(calculator);
+                StatusMessage = "✓ 计算器已成功更新！";
+            }
+            else
+            {
+                await _calculatorService.SaveCalculatorAsync(calculator);
+                StatusMessage = "✓ 计算器已成功创建！";
+            }
+
+            // 通知保存成功
+            OnCalculatorSaved?.Invoke(calculator);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"✗ 保存失败: {ex.Message}";
+            _logger.LogError(ex, "保存计算器失败");
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    [RelayCommand]
+    private void InsertCodeTemplate()
+    {
+        var template = GetCodeTemplate();
+        var insertPosition = CodeDocument.TextLength;
+
+        if (CodeDocument.TextLength > 0)
+        {
+            CodeDocument.Insert(insertPosition, "\n\n" + template);
+        }
+        else
+        {
+            CodeDocument.Insert(insertPosition, template);
+        }
+
+        StatusMessage = "代码模板已插入";
+    }
+
+    [RelayCommand]
+    private void InsertParameterCode()
+    {
+        if (SelectedParameter != null)
+        {
+            var paramCode = GenerateParameterCode(SelectedParameter);
+            var insertPosition = CodeDocument.TextLength;
+
+            if (CodeDocument.TextLength > 0)
+            {
+                CodeDocument.Insert(insertPosition, "\n" + paramCode);
+            }
+            else
+            {
+                CodeDocument.Insert(insertPosition, paramCode);
+            }
+
+            StatusMessage = $"已插入参数 {SelectedParameter.DisplayName} 的代码";
+        }
+    }
+
+    [RelayCommand]
+    private void ValidateCode()
+    {
+        try
+        {
+            var code = CodeDocument.Text;
+            var isValid = _calculatorService.ValidateJavaScript(code);
+            StatusMessage = isValid ? "✓ 代码语法验证通过！" : "✗ 代码语法验证失败，请检查语法";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"✗ 代码验证失败: {ex.Message}";
+        }
+    }
+
+    [RelayCommand]
+    private void ClearCode()
+    {
+        if (MessageBox.Show("确定要清空所有代码吗？", "确认", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+        {
+            CodeDocument.Text = "";
+            StatusMessage = "代码已清空";
+        }
+    }
+
+    [RelayCommand]
+    private void ResetToDefault()
+    {
+        if (MessageBox.Show("确定要重置为默认代码吗？这将覆盖现有代码。", "确认", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+        {
+            CodeDocument.Text = GetDefaultCalculationCode();
+            StatusMessage = "代码已重置为默认模板";
+        }
+    }
+
+    #endregion
+
+    #region Events
+
+    public event Action<DosageCalculator>? OnCalculatorSaved;
+
+    #endregion
+
+    #region Private Methods
+
+    private void InitializeCalculator()
+    {
+        if (_isEditing && _editingCalculator != null)
+        {
+            // 编辑模式：加载现有数据
+            CalculatorName = _editingCalculator.CalculatorName;
+            Description = _editingCalculator.Description ?? string.Empty;
+            CalculationCode = _editingCalculator.CalculationCode;
+            CodeDocument.Text = _editingCalculator.CalculationCode;
+
+            // 加载参数
+            if (!string.IsNullOrEmpty(_editingCalculator.ParameterDefinitions))
+            {
+                try
+                {
+                    var parameters = JsonSerializer.Deserialize<List<DosageParameter>>(_editingCalculator.ParameterDefinitions);
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            Parameters.Add(new DosageParameterViewModel(param));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "加载参数定义失败");
+                }
+            }
+
+            StatusMessage = "已加载现有计算器数据";
+        }
+        else
+        {
+            // 创建模式：设置默认值
+            CalculatorName = $"{_drugInfo.DrugName}剂量计算器";
+            Description = $"用于计算{_drugInfo.DrugName}的推荐剂量";
+            CalculationCode = GetDefaultCalculationCode();
+            CodeDocument.Text = CalculationCode;
+
+            // 添加默认参数
+            AddDefaultParameters();
+
+            StatusMessage = "已初始化新计算器";
+        }
+    }
+
+    private void AddDefaultParameters()
+    {
+        Parameters.Add(new DosageParameterViewModel
+        {
+            Name = "weight",
+            DisplayName = "体重",
+            DataType = ParameterTypes.Number,
+            Unit = "kg",
+            IsRequired = true,
+            DefaultValue = 70,
+            MinValue = 1,
+            MaxValue = 200,
+            Description = "患者体重（千克）"
+        });
+
+        Parameters.Add(new DosageParameterViewModel
+        {
+            Name = "age",
+            DisplayName = "年龄",
+            DataType = ParameterTypes.Number,
+            Unit = "岁",
+            IsRequired = true,
+            DefaultValue = 35,
+            MinValue = 0,
+            MaxValue = 120,
+            Description = "患者年龄（岁）"
+        });
+
+        Parameters.Add(new DosageParameterViewModel
+        {
+            Name = "severity",
+            DisplayName = "病情严重程度",
+            DataType = ParameterTypes.Select,
+            IsRequired = true,
+            DefaultValue = "中度",
+            OptionsText = "轻度, 中度, 重度",
+            Description = "根据病情严重程度选择"
+        });
+    }
+
+    private string GenerateParameterName()
+    {
+        var baseName = "param";
+        var counter = 1;
+
+        while (Parameters.Any(p => p.Name == $"{baseName}{counter}"))
+        {
+            counter++;
+        }
+
+        return $"{baseName}{counter}";
+    }
+
+    private string GenerateParameterCode(DosageParameterViewModel parameter)
+    {
+        return parameter.DataType switch
+        {
+            ParameterTypes.Number => $"// 获取{parameter.DisplayName}\n{parameter.Name} = parseFloat({parameter.Name}) || {parameter.DefaultValue ?? 0};\n",
+            ParameterTypes.Boolean => $"// 获取{parameter.DisplayName}\n{parameter.Name} = Boolean({parameter.Name});\n",
+            ParameterTypes.Select => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n",
+            _ => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n"
+        };
+    }
+
+    private string GetDefaultCalculationCode()
+    {
+        return @"// 获取并验证参数
+weight = parseFloat(weight) || 0;
+age = parseFloat(age) || 0;
+severity = severity || '中度';
+
+// 输入验证
+if (weight <= 0 || weight > 200) {
+    addWarning('体重范围', 0, 'mg', '', '体重应在1-200kg之间');
+    return;
+}
+
+if (age < 0 || age > 120) {
+    addWarning('年龄范围', 0, 'mg', '', '年龄应在0-120岁之间');
+    return;
+}
+
+// 基础剂量计算
+var baseDose = weight * 10; // 示例：10mg/kg
+
+// 严重程度调整
+if (severity === '重度') {
+    baseDose *= 1.5;
+} else if (severity === '轻度') {
+    baseDose *= 0.8;
+}
+
+// 年龄调整
+if (age > 65) {
+    baseDose *= 0.9;
+} else if (age < 18) {
+    baseDose *= 1.1;
+}
+
+// 计算单次剂量
+var singleDose = round(baseDose / 3, 1);
+
+// 输出结果
+addNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-14天', '餐后服用');";
+    }
+
+    private string GetCodeTemplate()
+    {
+        return @"// 代码模板
+// 1. 参数获取和验证
+weight = parseFloat(weight) || 0;
+age = parseFloat(age) || 0;
+
+// 2. 输入验证
+if (weight <= 0) {
+    addWarning('参数错误', 0, 'mg', '', '请输入有效的体重');
+    return;
+}
+
+// 3. 剂量计算
+var dose = weight * 10; // 根据实际药物调整
+
+// 4. 特殊情况调整
+if (age > 65) {
+    dose *= 0.8; // 老年人减量
+}
+
+// 5. 输出结果
+addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '餐后服用');";
+    }
+
+    private bool ValidateCalculator()
+    {
+        if (string.IsNullOrWhiteSpace(CalculatorName))
+        {
+            StatusMessage = "✗ 请输入计算器名称";
+            return false;
+        }
+
+        var currentCode = CodeDocument.Text;
+        if (string.IsNullOrWhiteSpace(currentCode))
+        {
+            StatusMessage = "✗ 请输入计算代码";
+            return false;
+        }
+
+        if (!Parameters.Any())
+        {
+            StatusMessage = "✗ 请至少添加一个参数";
+            return false;
+        }
+
+        // 验证参数
+        foreach (var param in Parameters)
+        {
+            if (string.IsNullOrWhiteSpace(param.Name))
+            {
+                StatusMessage = $"✗ 参数名称不能为空";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(param.DisplayName))
+            {
+                StatusMessage = $"✗ 参数 '{param.Name}' 的显示名称不能为空";
+                return false;
+            }
+
+            // 检查参数名称是否重复
+            if (Parameters.Count(p => p.Name == param.Name) > 1)
+            {
+                StatusMessage = $"✗ 参数名称 '{param.Name}' 重复";
+                return false;
+            }
+        }
+
+        // 验证代码
+        try
+        {
+            var isValid = _calculatorService.ValidateJavaScript(currentCode);
+            if (!isValid)
+            {
+                StatusMessage = "✗ 代码语法验证失败，请检查语法";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"✗ 代码验证失败: {ex.Message}";
+            return false;
+        }
+
+        return true;
+    }
+
+    private DosageCalculator CreateCalculatorFromViewModel()
+    {
+        var parameters = Parameters.Select(p => new DosageParameter
+        {
+            Name = p.Name,
+            DisplayName = p.DisplayName,
+            DataType = p.DataType,
+            Unit = p.Unit,
+            IsRequired = p.IsRequired,
+            DefaultValue = p.DefaultValue,
+            MinValue = p.MinValue,
+            MaxValue = p.MaxValue,
+            Options = p.Options.ToList(),
+            Description = p.Description
+        }).ToList();
+
+        return new DosageCalculator
+        {
+            DrugIdentifier = DosageCalculator.GenerateDrugIdentifier(_drugInfo.DataSource, _drugInfo.Id),
+            DataSource = _drugInfo.DataSource,
+            OriginalDrugId = _drugInfo.Id,
+            DrugName = _drugInfo.DrugName,
+            CalculatorName = CalculatorName,
+            Description = Description,
+            CalculationCode = CodeDocument.Text,
+            ParameterDefinitions = JsonSerializer.Serialize(parameters),
+            CreatedBy = "taigongzhaihua",
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+            IsActive = true
+        };
+    }
+
+    private object GetTestValue(DosageParameterViewModel param)
+    {
+        return param.DataType switch
+        {
+            ParameterTypes.Number => param.DefaultValue ?? 0,
+            ParameterTypes.Boolean => param.DefaultValue ?? false,
+            ParameterTypes.Select => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
+            _ => param.DefaultValue ?? ""
+        };
+    }
+
+    #endregion
+}
