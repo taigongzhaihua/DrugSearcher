@@ -612,7 +612,7 @@
 
                                                         <!-- 参数标题 -->
                                                         <TextBlock Grid.Row="0"
-                                                                   Text="计算参数"
+                                                                   Text="计算参数( "
                                                                    FontSize="14"
                                                                    FontWeight="SemiBold"
                                                                    Foreground="{DynamicResource PrimaryTextBrush}"
@@ -632,34 +632,30 @@
                                                                     <Border BorderBrush="{DynamicResource BorderBrush}"
                                                                             BorderThickness="1"
                                                                             CornerRadius="4"
-                                                                            Padding="10"
+                                                                            Padding="10,10,5,10"
                                                                             Margin="0,0,15,10"
                                                                             Background="{DynamicResource BackgroundBrush}">
-                                                                        <StackPanel>
-                                                                            <TextBlock Text="{Binding DisplayName}"
-                                                                                FontWeight="SemiBold"
-                                                                                Margin="0,0,0,5" />
+                                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <TextBlock Text="{Binding DisplayName}"
+                                                                                    FontWeight="SemiBold" VerticalAlignment="Center"
+                                                                                    Margin="0,0,0,5" />
+                                                                                <TextBlock Text="*" VerticalAlignment="Top"
+                                                                                    FontSize="10" Margin="5,10"
+                                                                                    Foreground="{DynamicResource ErrorBrush}"
+                                                                                    Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                                            </StackPanel>
 
                                                                             <TextBox
                                                                                 Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
                                                                                 Style="{StaticResource BaseTextBoxStyle}"
-                                                                                MinWidth="120"
+                                                                                MinWidth="50"
                                                                                 ToolTip="{Binding Description}" />
+                                                                            <TextBlock Text="{Binding Unit}"
+                                                                                FontSize="14" VerticalAlignment="Center"
+                                                                                Margin="10,5,5,5"
+                                                                                Foreground="{DynamicResource SecondaryTextBrush}" />
 
-                                                                            <StackPanel Orientation="Horizontal"
-                                                                                Margin="0,3,0,0">
-                                                                                <TextBlock Text="{Binding Unit}"
-                                                                                    FontSize="10"
-                                                                                    Foreground="{DynamicResource SecondaryTextBrush}" />
-                                                                                <TextBlock Text=" | "
-                                                                                    FontSize="10"
-                                                                                    Foreground="{DynamicResource SecondaryTextBrush}"
-                                                                                    Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                                <TextBlock Text="必填"
-                                                                                    FontSize="10"
-                                                                                    Foreground="#FF6B47"
-                                                                                    Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                            </StackPanel>
                                                                         </StackPanel>
                                                                     </Border>
                                                                 </DataTemplate>

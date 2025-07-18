@@ -5,6 +5,7 @@ using DrugSearcher.Services;
 using ICSharpCode.AvalonEdit.Document;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text.Json;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
@@ -18,6 +19,10 @@ public partial class CalculatorEditorViewModel : ObservableObject
     private readonly BaseDrugInfo _drugInfo;
     private readonly DosageCalculator? _editingCalculator;
     private readonly bool _isEditing;
+    private string _originalCode = string.Empty;
+    private string _originalCalculatorName = string.Empty;
+    private string _originalDescription = string.Empty;
+    private string _originalParametersJson = string.Empty;
 
     public CalculatorEditorViewModel(
         JavaScriptDosageCalculatorService calculatorService,
@@ -70,6 +75,32 @@ public partial class CalculatorEditorViewModel : ObservableObject
     public string SaveButtonText => _isEditing ? "保存修改" : "创建计算器";
 
     public bool IsEditing => _isEditing;
+
+    /// <summary>
+    /// 获取是否有未保存的更改
+    /// </summary>
+    public bool HasUnsavedChanges
+    {
+        get
+        {
+            // 检查基本信息是否更改
+            if (CalculatorName != _originalCalculatorName ||
+                Description != _originalDescription ||
+                CodeDocument.Text != _originalCode)
+            {
+                return true;
+            }
+
+            // 检查参数是否更改
+            var currentParametersJson = GetCurrentParametersJson();
+            if (currentParametersJson != _originalParametersJson)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
 
     #endregion
 
@@ -260,6 +291,15 @@ public partial class CalculatorEditorViewModel : ObservableObject
                 StatusMessage = "✓ 计算器已成功创建！";
             }
 
+            // 更新原始值
+            _originalCalculatorName = CalculatorName;
+            _originalDescription = Description;
+            _originalCode = CodeDocument.Text;
+            _originalParametersJson = GetCurrentParametersJson();
+
+            // 触发属性变化通知
+            OnPropertyChanged(nameof(HasUnsavedChanges));
+
             // 通知保存成功
             OnCalculatorSaved?.Invoke(calculator);
         }
@@ -358,6 +398,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     #region Private Methods
 
+
     private void InitializeCalculator()
     {
         if (_isEditing && _editingCalculator != null)
@@ -367,6 +408,11 @@ public partial class CalculatorEditorViewModel : ObservableObject
             Description = _editingCalculator.Description ?? string.Empty;
             CalculationCode = _editingCalculator.CalculationCode;
             CodeDocument.Text = _editingCalculator.CalculationCode;
+
+            // 保存原始值用于比较
+            _originalCalculatorName = CalculatorName;
+            _originalDescription = Description;
+            _originalCode = CalculationCode;
 
             // 加载参数
             if (!string.IsNullOrEmpty(_editingCalculator.ParameterDefinitions))
@@ -388,6 +434,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
                 }
             }
 
+            _originalParametersJson = GetCurrentParametersJson();
             StatusMessage = "已加载现有计算器数据";
         }
         else
@@ -398,11 +445,83 @@ public partial class CalculatorEditorViewModel : ObservableObject
             CalculationCode = GetDefaultCalculationCode();
             CodeDocument.Text = CalculationCode;
 
+            // 保存原始值
+            _originalCalculatorName = CalculatorName;
+            _originalDescription = Description;
+            _originalCode = CalculationCode;
+
             // 添加默认参数
             AddDefaultParameters();
+            _originalParametersJson = GetCurrentParametersJson();
 
             StatusMessage = "已初始化新计算器";
         }
+
+        // 监听属性变化以更新 HasUnsavedChanges
+        PropertyChanged += OnPropertyChangedForUnsavedChanges;
+        CodeDocument.TextChanged += OnCodeDocumentTextChanged;
+        Parameters.CollectionChanged += OnParametersCollectionChanged;
+    }
+
+    private void OnPropertyChangedForUnsavedChanges(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CalculatorName) ||
+            e.PropertyName == nameof(Description))
+        {
+            OnPropertyChanged(nameof(HasUnsavedChanges));
+        }
+    }
+
+    private void OnCodeDocumentTextChanged(object sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+    }
+
+    private void OnParametersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+
+        // 订阅新参数的属性变化
+        if (e.NewItems != null)
+        {
+            foreach (DosageParameterViewModel param in e.NewItems)
+            {
+                param.PropertyChanged += OnParameterPropertyChanged;
+            }
+        }
+
+        // 取消订阅移除的参数
+        if (e.OldItems != null)
+        {
+            foreach (DosageParameterViewModel param in e.OldItems)
+            {
+                param.PropertyChanged -= OnParameterPropertyChanged;
+            }
+        }
+    }
+
+    private void OnParameterPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+    }
+
+    private string GetCurrentParametersJson()
+    {
+        var parameters = Parameters.Select(p => new DosageParameter
+        {
+            Name = p.Name,
+            DisplayName = p.DisplayName,
+            DataType = p.DataType,
+            Unit = p.Unit,
+            IsRequired = p.IsRequired,
+            DefaultValue = p.DefaultValue,
+            MinValue = p.MinValue,
+            MaxValue = p.MaxValue,
+            Options = p.Options.ToList(),
+            Description = p.Description
+        }).ToList();
+
+        return JsonSerializer.Serialize(parameters);
     }
 
     private void AddDefaultParameters()
@@ -641,6 +760,26 @@ addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '
             ParameterTypes.Select => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
             _ => param.DefaultValue ?? ""
         };
+    }
+
+    #endregion
+
+    #region Cleanup
+
+    /// <summary>
+    /// 清理资源
+    /// </summary>
+    public void Cleanup()
+    {
+        // 取消事件订阅
+        PropertyChanged -= OnPropertyChangedForUnsavedChanges;
+        CodeDocument.TextChanged -= OnCodeDocumentTextChanged;
+        Parameters.CollectionChanged -= OnParametersCollectionChanged;
+
+        foreach (var param in Parameters)
+        {
+            param.PropertyChanged -= OnParameterPropertyChanged;
+        }
     }
 
     #endregion

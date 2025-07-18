@@ -101,7 +101,7 @@ public partial class HotKeyInputControl : UserControl
 
     #region 私有字段
 
-    private bool _isCapturingKeys = false;
+    private bool _isCapturingKeys;
 
     #endregion
 

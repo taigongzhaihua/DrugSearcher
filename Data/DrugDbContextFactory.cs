@@ -7,7 +7,7 @@ namespace DrugSearcher.Data;
 /// </summary>
 public class DrugDbContextFactory(DbContextOptions<DrugDbContext> options) : IDrugDbContextFactory
 {
-    private static bool _databaseInitialized = false;
+    private static bool _databaseInitialized;
     private static readonly Lock Lock = new();
 
     /// <summary>

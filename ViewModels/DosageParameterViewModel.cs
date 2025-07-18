@@ -11,6 +11,25 @@ public partial class DosageParameterViewModel : ObservableObject
         OptionsText = string.Empty;
         DataType = ParameterTypes.Number;
     }
+    /// <summary>
+    /// 转换为模型对象
+    /// </summary>
+    public DosageParameter ToModel()
+    {
+        return new DosageParameter
+        {
+            Name = Name,
+            DisplayName = DisplayName,
+            Description = Description,
+            DataType = DataType,
+            Unit = Unit,
+            IsRequired = IsRequired,
+            DefaultValue = DefaultValue,
+            MinValue = MinValue,
+            MaxValue = MaxValue,
+            Options = Options.ToList()
+        };
+    }
 
     public DosageParameterViewModel(DosageParameter parameter)
     {
@@ -145,7 +164,7 @@ public partial class DosageParameterViewModel : ObservableObject
         }
         else
         {
-            Options = Array.Empty<string>();
+            Options = [];
         }
     }
 

@@ -1,8 +1,12 @@
 using DrugSearcher.Models;
 using Microsoft.Extensions.Logging;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DrugSearcher.Services;
 
@@ -23,52 +27,201 @@ public class DosageCalculatorAiService
         _logger = logger;
         _httpClient = httpClient;
 
-        httpClient.Timeout = TimeSpan.FromMinutes(5);
+        httpClient.Timeout = TimeSpan.FromMinutes(10);
     }
 
     private const string ApiKey = "sk-dfb77b5548ee436598c26e39c2c75432";
-    private const string ApiEndpoint = "https://api.deepseek.com/chat/completions";
+    private const string ApiEndpoint = "https://api.deepseek.com/v1/chat/completions";
 
     /// <summary>
-    /// 根据药物信息生成计算器
+    /// 根据药物信息生成计算器（流式版本）
+    /// </summary>
+    public async IAsyncEnumerable<DosageCalculatorGenerationProgress> GenerateCalculatorStreamAsync(
+        BaseDrugInfo drugInfo,
+        string calculatorType = "通用剂量计算器",
+        string additionalRequirements = "",
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+
+        _logger.LogInformation("开始为药物 {DrugName} 生成计算器（流式）", drugInfo.DrugName);
+
+        // 发送初始状态
+        yield return new DosageCalculatorGenerationProgress
+        {
+            Status = GenerationStatus.Preparing,
+            Message = "正在准备生成计算器...",
+            Progress = 0
+        };
+
+        // 构建AI提示词
+        var prompt = BuildPrompt(drugInfo, calculatorType, additionalRequirements);
+
+        yield return new DosageCalculatorGenerationProgress
+        {
+            Status = GenerationStatus.Generating,
+            Message = "正在调用AI生成计算器配置...",
+            Progress = 10
+        };
+
+        // 调用AI API（流式）
+        var completeResponse = new StringBuilder();
+        var startTime = DateTime.Now;
+        var chunkCount = 0;
+
+        await foreach (var chunk in CallDeepSeekApiStreamAsync(prompt, cancellationToken))
+        {
+            completeResponse.Append(chunk);
+            chunkCount++;
+
+            // 计算进度（基于经验值）
+            var progress = Math.Min(10 + (chunkCount * 2), 90); // 10-90%
+
+            yield return new DosageCalculatorGenerationProgress
+            {
+                Status = GenerationStatus.Generating,
+                Message = "正在生成计算器配置...",
+                Progress = progress,
+                PartialContent = completeResponse.ToString(),
+                StreamChunk = chunk,
+                ElapsedTime = DateTime.Now - startTime
+            };
+        }
+
+        // 解析AI响应
+        yield return new DosageCalculatorGenerationProgress
+        {
+            Status = GenerationStatus.Parsing,
+            Message = "正在解析生成的配置...",
+            Progress = 95
+        };
+
+        var result = ParseAiResponse(completeResponse.ToString(), drugInfo);
+
+        // 返回最终结果
+        yield return new DosageCalculatorGenerationProgress
+        {
+            Status = result.Success ? GenerationStatus.Completed : GenerationStatus.Failed,
+            Message = result.Success ? "计算器生成成功！" : $"生成失败: {result.ErrorMessage}",
+            Progress = 100,
+            Result = result,
+            ElapsedTime = DateTime.Now - startTime
+        };
+
+        _logger.LogInformation("成功为药物 {DrugName} 生成计算器", drugInfo.DrugName);
+
+    }
+
+    /// <summary>
+    /// 根据药物信息生成计算器（非流式版本，保留兼容性）
     /// </summary>
     public async Task<DosageCalculatorGenerationResult> GenerateCalculatorAsync(
         BaseDrugInfo drugInfo,
         string calculatorType = "通用剂量计算器",
-        string additionalRequirements = "")
+        string additionalRequirements = "",
+        CancellationToken cancellationToken = default)
     {
-        try
+        DosageCalculatorGenerationResult? result = null;
+
+        await foreach (var progress in GenerateCalculatorStreamAsync(drugInfo, calculatorType, additionalRequirements, cancellationToken))
         {
-            _logger.LogInformation("开始为药物 {DrugName} 生成计算器", drugInfo.DrugName);
-
-            // 构建AI提示词
-            var prompt = BuildPrompt(drugInfo, calculatorType, additionalRequirements);
-
-            // 调用AI API
-            var aiResponse = await CallDeepSeekApiAsync(prompt);
-
-            // 解析AI响应
-            var result = ParseAiResponse(aiResponse, drugInfo);
-
-            _logger.LogInformation("成功为药物 {DrugName} 生成计算器", drugInfo.DrugName);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "生成计算器失败: {DrugName}", drugInfo.DrugName);
-            return new DosageCalculatorGenerationResult
+            if (progress.Result != null)
             {
-                Success = false,
-                ErrorMessage = $"生成计算器失败: {ex.Message}"
-            };
+                result = progress.Result;
+            }
+        }
+
+        return result ?? new DosageCalculatorGenerationResult
+        {
+            Success = false,
+            ErrorMessage = "生成过程未返回结果"
+        };
+    }
+
+    /// <summary>
+    /// 调用Deepseek API（流式版本）
+    /// </summary>
+    private async IAsyncEnumerable<string> CallDeepSeekApiStreamAsync(
+        string prompt,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var request = new
+        {
+            model = "deepseek-chat",
+            messages = new[]
+            {
+                new { role = "system", content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。你需要根据药物信息生成完整的剂量计算器配置。" },
+                new { role = "user", content = prompt }
+            },
+            max_tokens = 8192,
+            temperature = 0.2,
+            response_format = new { type = "json_object" },
+            stream = true  // 启用流式响应
+        };
+
+        var json = JsonSerializer.Serialize(request);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint)
+        {
+            Content = content
+        };
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+        requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+
+        using var response = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new Exception($"Deepseek API调用失败: {response.StatusCode} - {errorContent}");
+        }
+
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var reader = new StreamReader(stream);
+
+        while (!reader.EndOfStream)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                yield break;
+
+            var line = await reader.ReadLineAsync();
+
+            if (string.IsNullOrEmpty(line))
+                continue;
+
+            if (line.StartsWith("data: "))
+            {
+                var data = line.Substring(6);
+
+                if (data == "[DONE]")
+                    break;
+
+                DeepseekStreamingResponse? streamResponse = null;
+                try
+                {
+                    streamResponse = JsonSerializer.Deserialize<DeepseekStreamingResponse>(data);
+                }
+                catch (JsonException)
+                {
+                    continue;
+                }
+
+                var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
+
+                if (!string.IsNullOrEmpty(deltaContent))
+                {
+                    yield return deltaContent;
+                }
+            }
         }
     }
 
     /// <summary>
-    /// 构建AI提示词
+    /// 构建AI提示词（保持原有实现）
     /// </summary>
     private string BuildPrompt(BaseDrugInfo drugInfo, string calculatorType, string additionalRequirements)
     {
+        // ... 保持原有的 BuildPrompt 实现不变 ...
         var sb = new StringBuilder();
 
         sb.AppendLine("# 药物计算器生成任务");
@@ -216,46 +369,7 @@ public class DosageCalculatorAiService
     }
 
     /// <summary>
-    /// 调用Deepseek API
-    /// </summary>
-    private async Task<string> CallDeepSeekApiAsync(string prompt)
-    {
-        var request = new
-        {
-            model = "deepseek-reasoner",
-            messages = new[]
-            {
-                new { role = "system", content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。你需要根据药物信息生成完整的剂量计算器配置。" },
-                new { role = "user", content = prompt }
-            },
-            max_tokens = 8192,
-            temperature = 0.2,
-            response_format = new { type = "json_object" }
-        };
-
-        var json = JsonSerializer.Serialize(request);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
-
-        var response = await _httpClient.PostAsync(ApiEndpoint, content);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Deepseek API调用失败: {response.StatusCode} - {errorContent}");
-        }
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var apiResponse = JsonSerializer.Deserialize<DeepseekResponse>(responseContent);
-
-        return apiResponse?.Choices?.FirstOrDefault()?.Message?.Content ??
-               throw new Exception("Deepseek API返回空响应");
-    }
-
-    /// <summary>
-    /// 解析AI响应
+    /// 解析AI响应（保持原有实现）
     /// </summary>
     private DosageCalculatorGenerationResult ParseAiResponse(string aiResponse, BaseDrugInfo drugInfo)
     {
@@ -303,6 +417,76 @@ public class DosageCalculatorAiService
         }
     }
 }
+
+/// <summary>
+/// 计算器生成进度
+/// </summary>
+public class DosageCalculatorGenerationProgress
+{
+    public GenerationStatus Status { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public int Progress { get; set; }
+    public string? PartialContent { get; set; }
+    public string? StreamChunk { get; set; }
+    public TimeSpan? ElapsedTime { get; set; }
+    public DosageCalculatorGenerationResult? Result { get; set; }
+}
+
+/// <summary>
+/// 生成状态枚举
+/// </summary>
+public enum GenerationStatus
+{
+    Preparing,
+    Generating,
+    Parsing,
+    Completed,
+    Failed,
+    Cancelled
+}
+
+/// <summary>
+/// Deepseek 流式响应模型
+/// </summary>
+public class DeepseekStreamingResponse
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("object")]
+    public string? Object { get; set; }
+
+    [JsonPropertyName("created")]
+    public long Created { get; set; }
+
+    [JsonPropertyName("model")]
+    public string? Model { get; set; }
+
+    [JsonPropertyName("choices")]
+    public List<StreamingChoice>? Choices { get; set; }
+}
+
+public class StreamingChoice
+{
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
+
+    [JsonPropertyName("delta")]
+    public StreamingDelta? Delta { get; set; }
+
+    [JsonPropertyName("finish_reason")]
+    public string? FinishReason { get; set; }
+}
+
+public class StreamingDelta
+{
+    [JsonPropertyName("role")]
+    public string? Role { get; set; }
+
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
+}
+
 
 /// <summary>
 /// 计算器配置（移除category）
