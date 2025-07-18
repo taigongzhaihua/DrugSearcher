@@ -5,7 +5,6 @@ using DrugSearcher.Helpers;
 using DrugSearcher.Models;
 using DrugSearcher.Services;
 using DrugSearcher.Views;
-using DrugSearcher.Views.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

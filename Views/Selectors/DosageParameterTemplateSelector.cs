@@ -2,7 +2,7 @@ using DrugSearcher.Models;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DrugSearcher.Selectors
+namespace DrugSearcher.Views.Selectors
 {
     public class DosageParameterTemplateSelector : DataTemplateSelector
     {

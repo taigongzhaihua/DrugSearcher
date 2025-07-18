@@ -13,9 +13,6 @@
 	<ItemGroup>
 		<None Remove="Resources\app.ico" />
 		<None Remove="Resources\Fonts\iconfont.ttf" />
-		<None Remove="Resources\JavaScript-Dark.xshd" />
-		<None Remove="Resources\JavaScript-Light.xshd" />
-		<None Remove="Resources\JavaScript.xshd" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,15 +21,6 @@
 		</Resource>
 		<Resource Include="Resources\Fonts\iconfont.ttf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Resource>
-		<EmbeddedResource Include="Resources\JavaScript-Dark.xshd">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="Resources\JavaScript-Light.xshd">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<Resource Include="Resources\JavaScript.xshd">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
 	</ItemGroup>
 

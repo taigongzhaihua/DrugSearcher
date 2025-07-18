@@ -1,4 +1,4 @@
-<Window x:Class="DrugSearcher.Views.Dialogs.CalculatorGenerationDialog"
+<Window x:Class="DrugSearcher.Views.CalculatorGenerationDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="AI生成计算器" Height="600" Width="800"

@@ -9,7 +9,7 @@
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
       xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       xmlns:models="clr-namespace:DrugSearcher.Models"
-      xmlns:selectors="clr-namespace:DrugSearcher.Selectors"
+      xmlns:selectors="clr-namespace:DrugSearcher.Views.Selectors"
       mc:Ignorable="d"
       d:DesignHeight="600" d:DesignWidth="1000" d:DataContext="{d:DesignInstance viewModels:HomePageViewModel}"
       Title="药物查询">

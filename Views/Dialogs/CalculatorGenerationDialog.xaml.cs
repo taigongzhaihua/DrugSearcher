@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DrugSearcher.Views.Dialogs;
+namespace DrugSearcher.Views;
 
 /// <summary>
 /// 计算器生成对话框
