@@ -16,15 +16,9 @@ namespace DrugSearcher.Behaviors
                 typeof(ThemeBehavior),
                 new PropertyMetadata(null, OnBackgroundChanged));
 
-        public static Brush GetBackground(DependencyObject obj)
-        {
-            return (Brush)obj.GetValue(BackgroundProperty);
-        }
+        public static Brush GetBackground(DependencyObject obj) => (Brush)obj.GetValue(BackgroundProperty);
 
-        public static void SetBackground(DependencyObject obj, Brush value)
-        {
-            obj.SetValue(BackgroundProperty, value);
-        }
+        public static void SetBackground(DependencyObject obj, Brush value) => obj.SetValue(BackgroundProperty, value);
 
         #endregion
 
@@ -37,15 +31,9 @@ namespace DrugSearcher.Behaviors
                 typeof(ThemeBehavior),
                 new PropertyMetadata(null, OnForegroundChanged));
 
-        public static Brush GetForeground(DependencyObject obj)
-        {
-            return (Brush)obj.GetValue(ForegroundProperty);
-        }
+        public static Brush GetForeground(DependencyObject obj) => (Brush)obj.GetValue(ForegroundProperty);
 
-        public static void SetForeground(DependencyObject obj, Brush value)
-        {
-            obj.SetValue(ForegroundProperty, value);
-        }
+        public static void SetForeground(DependencyObject obj, Brush value) => obj.SetValue(ForegroundProperty, value);
 
         #endregion
 
@@ -58,15 +46,9 @@ namespace DrugSearcher.Behaviors
                 typeof(ThemeBehavior),
                 new PropertyMetadata(null, OnBorderBrushChanged));
 
-        public static Brush GetBorderBrush(DependencyObject obj)
-        {
-            return (Brush)obj.GetValue(BorderBrushProperty);
-        }
+        public static Brush GetBorderBrush(DependencyObject obj) => (Brush)obj.GetValue(BorderBrushProperty);
 
-        public static void SetBorderBrush(DependencyObject obj, Brush value)
-        {
-            obj.SetValue(BorderBrushProperty, value);
-        }
+        public static void SetBorderBrush(DependencyObject obj, Brush value) => obj.SetValue(BorderBrushProperty, value);
 
         #endregion
 
@@ -79,15 +61,9 @@ namespace DrugSearcher.Behaviors
                 typeof(ThemeBehavior),
                 new PropertyMetadata(TimeSpan.FromMilliseconds(200)));
 
-        public static TimeSpan GetDuration(DependencyObject obj)
-        {
-            return (TimeSpan)obj.GetValue(DurationProperty);
-        }
+        public static TimeSpan GetDuration(DependencyObject obj) => (TimeSpan)obj.GetValue(DurationProperty);
 
-        public static void SetDuration(DependencyObject obj, TimeSpan value)
-        {
-            obj.SetValue(DurationProperty, value);
-        }
+        public static void SetDuration(DependencyObject obj, TimeSpan value) => obj.SetValue(DurationProperty, value);
 
         #endregion
 

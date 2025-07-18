@@ -713,10 +713,7 @@ public partial class MainWindow
     #region 事件处理器 - 快捷键
 
     // 快捷键事件处理方法
-    private void OnShowMainWindowRequested()
-    {
-        _ = ShowFromTrayAsync();
-    }
+    private void OnShowMainWindowRequested() => _ = ShowFromTrayAsync();
 
     private void OnQuickSearchRequested()
     {
@@ -738,15 +735,9 @@ public partial class MainWindow
         }
     }
 
-    private void OnSettingsRequested()
-    {
-        NavigateToSettingsPage();
-    }
+    private void OnSettingsRequested() => NavigateToSettingsPage();
 
-    private void OnExitRequested()
-    {
-        Close();
-    }
+    private void OnExitRequested() => Close();
 
 
 
@@ -864,36 +855,24 @@ public partial class MainWindow
     /// <summary>
     /// 隐藏到托盘（向后兼容）
     /// </summary>
-    public void HideToTray()
-    {
-        _ = HideToTrayAsync();
-    }
+    public void HideToTray() => _ = HideToTrayAsync();
 
     /// <summary>
     /// 从托盘显示（向后兼容）
     /// </summary>
-    public void ShowFromTray()
-    {
-        _ = ShowFromTrayAsync();
-    }
+    public void ShowFromTray() => _ = ShowFromTrayAsync();
 
     /// <summary>
     /// 切换窗口显示状态（向后兼容）
     /// </summary>
-    public void ToggleVisibility()
-    {
-        _ = ToggleVisibilityAsync();
-    }
+    public void ToggleVisibility() => _ = ToggleVisibilityAsync();
 
     /// <summary>
     /// 显示托盘通知（向后兼容）
     /// </summary>
     /// <param name="title">通知标题</param>
     /// <param name="message">通知消息</param>
-    public void ShowNotification(string title, string message)
-    {
-        _ = ShowNotificationAsync(title, message);
-    }
+    public void ShowNotification(string title, string message) => _ = ShowNotificationAsync(title, message);
 
     #endregion
 

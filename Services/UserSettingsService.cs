@@ -101,12 +101,10 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// 获取当前用户ID
     /// </summary>
     /// <returns>用户ID，如果是全局设置则返回null</returns>
-    private static string? GetCurrentUserId()
-    {
+    private static string? GetCurrentUserId() =>
         // 这里可以根据你的认证系统实现
         // 目前返回null表示全局设置
-        return null;
-    }
+        null;
 
     /// <summary>
     /// 初始化默认设置定义
@@ -579,10 +577,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// 获取所有设置定义
     /// </summary>
     /// <returns>所有设置定义的列表</returns>
-    public Task<List<SettingDefinition>> GetSettingDefinitionsAsync()
-    {
-        return Task.FromResult(_settingDefinitions.Values.ToList());
-    }
+    public Task<List<SettingDefinition>> GetSettingDefinitionsAsync() => Task.FromResult(_settingDefinitions.Values.ToList());
 
     #endregion
 
@@ -848,37 +843,31 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// </summary>
     /// <param name="value">要转换的对象</param>
     /// <returns>字符串表示</returns>
-    private static string? ConvertToString(object? value)
+    private static string? ConvertToString(object? value) => value switch
     {
-        return value switch
-        {
-            null => null,
-            bool b => b.ToString().ToLowerInvariant(),
-            double d => d.ToString(CultureInfo.InvariantCulture),
-            decimal dec => dec.ToString(CultureInfo.InvariantCulture),
-            DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
-            Enum e => e.ToString(),
-            _ => value.ToString()
-        };
-    }
+        null => null,
+        bool b => b.ToString().ToLowerInvariant(),
+        double d => d.ToString(CultureInfo.InvariantCulture),
+        decimal dec => dec.ToString(CultureInfo.InvariantCulture),
+        DateTime dt => dt.ToString("O", CultureInfo.InvariantCulture),
+        Enum e => e.ToString(),
+        _ => value.ToString()
+    };
 
     /// <summary>
     /// 从JSON元素提取值
     /// </summary>
     /// <param name="element">JSON元素</param>
     /// <returns>提取的值</returns>
-    private static object? ExtractJsonValue(JsonElement element)
+    private static object? ExtractJsonValue(JsonElement element) => element.ValueKind switch
     {
-        return element.ValueKind switch
-        {
-            JsonValueKind.String => element.GetString(),
-            JsonValueKind.Number => element.TryGetInt32(out var i) ? i : element.GetDouble(),
-            JsonValueKind.True => true,
-            JsonValueKind.False => false,
-            JsonValueKind.Null => null,
-            _ => element.GetRawText()
-        };
-    }
+        JsonValueKind.String => element.GetString(),
+        JsonValueKind.Number => element.TryGetInt32(out var i) ? i : element.GetDouble(),
+        JsonValueKind.True => true,
+        JsonValueKind.False => false,
+        JsonValueKind.Null => null,
+        _ => element.GetRawText()
+    };
 
     #endregion
 
@@ -906,27 +895,18 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
     /// <param name="oldValue">旧值</param>
     /// <param name="newValue">新值</param>
     /// <param name="valueType">值类型</param>
-    protected virtual void OnSettingChanged(string key, object? oldValue, object? newValue, Type valueType)
-    {
-        SettingChanged?.Invoke(this, new SettingChangedEventArgs(key, oldValue, newValue, valueType));
-    }
+    protected virtual void OnSettingChanged(string key, object? oldValue, object? newValue, Type valueType) => SettingChanged?.Invoke(this, new SettingChangedEventArgs(key, oldValue, newValue, valueType));
 
     /// <summary>
     /// 触发设置重新加载事件
     /// </summary>
-    protected virtual void OnSettingsReloaded()
-    {
-        SettingsReloaded?.Invoke(this, EventArgs.Empty);
-    }
+    protected virtual void OnSettingsReloaded() => SettingsReloaded?.Invoke(this, EventArgs.Empty);
 
     /// <summary>
     /// 触发属性变更事件
     /// </summary>
     /// <param name="propertyName">属性名称</param>
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

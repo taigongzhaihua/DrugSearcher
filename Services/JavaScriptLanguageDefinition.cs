@@ -32,7 +32,7 @@ namespace DrugSearcher.Services
             ];
 
             // 所有关键字
-            public static readonly HashSet<string> All =
+            public static readonly HashSet<string?> All =
             [
 
                 ..ControlFlow.Concat(Loops).Concat(Declarations).Concat(Exceptions)
@@ -80,7 +80,7 @@ namespace DrugSearcher.Services
         /// </summary>
         public static class BuiltIns
         {
-            public static readonly Dictionary<string, string> GlobalFunctions = new()
+            public static readonly Dictionary<string, string?> GlobalFunctions = new()
             {
                 ["parseInt"] = "解析字符串并返回整数",
                 ["parseFloat"] = "解析字符串并返回浮点数",
@@ -112,7 +112,7 @@ namespace DrugSearcher.Services
                 ["console"] = "控制台对象"
             };
 
-            public static readonly Dictionary<string, List<string>> ObjectMethods = new()
+            public static readonly Dictionary<string, List<string?>> ObjectMethods = new()
             {
                 ["Array"] =
                 [
@@ -283,7 +283,7 @@ namespace DrugSearcher.Services
                 }
             };
 
-            public static readonly HashSet<string> Names = [.. Functions.Keys];
+            public static readonly HashSet<string?> Names = [.. Functions.Keys];
         }
 
         /// <summary>
@@ -334,9 +334,9 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 获取所有已知标识符
         /// </summary>
-        public static HashSet<string> GetAllKnownIdentifiers()
+        public static HashSet<string?> GetAllKnownIdentifiers()
         {
-            var identifiers = new HashSet<string>();
+            var identifiers = new HashSet<string?>();
 
             // 添加关键字
             identifiers.UnionWith(Keywords.All);
@@ -366,36 +366,24 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查是否为关键字
         /// </summary>
-        public static bool IsKeyword(string word)
-        {
-            return Keywords.All.Contains(word);
-        }
+        public static bool IsKeyword(string? word) => Keywords.All.Contains(word);
 
         /// <summary>
         /// 检查是否为内置函数
         /// </summary>
-        public static bool IsBuiltInFunction(string name)
-        {
-            return BuiltIns.GlobalFunctions.ContainsKey(name) ||
-                   name.StartsWith("Math.") ||
-                   name.StartsWith("console.");
-        }
+        public static bool IsBuiltInFunction(string? name) => name != null && (BuiltIns.GlobalFunctions.ContainsKey(name) ||
+                                                                               name.StartsWith("Math.") ||
+                                                                               name.StartsWith("console."));
 
         /// <summary>
         /// 检查是否为自定义函数
         /// </summary>
-        public static bool IsCustomFunction(string name)
-        {
-            return CustomFunctions.Names.Contains(name);
-        }
+        public static bool IsCustomFunction(string? name) => CustomFunctions.Names.Contains(name);
 
         /// <summary>
         /// 获取函数定义
         /// </summary>
-        public static FunctionDefinition GetFunctionDefinition(string name)
-        {
-            return CustomFunctions.Functions.TryGetValue(name, out var def) ? def : null;
-        }
+        public static FunctionDefinition? GetFunctionDefinition(string? name) => name != null && CustomFunctions.Functions.TryGetValue(name, out var def) ? def : null;
     }
 
     /// <summary>
@@ -403,29 +391,21 @@ namespace DrugSearcher.Services
     /// </summary>
     public class FunctionDefinition
     {
-        public string Name { get; set; }
-        public string Signature { get; set; }
-        public string Description { get; set; }
-        public ParameterDefinition[] Parameters { get; set; }
+        public string? Name { get; set; }
+        public string? Signature { get; set; }
+        public string? Description { get; set; }
+        public ParameterDefinition[] Parameters { get; set; } = [];
         public string ReturnType { get; set; } = "void";
     }
 
     /// <summary>
     /// 参数定义
     /// </summary>
-    public class ParameterDefinition
+    public class ParameterDefinition(string name, string type, string description, bool optional = false)
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Description { get; set; }
-        public bool Optional { get; set; }
-
-        public ParameterDefinition(string name, string type, string description, bool optional = false)
-        {
-            Name = name;
-            Type = type;
-            Description = description;
-            Optional = optional;
-        }
+        public string Name { get; set; } = name;
+        public string Type { get; set; } = type;
+        public string Description { get; set; } = description;
+        public bool Optional { get; set; } = optional;
     }
 }

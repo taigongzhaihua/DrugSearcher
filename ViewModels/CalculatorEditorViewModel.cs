@@ -18,7 +18,6 @@ public partial class CalculatorEditorViewModel : ObservableObject
     private readonly ILogger<CalculatorEditorViewModel> _logger;
     private readonly BaseDrugInfo _drugInfo;
     private readonly DosageCalculator? _editingCalculator;
-    private readonly bool _isEditing;
     private string _originalCode = string.Empty;
     private string _originalCalculatorName = string.Empty;
     private string _originalDescription = string.Empty;
@@ -34,7 +33,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         _logger = logger;
         _drugInfo = drugInfo;
         _editingCalculator = editingCalculator;
-        _isEditing = editingCalculator != null;
+        IsEditing = editingCalculator != null;
 
         Parameters = [];
         CodeDocument = new TextDocument();
@@ -70,11 +69,11 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     public ObservableCollection<DosageParameterViewModel> Parameters { get; }
 
-    public string WindowTitle => _isEditing ? $"编辑计算器 - {_drugInfo.DrugName}" : $"创建计算器 - {_drugInfo.DrugName}";
+    public string WindowTitle => IsEditing ? $"编辑计算器 - {_drugInfo.DrugName}" : $"创建计算器 - {_drugInfo.DrugName}";
 
-    public string SaveButtonText => _isEditing ? "保存修改" : "创建计算器";
+    public string SaveButtonText => IsEditing ? "保存修改" : "创建计算器";
 
-    public bool IsEditing => _isEditing;
+    public bool IsEditing { get; }
 
     /// <summary>
     /// 获取是否有未保存的更改
@@ -151,7 +150,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
                 DefaultValue = SelectedParameter.DefaultValue,
                 MinValue = SelectedParameter.MinValue,
                 MaxValue = SelectedParameter.MaxValue,
-                Options = SelectedParameter.Options.ToArray(),
+                Options = [.. SelectedParameter.Options],
                 Description = SelectedParameter.Description
             };
 
@@ -211,7 +210,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
             foreach (var param in Parameters)
             {
                 var testValue = GetTestValue(param);
-                testParams[param.Name] = testValue;
+                if (param.Name != null) testParams[param.Name] = testValue;
             }
 
             // 执行测试
@@ -223,7 +222,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
             var results = await _calculatorService.TestCalculationAsync(request);
 
-            if (results.Any())
+            if (results.Count != 0)
             {
                 var resultLines = results.Select(r =>
                 {
@@ -275,7 +274,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
             var calculator = CreateCalculatorFromViewModel();
 
-            if (_isEditing)
+            if (IsEditing)
             {
                 calculator.Id = _editingCalculator!.Id;
                 calculator.CreatedAt = _editingCalculator.CreatedAt;
@@ -401,7 +400,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     private void InitializeCalculator()
     {
-        if (_isEditing && _editingCalculator != null)
+        if (IsEditing && _editingCalculator != null)
         {
             // 编辑模式：加载现有数据
             CalculatorName = _editingCalculator.CalculatorName;
@@ -463,21 +462,17 @@ public partial class CalculatorEditorViewModel : ObservableObject
         Parameters.CollectionChanged += OnParametersCollectionChanged;
     }
 
-    private void OnPropertyChangedForUnsavedChanges(object sender, PropertyChangedEventArgs e)
+    private void OnPropertyChangedForUnsavedChanges(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(CalculatorName) ||
-            e.PropertyName == nameof(Description))
+        if (e.PropertyName is nameof(CalculatorName) or nameof(Description))
         {
             OnPropertyChanged(nameof(HasUnsavedChanges));
         }
     }
 
-    private void OnCodeDocumentTextChanged(object sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(HasUnsavedChanges));
-    }
+    private void OnCodeDocumentTextChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(HasUnsavedChanges));
 
-    private void OnParametersCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void OnParametersCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(HasUnsavedChanges));
 
@@ -500,10 +495,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         }
     }
 
-    private void OnParameterPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        OnPropertyChanged(nameof(HasUnsavedChanges));
-    }
+    private void OnParameterPropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(HasUnsavedChanges));
 
     private string GetCurrentParametersJson()
     {
@@ -517,7 +509,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
             DefaultValue = p.DefaultValue,
             MinValue = p.MinValue,
             MaxValue = p.MaxValue,
-            Options = p.Options.ToList(),
+            Options = [.. p.Options],
             Description = p.Description
         }).ToList();
 
@@ -577,20 +569,15 @@ public partial class CalculatorEditorViewModel : ObservableObject
         return $"{baseName}{counter}";
     }
 
-    private string GenerateParameterCode(DosageParameterViewModel parameter)
+    private static string GenerateParameterCode(DosageParameterViewModel parameter) => parameter.DataType switch
     {
-        return parameter.DataType switch
-        {
-            ParameterTypes.Number => $"// 获取{parameter.DisplayName}\n{parameter.Name} = parseFloat({parameter.Name}) || {parameter.DefaultValue ?? 0};\n",
-            ParameterTypes.Boolean => $"// 获取{parameter.DisplayName}\n{parameter.Name} = Boolean({parameter.Name});\n",
-            ParameterTypes.Select => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n",
-            _ => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n"
-        };
-    }
+        ParameterTypes.Number => $"// 获取{parameter.DisplayName}\n{parameter.Name} = parseFloat({parameter.Name}) || {parameter.DefaultValue ?? 0};\n",
+        ParameterTypes.Boolean => $"// 获取{parameter.DisplayName}\n{parameter.Name} = Boolean({parameter.Name});\n",
+        ParameterTypes.Select => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n",
+        _ => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n"
+    };
 
-    private string GetDefaultCalculationCode()
-    {
-        return @"// 获取并验证参数
+    private static string GetDefaultCalculationCode() => @"// 获取并验证参数
 weight = parseFloat(weight) || 0;
 age = parseFloat(age) || 0;
 severity = severity || '中度';
@@ -628,11 +615,8 @@ var singleDose = round(baseDose / 3, 1);
 
 // 输出结果
 addNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-14天', '餐后服用');";
-    }
 
-    private string GetCodeTemplate()
-    {
-        return @"// 代码模板
+    private static string GetCodeTemplate() => @"// 代码模板
 // 1. 参数获取和验证
 weight = parseFloat(weight) || 0;
 age = parseFloat(age) || 0;
@@ -653,7 +637,6 @@ if (age > 65) {
 
 // 5. 输出结果
 addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '餐后服用');";
-    }
 
     private bool ValidateCalculator()
     {
@@ -730,7 +713,7 @@ addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '
             DefaultValue = p.DefaultValue,
             MinValue = p.MinValue,
             MaxValue = p.MaxValue,
-            Options = p.Options.ToList(),
+            Options = [.. p.Options],
             Description = p.Description
         }).ToList();
 
@@ -751,16 +734,13 @@ addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '
         };
     }
 
-    private object GetTestValue(DosageParameterViewModel param)
+    private static object GetTestValue(DosageParameterViewModel param) => param.DataType switch
     {
-        return param.DataType switch
-        {
-            ParameterTypes.Number => param.DefaultValue ?? 0,
-            ParameterTypes.Boolean => param.DefaultValue ?? false,
-            ParameterTypes.Select => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
-            _ => param.DefaultValue ?? ""
-        };
-    }
+        ParameterTypes.Number => param.DefaultValue ?? 0,
+        ParameterTypes.Boolean => param.DefaultValue ?? false,
+        ParameterTypes.Select => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
+        _ => param.DefaultValue ?? ""
+    };
 
     #endregion
 

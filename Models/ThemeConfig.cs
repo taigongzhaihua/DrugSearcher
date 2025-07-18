@@ -4,10 +4,7 @@ namespace DrugSearcher.Models;
 
 public record ThemeConfig(ThemeMode Mode, ThemeColor Color)
 {
-    public override string ToString()
-    {
-        return $"{Mode}-{Color}";
-    }
+    public override string ToString() => $"{Mode}-{Color}";
 
     public static ThemeConfig FromString(string value)
     {

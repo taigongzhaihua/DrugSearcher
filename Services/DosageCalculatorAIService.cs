@@ -191,12 +191,12 @@ public class DosageCalculatorAiService
 
             if (line.StartsWith("data: "))
             {
-                var data = line.Substring(6);
+                var data = line[6..];
 
                 if (data == "[DONE]")
                     break;
 
-                DeepseekStreamingResponse? streamResponse = null;
+                DeepseekStreamingResponse? streamResponse;
                 try
                 {
                     streamResponse = JsonSerializer.Deserialize<DeepseekStreamingResponse>(data);
@@ -219,7 +219,7 @@ public class DosageCalculatorAiService
     /// <summary>
     /// 构建AI提示词（保持原有实现）
     /// </summary>
-    private string BuildPrompt(BaseDrugInfo drugInfo, string calculatorType, string additionalRequirements)
+    private static string BuildPrompt(BaseDrugInfo drugInfo, string calculatorType, string additionalRequirements)
     {
         // ... 保持原有的 BuildPrompt 实现不变 ...
         var sb = new StringBuilder();

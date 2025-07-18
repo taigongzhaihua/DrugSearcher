@@ -478,15 +478,12 @@ public class ExcelService : IExcelService
     /// <summary>
     /// 将单元格值转换为字符串
     /// </summary>
-    private static string GetCellValueAsString(ICell cell)
+    private static string GetCellValueAsString(ICell cell) => cell.CellType switch
     {
-        return cell.CellType switch
-        {
-            CellType.String => cell.StringCellValue?.Trim() ?? "",
-            CellType.Numeric => cell.NumericCellValue.ToString(CultureInfo.CurrentCulture),
-            CellType.Boolean => cell.BooleanCellValue.ToString(),
-            CellType.Formula => cell.StringCellValue?.Trim() ?? "",
-            _ => string.Empty
-        };
-    }
+        CellType.String => cell.StringCellValue?.Trim() ?? "",
+        CellType.Numeric => cell.NumericCellValue.ToString(CultureInfo.CurrentCulture),
+        CellType.Boolean => cell.BooleanCellValue.ToString(),
+        CellType.Formula => cell.StringCellValue?.Trim() ?? "",
+        _ => string.Empty
+    };
 }

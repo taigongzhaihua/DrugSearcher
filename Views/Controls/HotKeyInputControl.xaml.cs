@@ -359,10 +359,7 @@ public partial class HotKeyInputControl : UserControl
         IsRecording = false;
     }
 
-    private static bool IsModifierKey(Key key)
-    {
-        return key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin;
-    }
+    private static bool IsModifierKey(Key key) => key is Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin;
 
     private static bool ValidateHotKey(HotKeySetting hotKey)
     {
@@ -384,17 +381,14 @@ public partial class HotKeyInputControl : UserControl
 
     }
 
-    private static bool IsSystemReservedHotKey(HotKeySetting hotKey)
+    private static bool IsSystemReservedHotKey(HotKeySetting hotKey) => hotKey switch
     {
-        return hotKey switch
-        {
-            // 检查常见的系统保留快捷键
-            { Modifiers: ModifierKeys.Alt, Key: Key.F4 or Key.Tab }
-                or { Modifiers: ModifierKeys.Control, Key: Key.Escape }
-                or { Modifiers: (ModifierKeys.Control | ModifierKeys.Alt), Key: Key.Delete } => true,
-            _ => false
-        };
-    }
+        // 检查常见的系统保留快捷键
+        { Modifiers: ModifierKeys.Alt, Key: Key.F4 or Key.Tab }
+            or { Modifiers: ModifierKeys.Control, Key: Key.Escape }
+            or { Modifiers: (ModifierKeys.Control | ModifierKeys.Alt), Key: Key.Delete } => true,
+        _ => false
+    };
 
     private void SetValueAndExecuteCommand(HotKeySetting? newValue)
     {

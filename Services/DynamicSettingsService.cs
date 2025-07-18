@@ -16,7 +16,6 @@ public class DynamicSettingsService : IDynamicSettingsService
     #region 私有字段
 
     private readonly IUserSettingsService _userSettingsService;
-    private readonly ObservableCollection<DynamicSettingGroup> _settingGroups;
     private readonly Dictionary<string, DynamicSettingItem> _settingsLookup;
     private bool _isInitialized;
 
@@ -27,7 +26,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     public DynamicSettingsService(IUserSettingsService userSettingsService)
     {
         _userSettingsService = userSettingsService ?? throw new ArgumentNullException(nameof(userSettingsService));
-        _settingGroups = [];
+        SettingGroups = [];
         _settingsLookup = [];
 
         // 监听底层设置变更
@@ -44,7 +43,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <summary>
     /// 设置分组集合
     /// </summary>
-    public ObservableCollection<DynamicSettingGroup> SettingGroups => _settingGroups;
+    public ObservableCollection<DynamicSettingGroup> SettingGroups { get; }
 
     #endregion
 
@@ -61,7 +60,7 @@ public class DynamicSettingsService : IDynamicSettingsService
         _settingsLookup[item.Key] = item;
 
         // 找到或创建分组
-        var group = _settingGroups.FirstOrDefault(g => g.Name == item.Category);
+        var group = SettingGroups.FirstOrDefault(g => g.Name == item.Category);
         if (group == null)
         {
             group = new DynamicSettingGroup
@@ -88,7 +87,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     {
         ArgumentNullException.ThrowIfNull(group);
 
-        var existingGroup = _settingGroups.FirstOrDefault(g => g.Name == group.Name);
+        var existingGroup = SettingGroups.FirstOrDefault(g => g.Name == group.Name);
         if (existingGroup != null)
         {
             // 合并设置项
@@ -116,10 +115,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// </summary>
     /// <param name="key">设置键</param>
     /// <returns>设置项</returns>
-    public DynamicSettingItem? GetSetting(string key)
-    {
-        return _settingsLookup.TryGetValue(key, out var item) ? item : null;
-    }
+    public DynamicSettingItem? GetSetting(string key) => _settingsLookup.TryGetValue(key, out var item) ? item : null;
 
     /// <summary>
     /// 更新设置值
@@ -191,7 +187,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <param name="groupName">分组名称</param>
     public async Task ResetGroupAsync(string groupName)
     {
-        var group = _settingGroups.FirstOrDefault(g => g.Name == groupName);
+        var group = SettingGroups.FirstOrDefault(g => g.Name == groupName);
         if (group == null)
             return;
 
@@ -210,10 +206,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <summary>
     /// 重置所有设置
     /// </summary>
-    public async Task ResetAllSettingsAsync()
-    {
-        await _userSettingsService.ResetToDefaultsAsync();
-    }
+    public async Task ResetAllSettingsAsync() => await _userSettingsService.ResetToDefaultsAsync();
 
     /// <summary>
     /// 搜索设置
@@ -246,17 +239,14 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <returns>分组中的所有设置</returns>
     public List<DynamicSettingItem> GetGroupSettings(string groupName)
     {
-        var group = _settingGroups.FirstOrDefault(g => g.Name == groupName);
+        var group = SettingGroups.FirstOrDefault(g => g.Name == groupName);
         return group?.Items.ToList() ?? [];
     }
 
     /// <summary>
     /// 获取所有设置
     /// </summary>
-    public async Task<Dictionary<string, object?>> GetAllSettingsAsync()
-    {
-        return await _userSettingsService.GetAllSettingsAsync();
-    }
+    public async Task<Dictionary<string, object?>> GetAllSettingsAsync() => await _userSettingsService.GetAllSettingsAsync();
 
     #endregion
 
@@ -283,11 +273,9 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// </summary>
     /// <param name="sender">发送者</param>
     /// <param name="e">事件参数</param>
-    private void OnUserSettingsReloaded(object? sender, EventArgs e)
-    {
+    private void OnUserSettingsReloaded(object? sender, EventArgs e) =>
         // 重新加载所有设置值
         _ = LoadSettingsAsync();
-    }
 
     #endregion
 
@@ -593,9 +581,9 @@ public class DynamicSettingsService : IDynamicSettingsService
     private void InsertGroupInOrder(DynamicSettingGroup group)
     {
         var insertIndex = 0;
-        for (var i = 0; i < _settingGroups.Count; i++)
+        for (var i = 0; i < SettingGroups.Count; i++)
         {
-            if (_settingGroups[i].Order > group.Order)
+            if (SettingGroups[i].Order > group.Order)
             {
                 insertIndex = i;
                 break;
@@ -604,7 +592,7 @@ public class DynamicSettingsService : IDynamicSettingsService
             insertIndex = i + 1;
         }
 
-        _settingGroups.Insert(insertIndex, group);
+        SettingGroups.Insert(insertIndex, group);
     }
 
     /// <summary>
@@ -656,51 +644,42 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// </summary>
     /// <param name="category">分类</param>
     /// <returns>显示名称</returns>
-    private static string GetCategoryDisplayName(string category)
+    private static string GetCategoryDisplayName(string category) => category switch
     {
-        return category switch
-        {
-            SettingCategories.Tray => "系统托盘",
-            SettingCategories.Ui => "外观",
-            SettingCategories.Application => "应用程序",
-            SettingCategories.Search => "搜索",
-            _ => category
-        };
-    }
+        SettingCategories.Tray => "系统托盘",
+        SettingCategories.Ui => "外观",
+        SettingCategories.Application => "应用程序",
+        SettingCategories.Search => "搜索",
+        _ => category
+    };
 
     /// <summary>
     /// 获取分类图标
     /// </summary>
     /// <param name="category">分类</param>
     /// <returns>图标</returns>
-    private static string GetCategoryIcon(string category)
+    private static string GetCategoryIcon(string category) => category switch
     {
-        return category switch
-        {
-            SettingCategories.Tray => "\ue61e",
-            SettingCategories.Ui => "\ue61f",
-            SettingCategories.Application => "\ue621",
-            SettingCategories.Search => "\ue622",
-            _ => "\ue620"
-        };
-    }
+        SettingCategories.Tray => "\ue61e",
+        SettingCategories.Ui => "\ue61f",
+        SettingCategories.Application => "\ue621",
+        SettingCategories.Search => "\ue622",
+        _ => "\ue620"
+    };
 
     /// <summary>
     /// 获取分类排序
     /// </summary>
     /// <param name="category">分类</param>
     /// <returns>排序值</returns>
-    private static int GetCategoryOrder(string category)
+    private static int GetCategoryOrder(string category) => category switch
     {
-        return category switch
-        {
-            SettingCategories.Tray => 1,
-            SettingCategories.Ui => 2,
-            SettingCategories.Application => 3,
-            SettingCategories.Search => 4,
-            _ => 999
-        };
-    }
+        SettingCategories.Tray => 1,
+        SettingCategories.Ui => 2,
+        SettingCategories.Application => 3,
+        SettingCategories.Search => 4,
+        _ => 999
+    };
 
     /// <summary>
     /// 创建默认快捷键设置
@@ -781,21 +760,18 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <summary>
     /// 检查是否是系统保留的快捷键
     /// </summary>
-    private static bool IsSystemReservedHotKey(HotKeySetting hotKey)
+    private static bool IsSystemReservedHotKey(HotKeySetting hotKey) => hotKey switch
     {
-        return hotKey switch
-        {
-            // Alt + F4 (关闭窗口)
-            // Alt + Tab (切换窗口)
-            // Ctrl + Alt + Del (安全桌面)
-            // Windows + L (锁定计算机)
-            { Modifiers: ModifierKeys.Alt, Key: Key.F4 }
-                or { Modifiers: ModifierKeys.Alt, Key: Key.Tab }
-                or { Modifiers: (ModifierKeys.Control | ModifierKeys.Alt), Key: Key.Delete }
-                or { Modifiers: ModifierKeys.Windows, Key: Key.L } => true,
-            _ => false
-        };
-    }
+        // Alt + F4 (关闭窗口)
+        // Alt + Tab (切换窗口)
+        // Ctrl + Alt + Del (安全桌面)
+        // Windows + L (锁定计算机)
+        { Modifiers: ModifierKeys.Alt, Key: Key.F4 }
+            or { Modifiers: ModifierKeys.Alt, Key: Key.Tab }
+            or { Modifiers: (ModifierKeys.Control | ModifierKeys.Alt), Key: Key.Delete }
+            or { Modifiers: ModifierKeys.Windows, Key: Key.L } => true,
+        _ => false
+    };
 
     /// <summary>
     /// 检查快捷键是否冲突（修改版本）

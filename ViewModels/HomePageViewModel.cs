@@ -201,10 +201,7 @@ public partial class HomePageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void HideSuggestions()
-    {
-        ShowSearchSuggestions = false;
-    }
+    private void HideSuggestions() => ShowSearchSuggestions = false;
 
     #endregion
 
@@ -317,7 +314,7 @@ public partial class HomePageViewModel : ObservableObject
                     ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
                     _ => param.Value.ToString() ?? string.Empty
                 };
-                paramDict[param.Name] = value;
+                if (param.Name != null) paramDict[param.Name] = value;
             }
 
             var request = new DosageCalculationRequest
@@ -429,7 +426,7 @@ public partial class HomePageViewModel : ObservableObject
             return;
         }
 
-        var result = await ShowCalculatorGenerationDialog();
+        var result = ShowCalculatorGenerationDialog();
         if (result == null) return;
 
         IsGeneratingCalculator = true;
@@ -578,8 +575,7 @@ public partial class HomePageViewModel : ObservableObject
     /// <summary>
     /// 搜索词变化时获取建议
     /// </summary>
-    partial void OnSearchTermChanged(string value)
-    {
+    partial void OnSearchTermChanged(string value) =>
         // 延迟获取建议，避免频繁请求
         Task.Delay(300).ContinueWith(async _ =>
         {
@@ -588,7 +584,6 @@ public partial class HomePageViewModel : ObservableObject
                 await GetSearchSuggestions(value);
             }
         });
-    }
 
     /// <summary>
     /// 获取搜索建议
@@ -666,7 +661,7 @@ public partial class HomePageViewModel : ObservableObject
     /// <summary>
     /// 显示计算器生成对话框
     /// </summary>
-    private async Task<CalculatorGenerationRequest?> ShowCalculatorGenerationDialog()
+    private static CalculatorGenerationRequest? ShowCalculatorGenerationDialog()
     {
         var dialog = new CalculatorGenerationDialog();
         if (dialog.ShowDialog() == true)
@@ -703,15 +698,9 @@ public partial class HomePageViewModel : ObservableObject
         SearchStatus = isLoading ? "搜索中..." : string.Empty;
     }
 
-    private void UpdateResultCount(int count)
-    {
-        ResultCount = $"搜索结果: {count} 条";
-    }
+    private void UpdateResultCount(int count) => ResultCount = $"搜索结果: {count} 条";
 
-    private void ShowDetailPanel()
-    {
-        IsDetailPanelVisible = true;
-    }
+    private void ShowDetailPanel() => IsDetailPanelVisible = true;
 
     private void HideDetailPanel()
     {

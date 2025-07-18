@@ -294,15 +294,12 @@ public static partial class SingleInstanceManager
     /// 创建管道服务器
     /// </summary>
     /// <returns>管道服务器实例</returns>
-    private static NamedPipeServerStream CreatePipeServer()
-    {
-        return new NamedPipeServerStream(
+    private static NamedPipeServerStream CreatePipeServer() => new(
             PipeName,
             PipeDirection.In,
             maxNumberOfServerInstances: 1,
             PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous);
-    }
 
     /// <summary>
     /// 处理激活请求
@@ -554,10 +551,7 @@ public static partial class SingleInstanceManager
     /// <param name="foregroundThreadId">前台线程ID</param>
     /// <param name="currentThreadId">当前线程ID</param>
     /// <returns>如果需要附加则返回true</returns>
-    private static bool ShouldAttachThreadInput(uint foregroundThreadId, uint currentThreadId)
-    {
-        return foregroundThreadId != currentThreadId && foregroundThreadId != 0;
-    }
+    private static bool ShouldAttachThreadInput(uint foregroundThreadId, uint currentThreadId) => foregroundThreadId != currentThreadId && foregroundThreadId != 0;
 
     /// <summary>
     /// 附加线程输入并设置前台

@@ -10,15 +10,9 @@ public static class ContainerAccessor
 
     public static bool IsInitialized => _container != null;
 
-    public static void Initialize(IContainer container)
-    {
-        _container = container;
-    }
+    public static void Initialize(IContainer container) => _container = container;
 
-    public static T Resolve<T>() where T : notnull
-    {
-        return Container.Resolve<T>();
-    }
+    public static T Resolve<T>() where T : notnull => Container.Resolve<T>();
 
     public static void Dispose()
     {

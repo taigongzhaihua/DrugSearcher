@@ -280,19 +280,13 @@ public partial class HotKeyManager : IDisposable
     /// 获取所有已注册的全局快捷键
     /// </summary>
     /// <returns>全局快捷键列表</returns>
-    public IReadOnlyDictionary<int, HotKeyInfo> GetGlobalHotKeys()
-    {
-        return _globalHotKeys;
-    }
+    public IReadOnlyDictionary<int, HotKeyInfo> GetGlobalHotKeys() => _globalHotKeys;
 
     /// <summary>
     /// 获取所有已注册的局部快捷键
     /// </summary>
     /// <returns>局部快捷键列表</returns>
-    public IReadOnlyDictionary<string, LocalHotKeyInfo> GetLocalHotKeys()
-    {
-        return _localHotKeys;
-    }
+    public IReadOnlyDictionary<string, LocalHotKeyInfo> GetLocalHotKeys() => _localHotKeys;
 
     /// <summary>
     /// 检查快捷键是否已被注册

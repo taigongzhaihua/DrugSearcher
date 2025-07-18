@@ -98,22 +98,15 @@ public abstract class BaseDrugInfo
     /// </summary>
     public virtual string GetDataSourceText() => DataSource switch
     {
-        DataSource.LocalDatabase => "本地数据库",
-        DataSource.OnlineSearch => "在线数据",
-        DataSource.CachedDocuments => "缓存数据",
+        DataSource.LocalDatabase => "院内数据",
+        DataSource.OnlineSearch => "网络数据",
         _ => "未知来源"
     };
 
     /// <summary>
     /// 获取数据源显示文本
     /// </summary>
-    public virtual string DataSourceText => DataSource switch
-    {
-        DataSource.LocalDatabase => "本地数据库",
-        DataSource.OnlineSearch => "在线数据",
-        DataSource.CachedDocuments => "缓存数据",
-        _ => "未知来源"
-    };
+    public virtual string DataSourceText => GetDataSourceText();
 
     /// <summary>
     /// 获取数据源颜色

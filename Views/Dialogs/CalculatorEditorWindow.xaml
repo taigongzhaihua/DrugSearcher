@@ -12,7 +12,7 @@
         Background="{DynamicResource SurfaceBrush}"
         WindowState="Maximized"
         MinHeight="600" MinWidth="1000" 
-        d:DataContext="{vm:CalculatorEditorViewModel}">
+        d:DataContext="{d:DesignInstance vm:CalculatorEditorViewModel}">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

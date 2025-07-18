@@ -17,30 +17,27 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 根据统一药物信息获取计算器列表
     /// </summary>
-    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(BaseDrugInfo drugInfo)
-    {
-        return await calculatorRepository.GetByUnifiedDrugAsync(drugInfo);
-    }
+    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(BaseDrugInfo drugInfo) => await calculatorRepository.GetByUnifiedDrugAsync(drugInfo);
 
     /// <summary>
     /// 根据数据源和药物ID获取计算器列表
     /// </summary>
-    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(DataSource dataSource, int drugId)
-    {
-        return await calculatorRepository.GetByDataSourceAndDrugIdAsync(dataSource, drugId);
-    }
+    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(DataSource dataSource, int drugId) => await calculatorRepository.GetByDataSourceAndDrugIdAsync(dataSource, drugId);
 
     /// <summary>
     /// 根据药物标识符获取计算器列表
     /// </summary>
-    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(string drugIdentifier)
-    {
-        return await calculatorRepository.GetByDrugIdentifierAsync(drugIdentifier);
-    }
+    public async Task<List<DosageCalculator>> GetCalculatorsForDrugAsync(string drugIdentifier) => await calculatorRepository.GetByDrugIdentifierAsync(drugIdentifier);
 
-    /// <summary>
-    /// 获取计算器参数
-    /// </summary>
+    // Add a static readonly field to cache the JsonSerializerOptions instance
+    private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        AllowTrailingCommas = true
+    };
+
+    // Replace the inline creation of JsonSerializerOptions with the cached instance
     public async Task<List<DosageParameter>> GetCalculatorParametersAsync(int calculatorId)
     {
         var calculator = await calculatorRepository.GetByIdAsync(calculatorId);
@@ -49,15 +46,7 @@ public class JavaScriptDosageCalculatorService(
 
         try
         {
-            // 使用支持灵活默认值的JsonSerializerOptions
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true
-            };
-
-            var parameters = JsonSerializer.Deserialize<List<DosageParameter>>(calculator.ParameterDefinitions, options) ?? [];
+            var parameters = JsonSerializer.Deserialize<List<DosageParameter>>(calculator.ParameterDefinitions, CachedJsonSerializerOptions) ?? [];
 
             // 设置初始UI值
             foreach (var param in parameters)
@@ -218,45 +207,42 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 执行JavaScript代码
     /// </summary>
-    private async Task<List<DosageCalculationResult>> ExecuteJavaScriptAsync(string code, Dictionary<string, object> parameters)
-    {
-        return await Task.Run(() =>
-        {
-            try
-            {
-                using var engine = new V8ScriptEngine();
+    private async Task<List<DosageCalculationResult>> ExecuteJavaScriptAsync(string code, Dictionary<string, object> parameters) => await Task.Run(() =>
+                                                                                                                                          {
+                                                                                                                                              try
+                                                                                                                                              {
+                                                                                                                                                  using var engine = new V8ScriptEngine();
 
-                // 设置安全限制
-                engine.DefaultAccess = Microsoft.ClearScript.ScriptAccess.ReadOnly;
+                                                                                                                                                  // 设置安全限制
+                                                                                                                                                  engine.DefaultAccess = Microsoft.ClearScript.ScriptAccess.ReadOnly;
 
-                // 构建完整的JavaScript代码
-                var fullScript = BuildFullJavaScriptCode(code, parameters);
+                                                                                                                                                  // 构建完整的JavaScript代码
+                                                                                                                                                  var fullScript = BuildFullJavaScriptCode(code, parameters);
 
-                // 执行完整的脚本
-                engine.Execute(fullScript);
+                                                                                                                                                  // 执行完整的脚本
+                                                                                                                                                  engine.Execute(fullScript);
 
-                // 获取结果
-                var resultsJson = engine.Evaluate("JSON.stringify(results)").ToString();
-                var results = JsonSerializer.Deserialize<List<DosageCalculationResult>>(resultsJson ?? string.Empty) ?? [];
+                                                                                                                                                  // 获取结果
+                                                                                                                                                  var resultsJson = engine.Evaluate("JSON.stringify(results)").ToString();
+                                                                                                                                                  var results = JsonSerializer.Deserialize<List<DosageCalculationResult>>(resultsJson ?? string.Empty) ?? [];
 
-                logger.LogDebug("JavaScript execution completed successfully, {Count} results returned", results.Count);
-                return results;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "JavaScript execution failed: {Message}", ex.Message);
-                return
-                [
-                    new DosageCalculationResult
+                                                                                                                                                  logger.LogDebug("JavaScript execution completed successfully, {Count} results returned", results.Count);
+                                                                                                                                                  return results;
+                                                                                                                                              }
+                                                                                                                                              catch (Exception ex)
+                                                                                                                                              {
+                                                                                                                                                  logger.LogError(ex, "JavaScript execution failed: {Message}", ex.Message);
+                                                                                                                                                  return
+                                                                                                                                                  [
+                                                                                                                                                      new DosageCalculationResult
                 {
                     Description = "计算错误",
                     IsWarning = true,
                     WarningMessage = $"脚本执行失败: {ex.Message}"
                 }
-                ];
-            }
-        });
-    }
+                                                                                                                                                  ];
+                                                                                                                                              }
+                                                                                                                                          });
 
     /// <summary>
     /// 构建完整的JavaScript代码
@@ -372,7 +358,7 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 将值转换为JavaScript字面量
     /// </summary>
-    private string ConvertToJavaScriptLiteral(object? value)
+    private static string ConvertToJavaScriptLiteral(object? value)
     {
         if (value == null)
             return "null";
@@ -398,7 +384,7 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 格式化数字为JavaScript兼容格式
     /// </summary>
-    private string FormatNumber(double value)
+    private static string FormatNumber(double value)
     {
         if (double.IsNaN(value))
             return "NaN";
@@ -413,27 +399,22 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 转换JsonElement为JavaScript字面量
     /// </summary>
-    private string ConvertJsonElementToLiteral(JsonElement element)
+    private static string ConvertJsonElementToLiteral(JsonElement element) => element.ValueKind switch
     {
-        return element.ValueKind switch
-        {
-            JsonValueKind.String => $"\"{EscapeJavaScriptString(element.GetString() ?? "")}\"",
-            JsonValueKind.Number => FormatNumber(element.GetDouble()),
-            JsonValueKind.True => "true",
-            JsonValueKind.False => "false",
-            JsonValueKind.Null => "null",
-            JsonValueKind.Undefined => "undefined",
-            _ => $"\"{EscapeJavaScriptString(element.ToString())}\""
-        };
-    }
+        JsonValueKind.String => $"\"{EscapeJavaScriptString(element.GetString() ?? "")}\"",
+        JsonValueKind.Number => FormatNumber(element.GetDouble()),
+        JsonValueKind.True => "true",
+        JsonValueKind.False => "false",
+        JsonValueKind.Null => "null",
+        JsonValueKind.Undefined => "undefined",
+        _ => $"\"{EscapeJavaScriptString(element.ToString())}\""
+    };
 
     /// <summary>
     /// 转义JavaScript字符串
     /// </summary>
-    private string EscapeJavaScriptString(string input)
-    {
-        return input
-            .Replace("\\", "\\\\")
+    private static string EscapeJavaScriptString(string input) => input
+            .Replace("\\", @"\\")
             .Replace("\"", "\\\"")
             .Replace("'", "\\'")
             .Replace("\n", "\\n")
@@ -442,7 +423,6 @@ public class JavaScriptDosageCalculatorService(
             .Replace("\b", "\\b")
             .Replace("\f", "\\f")
             .Replace("\0", "\\0");
-    }
 
     /// <summary>
     /// 验证JavaScript代码
@@ -498,29 +478,31 @@ public class JavaScriptDosageCalculatorService(
         return BuildFullJavaScriptCode(userCode, testParams);
     }
 
-    /// <summary>
-    /// 测试JavaScript代码执行
-    /// </summary>
-    public async Task<List<DosageCalculationResult>> TestJavaScriptAsync(string code, Dictionary<string, object> parameters)
-    {
-        try
+    /*
+        /// <summary>
+        /// 测试JavaScript代码执行
+        /// </summary>
+        public async Task<List<DosageCalculationResult>> TestJavaScriptAsync(string code, Dictionary<string?, object> parameters)
         {
-            return await ExecuteJavaScriptAsync(code, parameters);
+            try
+            {
+                return await ExecuteJavaScriptAsync(code, parameters);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "JavaScript test execution failed");
+                return
+                [
+                    new DosageCalculationResult
+                    {
+                        Description = "测试失败",
+                        IsWarning = true,
+                        WarningMessage = $"测试执行失败: {ex.Message}"
+                    }
+                ];
+            }
         }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "JavaScript test execution failed");
-            return
-            [
-                new DosageCalculationResult
-                {
-                    Description = "测试失败",
-                    IsWarning = true,
-                    WarningMessage = $"测试执行失败: {ex.Message}"
-                }
-            ];
-        }
-    }
+    */
 
     /// <summary>
     /// 保存计算器
@@ -559,24 +541,15 @@ public class JavaScriptDosageCalculatorService(
     /// <summary>
     /// 删除计算器
     /// </summary>
-    public async Task<bool> DeleteCalculatorAsync(int id)
-    {
-        return await calculatorRepository.DeleteAsync(id);
-    }
+    public async Task<bool> DeleteCalculatorAsync(int id) => await calculatorRepository.DeleteAsync(id);
 
     /// <summary>
     /// 获取计算器统计信息
     /// </summary>
-    public async Task<DosageCalculatorStatistics> GetStatisticsAsync()
-    {
-        return await calculatorRepository.GetStatisticsAsync();
-    }
+    public async Task<DosageCalculatorStatistics> GetStatisticsAsync() => await calculatorRepository.GetStatisticsAsync();
 
     /// <summary>
     /// 搜索计算器
     /// </summary>
-    public async Task<List<DosageCalculator>> SearchCalculatorsAsync(string keyword)
-    {
-        return await calculatorRepository.SearchAsync(keyword);
-    }
+    public async Task<List<DosageCalculator>> SearchCalculatorsAsync(string keyword) => await calculatorRepository.SearchAsync(keyword);
 }

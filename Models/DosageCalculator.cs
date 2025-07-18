@@ -63,10 +63,7 @@ public class DosageCalculator
     /// <summary>
     /// 生成药物标识符
     /// </summary>
-    public static string GenerateDrugIdentifier(DataSource dataSource, int drugId)
-    {
-        return $"{dataSource}_{drugId}";
-    }
+    public static string GenerateDrugIdentifier(DataSource dataSource, int drugId) => $"{dataSource}_{drugId}";
 
     /// <summary>
     /// 解析药物标识符
@@ -85,7 +82,7 @@ public class DosageCalculator
 
 public class DosageParameter
 {
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public string DataType { get; set; } = string.Empty; // "number", "text", "select", "boolean"
     public string Unit { get; set; } = string.Empty;
@@ -160,9 +157,9 @@ public class FlexibleDefaultValueConverter : JsonConverter<object?>
             case JsonTokenType.String:
                 return reader.GetString();
             case JsonTokenType.Number:
-                if (reader.TryGetDouble(out double doubleValue))
+                if (reader.TryGetDouble(out var doubleValue))
                     return doubleValue;
-                if (reader.TryGetInt32(out int intValue))
+                if (reader.TryGetInt32(out var intValue))
                     return intValue;
                 return reader.GetDecimal();
             case JsonTokenType.True:

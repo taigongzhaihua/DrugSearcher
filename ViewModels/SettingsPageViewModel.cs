@@ -227,32 +227,26 @@ public partial class SettingsPageViewModel : ObservableObject
     /// 重置所有设置命令
     /// </summary>
     [RelayCommand]
-    private async Task ResetAllSettingsAsync()
-    {
-        await ExecuteWithLoadingAsync("正在重置所有设置...", async () =>
-        {
-            await _dynamicSettingsService.ResetAllSettingsAsync();
-            await ShowSuccessMessageAsync("所有设置已重置", 2000);
-        });
-    }
+    private async Task ResetAllSettingsAsync() => await ExecuteWithLoadingAsync("正在重置所有设置...", async () =>
+                                                       {
+                                                           await _dynamicSettingsService.ResetAllSettingsAsync();
+                                                           await ShowSuccessMessageAsync("所有设置已重置", 2000);
+                                                       });
 
     /// <summary>
     /// 导出设置命令
     /// </summary>
     [RelayCommand]
-    private async Task ExportSettingsAsync()
-    {
-        await ExecuteWithLoadingAsync("正在导出设置...", async () =>
-        {
-            var json = await _userSettingsService.ExportSettingsAsync();
-            var success = await SaveSettingsToFileAsync(json);
+    private async Task ExportSettingsAsync() => await ExecuteWithLoadingAsync("正在导出设置...", async () =>
+                                                     {
+                                                         var json = await _userSettingsService.ExportSettingsAsync();
+                                                         var success = await SaveSettingsToFileAsync(json);
 
-            if (success)
-            {
-                await ShowSuccessMessageAsync("设置导出成功", 2000);
-            }
-        });
-    }
+                                                         if (success)
+                                                         {
+                                                             await ShowSuccessMessageAsync("设置导出成功", 2000);
+                                                         }
+                                                     });
 
     /// <summary>
     /// 导入设置命令
@@ -283,10 +277,7 @@ public partial class SettingsPageViewModel : ObservableObject
     /// 清除搜索命令
     /// </summary>
     [RelayCommand]
-    private void ClearSearch()
-    {
-        SearchText = string.Empty;
-    }
+    private void ClearSearch() => SearchText = string.Empty;
 
     #endregion
 
@@ -349,10 +340,7 @@ public partial class SettingsPageViewModel : ObservableObject
     /// <summary>
     /// 搜索文本变更处理
     /// </summary>
-    partial void OnSearchTextChanged(string value)
-    {
-        FilterSettings(value);
-    }
+    partial void OnSearchTextChanged(string value) => FilterSettings(value);
 
     #endregion
 
@@ -361,15 +349,12 @@ public partial class SettingsPageViewModel : ObservableObject
     /// <summary>
     /// 加载设置
     /// </summary>
-    private async Task LoadSettingsAsync()
-    {
-        await ExecuteWithLoadingAsync("正在加载设置...", async () =>
-        {
-            await _dynamicSettingsService.LoadSettingsAsync();
-            FilterSettings(SearchText);
-            await ShowSuccessMessageAsync("设置加载完成", 1000);
-        });
-    }
+    private async Task LoadSettingsAsync() => await ExecuteWithLoadingAsync("正在加载设置...", async () =>
+                                                   {
+                                                       await _dynamicSettingsService.LoadSettingsAsync();
+                                                       FilterSettings(SearchText);
+                                                       await ShowSuccessMessageAsync("设置加载完成", 1000);
+                                                   });
 
     /// <summary>
     /// 过滤设置

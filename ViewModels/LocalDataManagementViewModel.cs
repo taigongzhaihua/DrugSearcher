@@ -197,28 +197,19 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 添加命令
     /// </summary>
     [RelayCommand]
-    private void Add()
-    {
-        ShowAddDialog();
-    }
+    private void Add() => ShowAddDialog();
 
     /// <summary>
     /// 编辑命令
     /// </summary>
     [RelayCommand]
-    private void Edit(LocalDrugInfo? drug)
-    {
-        ShowEditDialog(drug);
-    }
+    private void Edit(LocalDrugInfo? drug) => ShowEditDialog(drug);
 
     /// <summary>
     /// 删除命令
     /// </summary>
     [RelayCommand]
-    private async Task Delete(LocalDrugInfo? drug)
-    {
-        await DeleteDrugAsync(drug);
-    }
+    private async Task Delete(LocalDrugInfo? drug) => await DeleteDrugAsync(drug);
 
     /// <summary>
     /// 批量删除命令
@@ -437,10 +428,7 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 刷新命令
     /// </summary>
     [RelayCommand]
-    private async Task RefreshAsync()
-    {
-        await LoadDataAsync();
-    }
+    private async Task RefreshAsync() => await LoadDataAsync();
 
     /// <summary>
     /// 上一页命令
@@ -641,18 +629,12 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// <summary>
     /// 当前页变化时更新导航状态
     /// </summary>
-    partial void OnCurrentPageChanged(int value)
-    {
-        UpdateNavigationState();
-    }
+    partial void OnCurrentPageChanged(int value) => UpdateNavigationState();
 
     /// <summary>
     /// 总页数变化时更新导航状态
     /// </summary>
-    partial void OnTotalPagesChanged(int value)
-    {
-        UpdateNavigationState();
-    }
+    partial void OnTotalPagesChanged(int value) => UpdateNavigationState();
 
     #endregion
 }

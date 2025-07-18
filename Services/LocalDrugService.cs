@@ -11,18 +11,12 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 搜索药物
     /// </summary>
-    public async Task<List<LocalDrugInfo>> SearchDrugsAsync(string keyword)
-    {
-        return await drugRepository.SearchAsync(keyword);
-    }
+    public async Task<List<LocalDrugInfo>> SearchDrugsAsync(string keyword) => await drugRepository.SearchAsync(keyword);
 
     /// <summary>
     /// 获取药物详情
     /// </summary>
-    public async Task<LocalDrugInfo?> GetDrugDetailAsync(int id)
-    {
-        return await drugRepository.GetByIdAsync(id);
-    }
+    public async Task<LocalDrugInfo?> GetDrugDetailAsync(int id) => await drugRepository.GetByIdAsync(id);
 
     /// <summary>
     /// 获取药物名称建议
@@ -70,18 +64,12 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 删除药物
     /// </summary>
-    public async Task<bool> DeleteDrugAsync(int id)
-    {
-        return await drugRepository.DeleteAsync(id);
-    }
+    public async Task<bool> DeleteDrugAsync(int id) => await drugRepository.DeleteAsync(id);
 
     /// <summary>
     /// 批量删除药物
     /// </summary>
-    public async Task<bool> DeleteDrugsAsync(List<int> ids)
-    {
-        return await drugRepository.DeleteRangeAsync(ids);
-    }
+    public async Task<bool> DeleteDrugsAsync(List<int> ids) => await drugRepository.DeleteRangeAsync(ids);
 
     /// <summary>
     /// 从Excel导入药物数据
@@ -202,10 +190,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 获取Excel文件的详细验证信息
     /// </summary>
-    public async Task<ExcelValidationResult> ValidateExcelDetailAsync(string filePath)
-    {
-        return await excelService.ValidateExcelDetailAsync(filePath);
-    }
+    public async Task<ExcelValidationResult> ValidateExcelDetailAsync(string filePath) => await excelService.ValidateExcelDetailAsync(filePath);
 
     /// <summary>
     /// 导出药物数据到Excel
@@ -226,10 +211,7 @@ public class LocalDrugService(IDrugRepository drugRepository, IExcelService exce
     /// <summary>
     /// 获取所有药物（分页）
     /// </summary>
-    public async Task<(List<LocalDrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize)
-    {
-        return await drugRepository.GetPagedAsync(pageIndex, pageSize);
-    }
+    public async Task<(List<LocalDrugInfo> Items, int TotalCount)> GetDrugsPagedAsync(int pageIndex, int pageSize) => await drugRepository.GetPagedAsync(pageIndex, pageSize);
 
     /// <summary>
     /// 获取药物统计信息

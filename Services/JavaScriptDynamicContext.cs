@@ -8,12 +8,12 @@ namespace DrugSearcher.Services
     public class JavaScriptDynamicContext
     {
         private readonly Lock _lock = new();
-        private HashSet<string> _globalVariables = [];
-        private HashSet<string> _globalFunctions = [];
-        private Dictionary<int, ScopeInfo> _scopes = new();
+        private readonly HashSet<string> _globalVariables = [];
+        private readonly HashSet<string> _globalFunctions = [];
+        private readonly Dictionary<int, ScopeInfo> _scopes = [];
         private string _lastAnalyzedCode = string.Empty;
 
-        public event EventHandler<ContextChangedEventArgs> ContextChanged;
+        public event EventHandler<ContextChangedEventArgs>? ContextChanged;
 
         /// <summary>
         /// 分析代码并更新上下文
@@ -60,21 +60,19 @@ namespace DrugSearcher.Services
             scopeStack.Push(globalScope);
 
             // 分析全局作用域的变量和函数
-            AnalyzeVariablesInScope(cleanCode, globalScope, code);
-            AnalyzeFunctionsInScope(cleanCode, globalScope, code);
+            AnalyzeVariablesInScope(cleanCode, globalScope);
+            AnalyzeFunctionsInScope(cleanCode, globalScope);
 
             // 分析嵌套作用域
             var braceLevel = 0;
-            var currentScopeStart = -1;
 
-            for (int i = 0; i < cleanCode.Length; i++)
+            for (var i = 0; i < cleanCode.Length; i++)
             {
                 var ch = cleanCode[i];
 
                 if (ch == '{')
                 {
                     braceLevel++;
-                    currentScopeStart = i;
 
                     // 创建新作用域
                     var newScope = new ScopeInfo
@@ -99,10 +97,8 @@ namespace DrugSearcher.Services
                         {
                             var scopeCode = cleanCode.Substring(closingScope.StartOffset,
                                 closingScope.EndOffset - closingScope.StartOffset + 1);
-                            var originalScopeCode = code.Substring(closingScope.StartOffset,
-                                closingScope.EndOffset - closingScope.StartOffset + 1);
 
-                            AnalyzeVariablesInScope(scopeCode, closingScope, originalScopeCode);
+                            AnalyzeVariablesInScope(scopeCode, closingScope);
                         }
                     }
 
@@ -114,7 +110,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 分析作用域内的变量
         /// </summary>
-        private void AnalyzeVariablesInScope(string cleanCode, ScopeInfo scope, string originalCode)
+        private void AnalyzeVariablesInScope(string cleanCode, ScopeInfo scope)
         {
             // let 和 const 声明（块级作用域）
             var blockScopePattern = @"\b(?:let|const)\s+([a-zA-Z_$][a-zA-Z0-9_$]*(?:\s*,\s*[a-zA-Z_$][a-zA-Z0-9_$]*)*)";
@@ -122,7 +118,7 @@ namespace DrugSearcher.Services
 
             foreach (Match match in blockMatches)
             {
-                if (IsMatchInScope(match.Index, scope, cleanCode))
+                if (IsMatchInScope(match.Index, scope))
                 {
                     ExtractVariables(match.Groups[1].Value, scope.BlockScopeVariables);
                 }
@@ -134,7 +130,7 @@ namespace DrugSearcher.Services
 
             foreach (Match match in varMatches)
             {
-                if (IsMatchInScope(match.Index, scope, cleanCode))
+                if (IsMatchInScope(match.Index, scope))
                 {
                     // var 声明提升到最近的函数作用域或全局作用域
                     var functionScope = FindEnclosingFunctionScope(scope);
@@ -154,7 +150,7 @@ namespace DrugSearcher.Services
 
             foreach (Match match in paramMatches)
             {
-                if (IsMatchInScope(match.Index, scope, cleanCode))
+                if (IsMatchInScope(match.Index, scope))
                 {
                     var paramList = match.Groups[1].Value;
                     if (!string.IsNullOrWhiteSpace(paramList))
@@ -175,7 +171,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 分析作用域内的函数
         /// </summary>
-        private void AnalyzeFunctionsInScope(string cleanCode, ScopeInfo scope, string originalCode)
+        private void AnalyzeFunctionsInScope(string cleanCode, ScopeInfo scope)
         {
             // 函数声明
             var funcPattern = @"\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(";
@@ -183,7 +179,7 @@ namespace DrugSearcher.Services
 
             foreach (Match match in matches)
             {
-                if (IsMatchInScope(match.Index, scope, cleanCode))
+                if (IsMatchInScope(match.Index, scope))
                 {
                     var functionName = match.Groups[1].Value;
                     scope.Functions.Add(functionName);
@@ -207,7 +203,7 @@ namespace DrugSearcher.Services
                 matches = Regex.Matches(cleanCode, pattern);
                 foreach (Match match in matches)
                 {
-                    if (IsMatchInScope(match.Index, scope, cleanCode))
+                    if (IsMatchInScope(match.Index, scope))
                     {
                         var functionName = match.Groups[1].Value;
                         scope.Functions.Add(functionName);
@@ -224,15 +220,12 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查匹配是否在作用域内
         /// </summary>
-        private bool IsMatchInScope(int matchIndex, ScopeInfo scope, string code)
+        private bool IsMatchInScope(int matchIndex, ScopeInfo scope)
         {
             // 检查是否直接在该作用域内（不在子作用域中）
-            foreach (var childScope in _scopes.Values.Where(s => s.Parent == scope))
+            if (_scopes.Values.Where(s => s.Parent == scope).Any(childScope => matchIndex >= childScope.StartOffset && matchIndex <= childScope.EndOffset))
             {
-                if (matchIndex >= childScope.StartOffset && matchIndex <= childScope.EndOffset)
-                {
-                    return false;
-                }
+                return false;
             }
 
             return matchIndex >= scope.StartOffset && matchIndex <= scope.EndOffset;
@@ -258,7 +251,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 提取变量名
         /// </summary>
-        private void ExtractVariables(string varList, HashSet<string> targetSet)
+        private static void ExtractVariables(string varList, HashSet<string> targetSet)
         {
             var varNames = varList.Split(',').Select(v => v.Trim().Split('=')[0].Trim());
             foreach (var varName in varNames.Where(n => !string.IsNullOrWhiteSpace(n)))
@@ -270,7 +263,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 移除字符串和注释
         /// </summary>
-        private string RemoveStringsAndComments(string code)
+        private static string RemoveStringsAndComments(string code)
         {
             var result = new System.Text.StringBuilder(code.Length);
             var i = 0;
@@ -400,11 +393,11 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 获取所有局部标识符
         /// </summary>
-        public HashSet<string> GetAllLocalIdentifiers()
+        public HashSet<string?> GetAllLocalIdentifiers()
         {
             lock (_lock)
             {
-                var identifiers = new HashSet<string>();
+                var identifiers = new HashSet<string?>();
 
                 foreach (var scope in _scopes.Values)
                 {
@@ -426,7 +419,7 @@ namespace DrugSearcher.Services
         public int StartOffset { get; set; }
         public int EndOffset { get; set; }
         public int Level { get; set; }
-        public ScopeInfo Parent { get; set; }
+        public ScopeInfo? Parent { get; set; }
         public bool IsFunctionScope { get; set; }
         public HashSet<string> BlockScopeVariables { get; } = [];
         public HashSet<string> FunctionScopeVariables { get; } = [];
@@ -438,8 +431,8 @@ namespace DrugSearcher.Services
     /// </summary>
     public class ContextChangedEventArgs : EventArgs
     {
-        public HashSet<string> LocalVariables { get; set; }
-        public HashSet<string> LocalFunctions { get; set; }
-        public HashSet<string> CurrentScope { get; set; }
+        public HashSet<string> LocalVariables { get; set; } = [];
+        public HashSet<string> LocalFunctions { get; set; } = [];
+        public HashSet<string> CurrentScope { get; set; } = [];
     }
 }

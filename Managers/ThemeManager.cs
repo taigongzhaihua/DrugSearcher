@@ -225,18 +225,12 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// <summary>
     /// 检查是否为主题相关设置
     /// </summary>
-    private static bool IsThemeRelatedSetting(string key)
-    {
-        return key is SettingKeys.ThemeMode or SettingKeys.ThemeColor;
-    }
+    private static bool IsThemeRelatedSetting(string key) => key is SettingKeys.ThemeMode or SettingKeys.ThemeColor;
 
     /// <summary>
     /// 检查设置值是否未发生变化
     /// </summary>
-    private static bool IsSettingValueUnchanged(SettingChangedEventArgs e)
-    {
-        return e.NewValue?.ToString() == e.OldValue?.ToString();
-    }
+    private static bool IsSettingValueUnchanged(SettingChangedEventArgs e) => e.NewValue?.ToString() == e.OldValue?.ToString();
 
     #endregion
 
@@ -449,12 +443,9 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// </summary>
     /// <param name="mode">原始主题模式</param>
     /// <returns>实际主题模式</returns>
-    private static ThemeMode GetActualThemeMode(ThemeMode mode)
-    {
-        return mode == ThemeMode.System
+    private static ThemeMode GetActualThemeMode(ThemeMode mode) => mode == ThemeMode.System
             ? (SystemThemeHelper.IsSystemDarkTheme() ? ThemeMode.Dark : ThemeMode.Light)
             : mode;
-    }
 
     /// <summary>
     /// 更新应用程序资源
@@ -594,10 +585,7 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// 更新当前主题
     /// </summary>
     /// <param name="themeConfig">新的主题配置</param>
-    private void UpdateCurrentTheme(ThemeConfig themeConfig)
-    {
-        CurrentTheme = themeConfig;
-    }
+    private void UpdateCurrentTheme(ThemeConfig themeConfig) => CurrentTheme = themeConfig;
 
     /// <summary>
     /// 触发主题变更事件
@@ -658,10 +646,7 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// 获取颜色缓存统计信息
     /// </summary>
     /// <returns>已缓存的颜色主题数量</returns>
-    public int GetColorCacheStats()
-    {
-        return _colorDictionaries.Count;
-    }
+    public int GetColorCacheStats() => _colorDictionaries.Count;
 
     /// <summary>
     /// 获取缓存初始化状态

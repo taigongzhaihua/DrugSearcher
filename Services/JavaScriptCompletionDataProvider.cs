@@ -24,18 +24,12 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 更新参数列表
         /// </summary>
-        public void UpdateParameters(List<DosageParameter> parameters)
-        {
-            _parameters = parameters ?? [];
-        }
+        public void UpdateParameters(List<DosageParameter> parameters) => _parameters = parameters ?? [];
 
         /// <summary>
         /// 更新当前代码
         /// </summary>
-        public void UpdateCurrentCode(string code)
-        {
-            _currentCode = code ?? string.Empty;
-        }
+        public void UpdateCurrentCode(string code) => _currentCode = code ?? string.Empty;
 
         /// <summary>
         /// 获取代码提示数据
@@ -56,23 +50,21 @@ namespace DrugSearcher.Services
             // 如果有当前输入的词，进行过滤
             if (!string.IsNullOrEmpty(currentWord))
             {
-                return completionData
+                return [.. completionData
                     .Where(cd => cd.Text.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
                     .OrderBy(cd => cd.Priority)
-                    .ThenBy(cd => cd.Text)
-                    .ToList();
+                    .ThenBy(cd => cd.Text)];
             }
 
-            return completionData
+            return [.. completionData
                 .OrderBy(cd => cd.Priority)
-                .ThenBy(cd => cd.Text)
-                .ToList();
+                .ThenBy(cd => cd.Text)];
         }
 
         /// <summary>
         /// 创建静态代码提示数据
         /// </summary>
-        private List<ICompletionData> CreateStaticCompletionData()
+        private static List<ICompletionData> CreateStaticCompletionData()
         {
             var completionData = new List<ICompletionData>();
 
@@ -128,7 +120,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 生成插入文本
         /// </summary>
-        private string GenerateInsertionText(FunctionDefinition func)
+        private static string GenerateInsertionText(FunctionDefinition func)
         {
             var parameters = func.Parameters.Select((p, i) => $"${{${i + 1}:{p.Name}}}");
             return $"{func.Name}({string.Join(", ", parameters)});";
@@ -137,23 +129,20 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 获取关键字模板
         /// </summary>
-        private string GetKeywordTemplate(string keyword)
+        private static string? GetKeywordTemplate(string? keyword) => keyword switch
         {
-            return keyword switch
-            {
-                "if" => "if (${1:condition}) {\n    ${2:// 代码}\n}",
-                "else" => "else {\n    ${1:// 代码}\n}",
-                "for" => "for (var ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {\n    ${3:// 代码}\n}",
-                "while" => "while (${1:condition}) {\n    ${2:// 代码}\n}",
-                "function" => "function ${1:name}(${2:params}) {\n    ${3:// 代码}\n    return ${4:result};\n}",
-                "var" => "var ${1:variable} = ${2:value};",
-                "let" => "let ${1:variable} = ${2:value};",
-                "const" => "const ${1:variable} = ${2:value};",
-                "return" => "return ${1:value};",
-                "try" => "try {\n    ${1:// 代码}\n} catch (${2:error}) {\n    ${3:// 错误处理}\n}",
-                _ => keyword
-            };
-        }
+            "if" => "if (${1:condition}) {\n    ${2:// 代码}\n}",
+            "else" => "else {\n    ${1:// 代码}\n}",
+            "for" => "for (var ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {\n    ${3:// 代码}\n}",
+            "while" => "while (${1:condition}) {\n    ${2:// 代码}\n}",
+            "function" => "function ${1:name}(${2:params}) {\n    ${3:// 代码}\n    return ${4:result};\n}",
+            "var" => "var ${1:variable} = ${2:value};",
+            "let" => "let ${1:variable} = ${2:value};",
+            "const" => "const ${1:variable} = ${2:value};",
+            "return" => "return ${1:value};",
+            "try" => "try {\n    ${1:// 代码}\n} catch (${2:error}) {\n    ${3:// 错误处理}\n}",
+            _ => keyword
+        };
     }
 
     /// <summary>
@@ -161,8 +150,8 @@ namespace DrugSearcher.Services
     /// </summary>
     public class LocalVariable
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public string? Name { get; set; }
+        public string? Type { get; set; }
         public int LineNumber { get; set; }
         public bool IsFunction { get; set; }
     }
@@ -170,142 +159,104 @@ namespace DrugSearcher.Services
     /// <summary>
     /// 局部变量代码提示数据
     /// </summary>
-    public class LocalVariableCompletionData : ICompletionData
+    public class LocalVariableCompletionData(LocalVariable variable) : ICompletionData
     {
-        public string Text { get; }
-        public object Content { get; }
-        public object Description { get; }
-        public ImageSource Image { get; }
-        public double Priority { get; }
+        public string? Text { get; } = variable.Name;
+        public object Content { get; } = $"{variable.Name} ({variable.Type})";
+        public object Description { get; } = $"局部{GetTypeDescription(variable.Type)}: {variable.Name}" +
+                                             (variable.LineNumber > 0 ? $"\n声明位置: 第{variable.LineNumber}行" : "");
 
-        private readonly LocalVariable _variable;
+        public ImageSource? Image { get; } = null;
+        public double Priority { get; } = 0.6;
 
-        public LocalVariableCompletionData(LocalVariable variable)
+        private readonly LocalVariable _variable = variable;
+
+        private static string GetTypeDescription(string? type) => type switch
         {
-            _variable = variable;
-            Text = variable.Name;
-            Content = $"{variable.Name} ({variable.Type})";
-            Description = $"局部{GetTypeDescription(variable.Type)}: {variable.Name}" +
-                         (variable.LineNumber > 0 ? $"\n声明位置: 第{variable.LineNumber}行" : "");
-            Priority = 0.6;
-            Image = null;
-        }
+            "var" => "变量",
+            "let" => "变量",
+            "const" => "常量",
+            "function" => "函数",
+            "parameter" => "参数",
+            _ => "变量"
+        };
 
-        private string GetTypeDescription(string type)
-        {
-            return type switch
-            {
-                "var" => "变量",
-                "let" => "变量",
-                "const" => "常量",
-                "function" => "函数",
-                "parameter" => "参数",
-                _ => "变量"
-            };
-        }
-
-        public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
-        {
-            textArea.Document.Replace(completionSegment, Text);
-        }
+        public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs) => textArea.Document.Replace(completionSegment, Text);
     }
 
     /// <summary>
     /// 方法代码提示数据
     /// </summary>
-    public class MethodCompletionData : ICompletionData
+    public partial class MethodCompletionData(string? text, string? signature, string? description, string insertionText)
+        : ICompletionData
     {
-        public string Text { get; }
-        public object Content { get; }
-        public object Description { get; }
-        public ImageSource Image { get; }
-        public double Priority { get; }
-
-        private readonly string _insertionText;
-
-        public MethodCompletionData(string text, string signature, string description, string insertionText)
-        {
-            Text = text;
-            Content = signature;
-            Description = description;
-            _insertionText = insertionText;
-            Priority = 1.0;
-            Image = null;
-        }
+        public string? Text { get; } = text;
+        public object? Content { get; } = signature;
+        public object? Description { get; } = description;
+        public ImageSource? Image { get; } = null;
+        public double Priority { get; } = 1.0;
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
-            var insertText = _insertionText;
+            var insertText = insertionText;
 
             // 简单的模板变量替换
-            insertText = Regex.Replace(insertText, @"\$\{\d+:([^}]+)\}", "$1");
-            insertText = Regex.Replace(insertText, @"\$\{\d+\}", "");
+            insertText = InsertTextRegex1().Replace(insertText, "$1");
+            insertText = InsertTextRegex2().Replace(insertText, "");
 
             textArea.Document.Replace(completionSegment, insertText);
         }
+
+        [GeneratedRegex(@"\$\{\d+:([^}]+)\}")]
+        private static partial Regex InsertTextRegex1();
+        [GeneratedRegex(@"\$\{\d+\}")]
+        private static partial Regex InsertTextRegex2();
     }
 
     /// <summary>
     /// 参数代码提示数据
     /// </summary>
-    public class ParameterCompletionData : ICompletionData
+    public class ParameterCompletionData(DosageParameter parameter) : ICompletionData
     {
-        public string Text { get; }
-        public object Content { get; }
-        public object Description { get; }
-        public ImageSource Image { get; }
-        public double Priority { get; }
+        public string? Text { get; } = parameter.Name;
+        public object Content { get; } = $"{parameter.Name} ({parameter.DataType})";
+        public object Description { get; } = $"{parameter.DisplayName}\n类型: {parameter.DataType}\n描述: {parameter.Description}";
+        public ImageSource? Image { get; } = null;
+        public double Priority { get; } = 0.8;
 
-        private readonly DosageParameter _parameter;
+        private readonly DosageParameter _parameter = parameter;
 
-        public ParameterCompletionData(DosageParameter parameter)
-        {
-            _parameter = parameter;
-            Text = parameter.Name;
-            Content = $"{parameter.Name} ({parameter.DataType})";
-            Description = $"{parameter.DisplayName}\n类型: {parameter.DataType}\n描述: {parameter.Description}";
-            Priority = 0.8;
-            Image = null;
-        }
-
-        public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
-        {
-            textArea.Document.Replace(completionSegment, Text);
-        }
+        public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs) => textArea.Document.Replace(completionSegment, Text);
     }
 
     /// <summary>
     /// 关键字代码提示数据
     /// </summary>
-    public class KeywordCompletionData : ICompletionData
+    public partial class KeywordCompletionData(string? text, string description, string? insertionText) : ICompletionData
     {
-        public string Text { get; }
-        public object Content { get; }
-        public object Description { get; }
-        public ImageSource Image { get; }
-        public double Priority { get; }
-
-        private readonly string _insertionText;
-
-        public KeywordCompletionData(string text, string description, string insertionText)
-        {
-            Text = text;
-            Content = text;
-            Description = description;
-            _insertionText = insertionText;
-            Priority = 0.9;
-            Image = null;
-        }
+        public string? Text { get; } = text;
+        public object? Content { get; } = text;
+        public object Description { get; } = description;
+        public ImageSource? Image { get; } = null;
+        public double Priority { get; } = 0.9;
 
         public void Complete(TextArea textArea, ISegment completionSegment, EventArgs insertionRequestEventArgs)
         {
-            var insertText = _insertionText;
+            var insertText = insertionText;
 
             // 简单的模板变量替换
-            insertText = Regex.Replace(insertText, @"\$\{\d+:([^}]+)\}", "$1");
-            insertText = Regex.Replace(insertText, @"\$\{\d+\}", "");
+            if (insertText != null)
+            {
+                insertText = InsertTextRegex1().Replace(insertText, "$1");
+                insertText = InsertTextRegex2().Replace(insertText, "");
 
-            textArea.Document.Replace(completionSegment, insertText);
+                textArea.Document.Replace(completionSegment, insertText);
+            }
         }
+
+        [GeneratedRegex(@"\$\{\d+:([^}]+)\}")]
+        private static partial Regex InsertTextRegex1();
+        [GeneratedRegex(@"\$\{\d+\}")]
+        private static partial Regex InsertTextRegex2();
     }
 }

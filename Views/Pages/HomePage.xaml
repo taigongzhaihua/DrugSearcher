@@ -9,8 +9,9 @@
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
       xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       xmlns:models="clr-namespace:DrugSearcher.Models"
+      xmlns:selectors="clr-namespace:DrugSearcher.Selectors"
       mc:Ignorable="d"
-      d:DesignHeight="600" d:DesignWidth="1000" d:DataContext="{viewModels:HomePageViewModel}"
+      d:DesignHeight="600" d:DesignWidth="1000" d:DataContext="{d:DesignInstance viewModels:HomePageViewModel}"
       Title="药物查询">
 
     <Page.Resources>
@@ -48,6 +49,274 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:ListToStringConverter x:Key="ListToStringConverter" />
+
+
+        <!-- 参数模板选择器 -->
+        <selectors:DosageParameterTemplateSelector x:Key="ParameterTemplateSelector">
+            <!-- 文本类型模板 -->
+            <selectors:DosageParameterTemplateSelector.TextTemplate>
+                <DataTemplate DataType="{x:Type models:DosageParameter}">
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,15,10"
+                            Background="{DynamicResource BackgroundBrush}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="100" />
+                                <ColumnDefinition Width="*" MinWidth="150" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 参数名称 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="*"
+                                           FontSize="10"
+                                           Margin="3,0,0,5"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource ErrorBrush}"
+                                           Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+
+                            <!-- 文本输入框 -->
+                            <TextBox Grid.Row="0" Grid.Column="1"
+                                     Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     Margin="10,0, 0,0"
+                                     VerticalAlignment="Center"
+                                     Tag="{Binding Description}" />
+
+                            <!-- 单位 -->
+                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                       Text="{Binding Unit}"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,5,0"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <!-- 说明文本 -->
+                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                                       Text="{Binding Description}"
+                                       FontSize="12" Margin="0,5,0,0"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:DosageParameterTemplateSelector.TextTemplate>
+
+            <!-- 数字类型模板 -->
+            <selectors:DosageParameterTemplateSelector.NumberTemplate>
+                <DataTemplate DataType="{x:Type models:DosageParameter}">
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,15,10"
+                            Background="{DynamicResource BackgroundBrush}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="40" />
+                                <ColumnDefinition Width="*" MinWidth="40" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 参数名称 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="*"
+                                           FontSize="10"
+                                           Margin="3,0,0,5"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource ErrorBrush}"
+                                           Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+
+                            <!-- 数字输入框 -->
+                            <TextBox Grid.Row="0" Grid.Column="1"
+                                     Text="{Binding Value, UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
+                                     Style="{StaticResource NumericTextBoxStyle}"
+                                     Margin="10,0,0,0"
+                                     VerticalAlignment="Center"
+                                     Tag="{Binding Description}">
+                                <i:Interaction.Behaviors>
+                                    <behaviors:NumericInputBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+
+                            <!-- 单位 -->
+                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                       Text="{Binding Unit}"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,5,0"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <!-- 说明文本 -->
+                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                                       Text="{Binding Description}"
+                                       FontSize="12" Margin="0,5,0,0"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:DosageParameterTemplateSelector.NumberTemplate>
+
+            <!-- 布尔类型模板 -->
+            <selectors:DosageParameterTemplateSelector.BooleanTemplate>
+                <DataTemplate DataType="{x:Type models:DosageParameter}">
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,15,10"
+                            Background="{DynamicResource BackgroundBrush}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="40" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 参数名称 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                                        Margin="0,0,5,0">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="*"
+                                           FontSize="10"
+                                           Margin="3,0,0,5"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource ErrorBrush}"
+                                           Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+
+                            <!-- 开关 -->
+                            <CheckBox Grid.Row="0" Grid.Column="1"
+                                      IsChecked="{Binding Value}"
+                                      Style="{StaticResource FluentToggleSwitchStyle}"
+                                      Margin="10,0"
+                                      VerticalAlignment="Center"
+                                      ToolTip="{Binding Description}" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                       FontSize="12" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Value}" Value="True">
+                                                <Setter Property="Text" Value="是" />
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Value}" Value="False">
+                                                <Setter Property="Text" Value="否" />
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource SecondaryTextBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <!-- 说明文本 -->
+                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                                       Text="{Binding Description}"
+                                       FontSize="12" Margin="0,5,0,0"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:DosageParameterTemplateSelector.BooleanTemplate>
+
+            <!-- 选择类型模板 -->
+            <selectors:DosageParameterTemplateSelector.SelectionTemplate>
+                <DataTemplate DataType="{x:Type models:DosageParameter}">
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10"
+                            Margin="0,0,15,10"
+                            Background="{DynamicResource BackgroundBrush}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" MinWidth="40" />
+                                <ColumnDefinition Width="*" MinWidth="40" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 参数名称 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="*"
+                                           FontSize="10"
+                                           Margin="3,0,0,5"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource ErrorBrush}"
+                                           Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+
+                            <!-- 下拉选择框 -->
+                            <ComboBox Grid.Row="0" Grid.Column="1"
+                                      ItemsSource="{Binding Options}"
+                                      SelectedItem="{Binding Value}"
+                                      Style="{StaticResource FluentComboBoxStyle}"
+                                      Margin="10,0,0,0"
+                                      VerticalAlignment="Center"
+                                      ToolTip="{Binding Description}" />
+
+                            <!-- 单位 -->
+                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                       Text="{Binding Unit}"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,5,0"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <!-- 说明文本 -->
+                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                                       Text="{Binding Description}"
+                                       FontSize="12" Margin="0,5,0,0"
+                                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       TextWrapping="Wrap"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </selectors:DosageParameterTemplateSelector.SelectionTemplate>
+        </selectors:DosageParameterTemplateSelector>
     </Page.Resources>
 
     <Grid Margin="20">
@@ -188,10 +457,10 @@
                                     <!-- 数据源标识 -->
                                     <Border Grid.Column="1" Grid.Row="0"
                                             Background="{Binding DrugInfo.DataSourceColor}"
-                                            CornerRadius="4" Padding="8,2"
+                                            CornerRadius="9" Padding="16,2"
                                             VerticalAlignment="Center" HorizontalAlignment="Right">
                                         <TextBlock Text="{Binding DrugInfo.DataSourceText}"
-                                                   FontSize="9" LineHeight="13"
+                                                   FontSize="12" LineHeight="Auto" VerticalAlignment="Center"
                                                    Foreground="White" />
                                     </Border>
 
@@ -559,7 +828,7 @@
                                                                         Style="{StaticResource BaseButtonStyle}"
                                                                         IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                         Visibility="{Binding HasCalculators, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                                                        Margin="10,0,0,0"/>
+                                                                        Margin="10,0,0,0" />
                                                             </StackPanel>
                                                         </Grid>
 
@@ -611,55 +880,33 @@
                                                         </Grid.RowDefinitions>
 
                                                         <!-- 参数标题 -->
-                                                        <TextBlock Grid.Row="0"
-                                                                   Text="计算参数( "
-                                                                   FontSize="14"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                                                   Margin="0,0,0,10" />
-
+                                                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                                            <TextBlock Text="计算参数( "
+                                                                       FontSize="14"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                       Margin="0,0,0,10" />
+                                                            <TextBlock Text="*"
+                                                                       FontSize="10"
+                                                                       Margin="3,0,3,10"
+                                                                       VerticalAlignment="Top"
+                                                                       Foreground="{DynamicResource ErrorBrush}"
+                                                                       Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                            <TextBlock Text="号标记为必填）"
+                                                                       FontSize="14"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                       Margin="0,0,0,10" />
+                                                        </StackPanel>
                                                         <!-- 参数输入 -->
                                                         <ItemsControl Grid.Row="1"
-                                                                      ItemsSource="{Binding CalculatorParameters}">
+                                                                      ItemsSource="{Binding CalculatorParameters}"
+                                                                      ItemTemplateSelector="{StaticResource ParameterTemplateSelector}">
                                                             <ItemsControl.ItemsPanel>
                                                                 <ItemsPanelTemplate>
                                                                     <WrapPanel Orientation="Horizontal" />
                                                                 </ItemsPanelTemplate>
                                                             </ItemsControl.ItemsPanel>
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate
-                                                                    DataType="{x:Type models:DosageParameter}">
-                                                                    <Border BorderBrush="{DynamicResource BorderBrush}"
-                                                                            BorderThickness="1"
-                                                                            CornerRadius="4"
-                                                                            Padding="10,10,5,10"
-                                                                            Margin="0,0,15,10"
-                                                                            Background="{DynamicResource BackgroundBrush}">
-                                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                                            <StackPanel Orientation="Horizontal">
-                                                                                <TextBlock Text="{Binding DisplayName}"
-                                                                                    FontWeight="SemiBold" VerticalAlignment="Center"
-                                                                                    Margin="0,0,0,5" />
-                                                                                <TextBlock Text="*" VerticalAlignment="Top"
-                                                                                    FontSize="10" Margin="5,10"
-                                                                                    Foreground="{DynamicResource ErrorBrush}"
-                                                                                    Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                            </StackPanel>
-
-                                                                            <TextBox
-                                                                                Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
-                                                                                Style="{StaticResource BaseTextBoxStyle}"
-                                                                                MinWidth="50"
-                                                                                ToolTip="{Binding Description}" />
-                                                                            <TextBlock Text="{Binding Unit}"
-                                                                                FontSize="14" VerticalAlignment="Center"
-                                                                                Margin="10,5,5,5"
-                                                                                Foreground="{DynamicResource SecondaryTextBrush}" />
-
-                                                                        </StackPanel>
-                                                                    </Border>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
                                                         </ItemsControl>
 
                                                         <!-- 计算按钮 -->
@@ -675,10 +922,11 @@
                                                                     Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                     Margin="10,0,0,0" />
                                                             <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                                                                <ProgressBar Width="20"
-                                                                             Height="20"
+                                                                <ProgressBar Width="50"
+                                                                             Height="5"
                                                                              IsIndeterminate="True"
                                                                              Margin="0,0,10,0"
+                                                                             Foreground="{DynamicResource PrimaryBrush}"
                                                                              Visibility="{Binding IsCalculating, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                                                 <TextBlock Text="计算中..."
                                                                            VerticalAlignment="Center"

@@ -445,16 +445,10 @@ public static class ContainerConfig
     /// <summary>
     /// 记录数据库路径
     /// </summary>
-    private static void LogDatabasePath(string dbType, string path)
-    {
-        System.Diagnostics.Debug.WriteLine($"{dbType}路径: {path}");
-    }
+    private static void LogDatabasePath(string dbType, string path) => System.Diagnostics.Debug.WriteLine($"{dbType}路径: {path}");
 
     /// <summary>
     /// 记录错误信息
     /// </summary>
-    private static void LogError(string message, Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"{message}: {ex.Message}");
-    }
+    private static void LogError(string message, Exception ex) => System.Diagnostics.Debug.WriteLine($"{message}: {ex.Message}");
 }

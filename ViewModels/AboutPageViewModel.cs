@@ -62,22 +62,22 @@ namespace DrugSearcher.ViewModels
         /// <summary>
         /// 应用程序名称
         /// </summary>
-        public string AppName => "DrugSearcher";
+        public static string AppName => "DrugSearcher";
 
         /// <summary>
         /// 应用程序描述
         /// </summary>
-        public string AppDescription => "现代化的药物搜索应用程序，提供智能搜索、数据管理和多主题支持";
+        public static string AppDescription => "现代化的药物搜索应用程序，提供智能搜索、数据管理和多主题支持";
 
         /// <summary>
         /// 版权信息
         /// </summary>
-        public string Copyright => $"© {DateTime.Now.Year} DrugSearcher. All rights reserved.";
+        public static string Copyright => $"© {DateTime.Now.Year} DrugSearcher. All rights reserved.";
 
         /// <summary>
         /// 开发者信息
         /// </summary>
-        public string Developer => "DrugSearcher Team";
+        public static string Developer => "DrugSearcher Team";
 
         /// <summary>
         /// 是否有可用更新
@@ -144,19 +144,13 @@ namespace DrugSearcher.ViewModels
         /// 打开GitHub命令
         /// </summary>
         [RelayCommand]
-        private void OpenGitHub()
-        {
-            OpenUrl("https://github.com/taigongzhaihua/drugsearcher");
-        }
+        private void OpenGitHub() => OpenUrl("https://github.com/taigongzhaihua/drugsearcher");
 
         /// <summary>
         /// 打开许可证命令
         /// </summary>
         [RelayCommand]
-        private void OpenLicense()
-        {
-            OpenUrl("https://github.com/taigongzhaihua/drugsearcher/blob/main/LICENSE");
-        }
+        private void OpenLicense() => OpenUrl("https://github.com/taigongzhaihua/drugsearcher/blob/main/LICENSE");
 
         /// <summary>
         /// 刷新版本信息命令
@@ -228,10 +222,7 @@ namespace DrugSearcher.ViewModels
         /// <summary>
         /// 当CurrentVersion变更时
         /// </summary>
-        partial void OnCurrentVersionChanged(VersionInfo? value)
-        {
-            OnPropertyChanged(nameof(IsPreRelease));
-        }
+        partial void OnCurrentVersionChanged(VersionInfo? value) => OnPropertyChanged(nameof(IsPreRelease));
 
         #endregion
 

@@ -11,7 +11,7 @@ public class LessThanValueConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is int intValue && parameter is Binding binding)
+        if (value is int intValue && parameter is Binding)
         {
             // 这里需要根据实际绑定的值进行比较
             // 简化处理，假设直接传入数值
@@ -20,8 +20,5 @@ public class LessThanValueConverter : IValueConverter
         return false;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 }

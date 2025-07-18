@@ -160,10 +160,7 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 订阅设置变更事件
     /// </summary>
-    private void SubscribeToSettingsChanges()
-    {
-        _settingsService.SettingChanged += OnSettingChanged;
-    }
+    private void SubscribeToSettingsChanges() => _settingsService.SettingChanged += OnSettingChanged;
 
     /// <summary>
     /// 获取应用程序图标
@@ -256,18 +253,12 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 处理右键菜单打开事件
     /// </summary>
-    private async void OnContextMenuOpening(object? sender, CancelEventArgs e)
-    {
-        await UpdateMenuItemStatesAsync();
-    }
+    private async void OnContextMenuOpening(object? sender, CancelEventArgs e) => await UpdateMenuItemStatesAsync();
 
     /// <summary>
     /// 处理托盘图标双击事件
     /// </summary>
-    private async void OnNotifyIconDoubleClick(object? sender, EventArgs e)
-    {
-        await ToggleWindowVisibilityAsync();
-    }
+    private async void OnNotifyIconDoubleClick(object? sender, EventArgs e) => await ToggleWindowVisibilityAsync();
 
     /// <summary>
     /// 处理托盘图标单击事件
@@ -284,10 +275,7 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 处理显示/隐藏菜单项点击事件
     /// </summary>
-    private async void OnShowHideClick(object? sender, EventArgs e)
-    {
-        await ToggleWindowVisibilityAsync();
-    }
+    private async void OnShowHideClick(object? sender, EventArgs e) => await ToggleWindowVisibilityAsync();
 
     /// <summary>
     /// 处理托盘图标开关菜单项点击事件
@@ -358,10 +346,7 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 处理退出菜单项点击事件
     /// </summary>
-    private void OnExitClick(object? sender, EventArgs e)
-    {
-        ExitApplication();
-    }
+    private void OnExitClick(object? sender, EventArgs e) => ExitApplication();
 
     #endregion
 
@@ -542,12 +527,9 @@ public class TrayManager : IDisposable
     /// 检查窗口是否可见
     /// </summary>
     /// <returns>如果窗口可见则返回true</returns>
-    private bool IsWindowVisible()
-    {
-        return _mainWindow.IsVisible &&
+    private bool IsWindowVisible() => _mainWindow.IsVisible &&
                _mainWindow.WindowState != WindowState.Minimized &&
                _mainWindow.ShowInTaskbar;
-    }
 
     /// <summary>
     /// 异步更新菜单项状态
@@ -622,10 +604,7 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 取消订阅设置变更事件
     /// </summary>
-    private void UnsubscribeFromSettingsChanges()
-    {
-        _settingsService.SettingChanged -= OnSettingChanged;
-    }
+    private void UnsubscribeFromSettingsChanges() => _settingsService.SettingChanged -= OnSettingChanged;
 
     #endregion
 
@@ -634,42 +613,27 @@ public class TrayManager : IDisposable
     /// <summary>
     /// 切换窗口显示/隐藏状态（同步版本，用于向后兼容）
     /// </summary>
-    public void ToggleWindowVisibility()
-    {
-        _ = ToggleWindowVisibilityAsync();
-    }
+    public void ToggleWindowVisibility() => _ = ToggleWindowVisibilityAsync();
 
     /// <summary>
     /// 隐藏到托盘（同步版本，用于向后兼容）
     /// </summary>
-    public void HideToTray()
-    {
-        _ = HideToTrayAsync();
-    }
+    public void HideToTray() => _ = HideToTrayAsync();
 
     /// <summary>
     /// 从托盘显示（同步版本，用于向后兼容）
     /// </summary>
-    public void ShowFromTray()
-    {
-        _ = ShowFromTrayAsync();
-    }
+    public void ShowFromTray() => _ = ShowFromTrayAsync();
 
     /// <summary>
     /// 更新托盘图标可见性（同步版本，用于向后兼容）
     /// </summary>
-    public void UpdateTrayIconVisibility()
-    {
-        _ = UpdateTrayIconVisibilityAsync();
-    }
+    public void UpdateTrayIconVisibility() => _ = UpdateTrayIconVisibilityAsync();
 
     /// <summary>
     /// 显示托盘通知（同步版本，用于向后兼容）
     /// </summary>
-    public void ShowTrayNotification(string title, string message, ToolTipIcon icon = ToolTipIcon.Info, int timeout = 3000)
-    {
-        _ = ShowTrayNotificationAsync(title, message, icon, timeout);
-    }
+    public void ShowTrayNotification(string title, string message, ToolTipIcon icon = ToolTipIcon.Info, int timeout = 3000) => _ = ShowTrayNotificationAsync(title, message, icon, timeout);
 
     #endregion
 

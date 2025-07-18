@@ -425,16 +425,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// <param name="mode">主题模式</param>
     /// <param name="isSystemDark">系统是否为深色主题</param>
     /// <returns>图标字符</returns>
-    private static string GetThemeButtonIcon(ThemeMode mode, bool isSystemDark)
+    private static string GetThemeButtonIcon(ThemeMode mode, bool isSystemDark) => mode switch
     {
-        return mode switch
-        {
-            ThemeMode.Light => "\ue611",      // 太阳符号
-            ThemeMode.Dark => "\ue616",       // 月亮符号
-            ThemeMode.System => isSystemDark ? "\ue60b" : "\ue610", // 自动/设置符号
-            _ => "\ue611"
-        };
-    }
+        ThemeMode.Light => "\ue611",      // 太阳符号
+        ThemeMode.Dark => "\ue616",       // 月亮符号
+        ThemeMode.System => isSystemDark ? "\ue60b" : "\ue610", // 自动/设置符号
+        _ => "\ue611"
+    };
 
     /// <summary>
     /// 获取首页按钮图标
@@ -442,16 +439,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// <param name="mode">主题模式</param>
     /// <param name="isSystemDark">系统是否为深色主题</param>
     /// <returns>图标字符</returns>
-    private static string GetHomeButtonIcon(ThemeMode mode, bool isSystemDark)
+    private static string GetHomeButtonIcon(ThemeMode mode, bool isSystemDark) => mode switch
     {
-        return mode switch
-        {
-            ThemeMode.Light => "\ue61a",      // 家符号
-            ThemeMode.Dark => "\ue619",       // 家符号（深色）
-            ThemeMode.System => isSystemDark ? "\ue619" : "\ue61a", // 家符号（跟随系统）
-            _ => "\ue61a"
-        };
-    }
+        ThemeMode.Light => "\ue61a",      // 家符号
+        ThemeMode.Dark => "\ue619",       // 家符号（深色）
+        ThemeMode.System => isSystemDark ? "\ue619" : "\ue61a", // 家符号（跟随系统）
+        _ => "\ue61a"
+    };
 
     /// <summary>
     /// 获取设置按钮图标
@@ -459,16 +453,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// <param name="mode">主题模式</param>
     /// <param name="isSystemDark">系统是否为深色主题</param>
     /// <returns>图标字符</returns>
-    private static string GetSettingsButtonIcon(ThemeMode mode, bool isSystemDark)
+    private static string GetSettingsButtonIcon(ThemeMode mode, bool isSystemDark) => mode switch
     {
-        return mode switch
-        {
-            ThemeMode.Light => "\ue61c",      // 设置符号
-            ThemeMode.Dark => "\ue61b",       // 设置符号（深色）
-            ThemeMode.System => isSystemDark ? "\ue61b" : "\ue61c", // 设置符号（跟随系统）
-            _ => "\ue61c"
-        };
-    }
+        ThemeMode.Light => "\ue61c",      // 设置符号
+        ThemeMode.Dark => "\ue61b",       // 设置符号（深色）
+        ThemeMode.System => isSystemDark ? "\ue61b" : "\ue61c", // 设置符号（跟随系统）
+        _ => "\ue61c"
+    };
 
     #endregion
 
@@ -479,35 +470,29 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// </summary>
     /// <param name="mode">主题模式</param>
     /// <returns>显示名称</returns>
-    private static string GetThemeModeDisplayName(ThemeMode mode)
+    private static string GetThemeModeDisplayName(ThemeMode mode) => mode switch
     {
-        return mode switch
-        {
-            ThemeMode.Light => "浅色",
-            ThemeMode.Dark => "深色",
-            ThemeMode.System => "跟随系统",
-            _ => "未知"
-        };
-    }
+        ThemeMode.Light => "浅色",
+        ThemeMode.Dark => "深色",
+        ThemeMode.System => "跟随系统",
+        _ => "未知"
+    };
 
     /// <summary>
     /// 获取主题颜色的显示名称
     /// </summary>
     /// <param name="color">主题颜色</param>
     /// <returns>显示名称</returns>
-    private static string GetThemeColorDisplayName(ThemeColor color)
+    private static string GetThemeColorDisplayName(ThemeColor color) => color switch
     {
-        return color switch
-        {
-            ThemeColor.Blue => "蓝色",
-            ThemeColor.Green => "绿色",
-            ThemeColor.Purple => "紫色",
-            ThemeColor.Red => "红色",
-            ThemeColor.Orange => "橙色",
-            ThemeColor.Pink => "粉色",
-            _ => color.ToString()
-        };
-    }
+        ThemeColor.Blue => "蓝色",
+        ThemeColor.Green => "绿色",
+        ThemeColor.Purple => "紫色",
+        ThemeColor.Red => "红色",
+        ThemeColor.Orange => "橙色",
+        ThemeColor.Pink => "粉色",
+        _ => color.ToString()
+    };
 
     #endregion
 
@@ -518,16 +503,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// </summary>
     /// <param name="currentMode">当前主题模式</param>
     /// <returns>下一个主题模式</returns>
-    private static ThemeMode GetNextThemeMode(ThemeMode currentMode)
+    private static ThemeMode GetNextThemeMode(ThemeMode currentMode) => currentMode switch
     {
-        return currentMode switch
-        {
-            ThemeMode.Light => ThemeMode.Dark,
-            ThemeMode.Dark => ThemeMode.System,
-            ThemeMode.System => ThemeMode.Light,
-            _ => ThemeMode.Light
-        };
-    }
+        ThemeMode.Light => ThemeMode.Dark,
+        ThemeMode.Dark => ThemeMode.System,
+        ThemeMode.System => ThemeMode.Light,
+        _ => ThemeMode.Light
+    };
 
     /// <summary>
     /// 尝试解析主题颜色

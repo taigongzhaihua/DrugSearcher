@@ -58,22 +58,18 @@ namespace DrugSearcher.Services
             {
                 _textEditor.TextArea.TextView.BackgroundRenderers.Remove(_underlineRenderer);
             }
+            GC.SuppressFinalize(this);
         }
     }
 
     /// <summary>
     /// 错误下划线渲染器
     /// </summary>
-    public class ErrorUnderlineRenderer : IBackgroundRenderer
+    public partial class ErrorUnderlineRenderer(TextEditor textEditor) : IBackgroundRenderer
     {
-        private readonly TextEditor _textEditor;
+        private readonly TextEditor _textEditor = textEditor;
         private List<SyntaxError> _errors = [];
-        private readonly object _lock = new();
-
-        public ErrorUnderlineRenderer(TextEditor textEditor)
-        {
-            _textEditor = textEditor;
-        }
+        private readonly Lock _lock = new();
 
         public KnownLayer Layer => KnownLayer.Selection;
 
@@ -81,7 +77,7 @@ namespace DrugSearcher.Services
         {
             lock (_lock)
             {
-                _errors = new List<SyntaxError>(errors ?? []);
+                _errors = [.. errors ?? []];
             }
         }
 
@@ -99,7 +95,7 @@ namespace DrugSearcher.Services
             }
         }
 
-        private void DrawErrorUnderline(TextView textView, DrawingContext drawingContext, SyntaxError error)
+        private static void DrawErrorUnderline(TextView textView, DrawingContext drawingContext, SyntaxError error)
         {
             try
             {
@@ -150,7 +146,7 @@ namespace DrugSearcher.Services
             }
         }
 
-        private void DrawWavyLine(DrawingContext drawingContext, Point start, Point end, Brush brush)
+        private static void DrawWavyLine(DrawingContext drawingContext, Point start, Point end, Brush brush)
         {
             var pen = new Pen(brush, 1.5);
 
@@ -183,27 +179,30 @@ namespace DrugSearcher.Services
             drawingContext.DrawGeometry(null, pen, geometry);
         }
 
-        private int CalculateErrorLength(string lineText, int startIndex, string errorMessage)
+        private static int CalculateErrorLength(string lineText, int startIndex, string? errorMessage)
         {
             if (startIndex < 0 || startIndex >= lineText.Length)
                 return 1;
 
             // 根据错误类型计算长度
-            if (errorMessage.Contains("未闭合"))
+            if (errorMessage != null && errorMessage.Contains("未闭合"))
             {
                 return lineText.Length - startIndex;
             }
 
             // 尝试从错误消息中提取标识符
-            var match = System.Text.RegularExpressions.Regex.Match(errorMessage, @"[：:]\s*(\w+)");
-            if (match.Success)
+            if (errorMessage != null)
             {
-                return match.Groups[1].Value.Length;
+                var match = CaculateErrorRegex().Match(errorMessage);
+                if (match.Success)
+                {
+                    return match.Groups[1].Value.Length;
+                }
             }
 
             // 查找下一个非标识符字符
             var length = 0;
-            for (int i = startIndex; i < lineText.Length; i++)
+            for (var i = startIndex; i < lineText.Length; i++)
             {
                 var ch = lineText[i];
                 if (char.IsLetterOrDigit(ch) || ch == '_' || ch == '$')
@@ -219,15 +218,14 @@ namespace DrugSearcher.Services
             return Math.Max(1, length);
         }
 
-        private Brush GetErrorBrush(SyntaxErrorSeverity severity)
+        private static SolidColorBrush GetErrorBrush(SyntaxErrorSeverity severity) => severity switch
         {
-            return severity switch
-            {
-                SyntaxErrorSeverity.Error => Brushes.Red,
-                SyntaxErrorSeverity.Warning => Brushes.Orange,
-                SyntaxErrorSeverity.Info => Brushes.Blue,
-                _ => Brushes.Red
-            };
-        }
+            SyntaxErrorSeverity.Error => Brushes.Red,
+            SyntaxErrorSeverity.Warning => Brushes.Orange,
+            SyntaxErrorSeverity.Info => Brushes.Blue,
+            _ => Brushes.Red
+        };
+        [System.Text.RegularExpressions.GeneratedRegex(@"[：:]\s*(\w+)")]
+        private static partial System.Text.RegularExpressions.Regex CaculateErrorRegex();
     }
 }

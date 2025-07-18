@@ -64,26 +64,19 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// 创建所有设置定义
     /// </summary>
     /// <returns>设置定义列表</returns>
-    private static List<SettingDefinition> CreateSettingDefinitions()
-    {
-        return
-        [
+    private static List<SettingDefinition> CreateSettingDefinitions() => [
             ..CreateTraySettings(),
             ..CreateUiSettings(),
             ..CreateHotKeySettings(),
             ..CreateApplicationSettings()
         ];
-    }
 
     /// <summary>
     /// 创建托盘相关设置定义
     /// </summary>
     /// <returns>托盘设置定义列表</returns>
-    private static List<SettingDefinition> CreateTraySettings()
-    {
-        return
-        [
-            new SettingDefinition
+    private static List<SettingDefinition> CreateTraySettings() => [
+            new()
             {
                 Key = SettingKeys.MinimizeToTrayOnClose,
                 ValueType = typeof(bool),
@@ -95,7 +88,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             },
 
 
-            new SettingDefinition
+            new()
             {
                 Key = SettingKeys.ShowTrayIcon,
                 ValueType = typeof(bool),
@@ -107,7 +100,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             },
 
 
-            new SettingDefinition
+            new()
             {
                 Key = SettingKeys.ShowTrayNotifications,
                 ValueType = typeof(bool),
@@ -118,17 +111,13 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 Validator = value => value is bool
             }
         ];
-    }
 
     /// <summary>
     /// 创建UI相关设置定义
     /// </summary>
     /// <returns>UI设置定义列表</returns>
-    private static List<SettingDefinition> CreateUiSettings()
-    {
-        return
-        [
-            new SettingDefinition
+    private static List<SettingDefinition> CreateUiSettings() => [
+            new()
             {
                 Key = SettingKeys.ThemeMode,
                 ValueType = typeof(ThemeMode),
@@ -140,7 +129,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             },
 
 
-            new SettingDefinition
+            new()
             {
                 Key = SettingKeys.ThemeColor,
                 ValueType = typeof(ThemeColor),
@@ -152,7 +141,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             },
 
 
-            new SettingDefinition
+            new()
             {
                 Key = SettingKeys.FontSize,
                 ValueType = typeof(int),
@@ -164,7 +153,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             },
 
 
-            new SettingDefinition
+            new()
             {
                 Key = SettingKeys.Language,
                 ValueType = typeof(string),
@@ -175,16 +164,12 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 Validator = ValidateLanguage
             }
         ];
-    }
     /// <summary>
     /// 创建快捷键相关设置定义
     /// </summary>
-    private static List<SettingDefinition> CreateHotKeySettings()
-    {
-        return
-        [
-            new SettingDefinition
-        {
+    private static List<SettingDefinition> CreateHotKeySettings() => [
+            new()
+            {
             Key = SettingKeys.HotKeyShowMainWindow,
             ValueType = typeof(string), // 改为string类型，存储JSON
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F1, ModifierKeys.Alt)),
@@ -194,7 +179,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null // 移除验证器，在DynamicSettingsService中处理
         },
 
-        new SettingDefinition
+        new()
         {
             Key = SettingKeys.HotKeyQuickSearch,
             ValueType = typeof(string),
@@ -205,7 +190,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null
         },
 
-        new SettingDefinition
+        new()
         {
             Key = SettingKeys.HotKeySearch,
             ValueType = typeof(string),
@@ -216,7 +201,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null
         },
 
-        new SettingDefinition
+        new()
         {
             Key = SettingKeys.HotKeyRefresh,
             ValueType = typeof(string),
@@ -227,7 +212,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null
         },
 
-        new SettingDefinition
+        new()
         {
             Key = SettingKeys.HotKeySettings,
             ValueType = typeof(string),
@@ -238,7 +223,7 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null
         },
 
-        new SettingDefinition
+        new()
         {
             Key = SettingKeys.HotKeyExit,
             ValueType = typeof(string),
@@ -249,16 +234,12 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
             Validator = null
         }
         ];
-    }
     /// <summary>
     /// 创建应用程序相关设置定义
     /// </summary>
     /// <returns>应用程序设置定义列表</returns>
-    private static List<SettingDefinition> CreateApplicationSettings()
-    {
-        return
-        [
-            new SettingDefinition
+    private static List<SettingDefinition> CreateApplicationSettings() => [
+            new()
             {
                 Key = SettingKeys.AutoStartup,
                 ValueType = typeof(bool),
@@ -269,7 +250,6 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
                 Validator = value => value is bool
             }
         ];
-    }
 
     #endregion
 
@@ -280,35 +260,26 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// </summary>
     /// <param name="value">要验证的值</param>
     /// <returns>是否有效</returns>
-    private static bool ValidateThemeMode(object? value)
-    {
-        return value is ThemeMode themeMode && Enum.IsDefined(themeMode);
-    }
+    private static bool ValidateThemeMode(object? value) => value is ThemeMode themeMode && Enum.IsDefined(themeMode);
 
     /// <summary>
     /// 验证主题颜色
     /// </summary>
     /// <param name="value">要验证的值</param>
     /// <returns>是否有效</returns>
-    private static bool ValidateThemeColor(object? value)
-    {
-        return value is ThemeColor themeColor && Enum.IsDefined(themeColor);
-    }
+    private static bool ValidateThemeColor(object? value) => value is ThemeColor themeColor && Enum.IsDefined(themeColor);
 
     /// <summary>
     /// 验证字体大小
     /// </summary>
     /// <param name="value">要验证的值</param>
     /// <returns>是否有效</returns>
-    private static bool ValidateFontSize(object? value)
+    private static bool ValidateFontSize(object? value) => value switch
     {
-        return value switch
-        {
-            double doubleSize => doubleSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
-            int intSize => intSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
-            _ => false
-        };
-    }
+        double doubleSize => doubleSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
+        int intSize => intSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
+        _ => false
+    };
 
     /// <summary>
     /// 验证语言设置
@@ -332,15 +303,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// 获取支持的语言列表
     /// </summary>
     /// <returns>支持的语言代码列表</returns>
-    private static HashSet<string> GetSupportedLanguages()
-    {
-        return
-        [
+    private static HashSet<string> GetSupportedLanguages() => [
             "zh-CN", // 简体中文
             "en-US", // 英语
             "zh-TW"
         ];
-    }
 
     #endregion
 
@@ -379,21 +346,18 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// <param name="definition">设置定义</param>
     /// <param name="currentTime">当前时间</param>
     /// <returns>设置项</returns>
-    private static SettingItem ConvertDefinitionToSettingItem(SettingDefinition definition, DateTime currentTime)
+    private static SettingItem ConvertDefinitionToSettingItem(SettingDefinition definition, DateTime currentTime) => new()
     {
-        return new SettingItem
-        {
-            Key = definition.Key,
-            ValueType = definition.ValueType.Name,
-            Value = ConvertValueToString(definition.DefaultValue),
-            Description = definition.Description,
-            Category = definition.Category,
-            IsReadOnly = definition.IsReadOnly,
-            UserId = null, // 全局设置
-            CreatedAt = currentTime,
-            UpdatedAt = currentTime
-        };
-    }
+        Key = definition.Key,
+        ValueType = definition.ValueType.Name,
+        Value = ConvertValueToString(definition.DefaultValue),
+        Description = definition.Description,
+        Category = definition.Category,
+        IsReadOnly = definition.IsReadOnly,
+        UserId = null, // 全局设置
+        CreatedAt = currentTime,
+        UpdatedAt = currentTime
+    };
 
     /// <summary>
     /// 将值转换为字符串表示

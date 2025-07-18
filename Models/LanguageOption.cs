@@ -26,17 +26,11 @@ public class LanguageOption
     /// </summary>
     /// <param name="obj">比较对象</param>
     /// <returns>是否相等</returns>
-    public override bool Equals(object? obj)
-    {
-        return obj is LanguageOption other && Code == other.Code;
-    }
+    public override bool Equals(object? obj) => obj is LanguageOption other && Code == other.Code;
 
     /// <summary>
     /// 获取哈希码
     /// </summary>
     /// <returns>哈希码</returns>
-    public override int GetHashCode()
-    {
-        return Code.GetHashCode();
-    }
+    public override int GetHashCode() => Code.GetHashCode();
 }

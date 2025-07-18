@@ -14,22 +14,19 @@ public partial class DosageParameterViewModel : ObservableObject
     /// <summary>
     /// 转换为模型对象
     /// </summary>
-    public DosageParameter ToModel()
+    public DosageParameter ToModel() => new()
     {
-        return new DosageParameter
-        {
-            Name = Name,
-            DisplayName = DisplayName,
-            Description = Description,
-            DataType = DataType,
-            Unit = Unit,
-            IsRequired = IsRequired,
-            DefaultValue = DefaultValue,
-            MinValue = MinValue,
-            MaxValue = MaxValue,
-            Options = Options.ToList()
-        };
-    }
+        Name = Name,
+        DisplayName = DisplayName,
+        Description = Description,
+        DataType = DataType,
+        Unit = Unit,
+        IsRequired = IsRequired,
+        DefaultValue = DefaultValue,
+        MinValue = MinValue,
+        MaxValue = MaxValue,
+        Options = [.. Options]
+    };
 
     public DosageParameterViewModel(DosageParameter parameter)
     {
@@ -41,7 +38,7 @@ public partial class DosageParameterViewModel : ObservableObject
         DefaultValue = parameter.DefaultValue;
         MinValue = parameter.MinValue;
         MaxValue = parameter.MaxValue;
-        Options = parameter.Options.ToArray();
+        Options = [.. parameter.Options];
         Description = parameter.Description ?? string.Empty;
 
         // 初始化选项文本
@@ -49,7 +46,7 @@ public partial class DosageParameterViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private string _name = string.Empty;
+    private string? _name = string.Empty;
 
     [ObservableProperty]
     private string _displayName = string.Empty;
@@ -168,10 +165,7 @@ public partial class DosageParameterViewModel : ObservableObject
         }
     }
 
-    partial void OnOptionsChanged(string[] value)
-    {
-        UpdateOptionsText();
-    }
+    partial void OnOptionsChanged(string[] value) => UpdateOptionsText();
 
     partial void OnDataTypeChanged(string value)
     {
@@ -205,17 +199,9 @@ public partial class DosageParameterViewModel : ObservableObject
         OnPropertyChanged(nameof(DefaultValueString));
     }
 
-    private void UpdateOptionsText()
-    {
-        OptionsText = string.Join(", ", Options);
-    }
+    private void UpdateOptionsText() => OptionsText = string.Join(", ", Options);
 
-    private static bool IsNumeric(object value)
-    {
-        return value is byte || value is sbyte || value is short || value is ushort ||
-               value is int || value is uint || value is long || value is ulong ||
-               value is float || value is double || value is decimal;
-    }
+    private static bool IsNumeric(object value) => value is byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal;
 
     public bool IsNumberType => DataType == ParameterTypes.Number;
     public bool IsSelectType => DataType == ParameterTypes.Select;

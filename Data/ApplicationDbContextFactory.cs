@@ -11,10 +11,7 @@ public class ApplicationDbContextFactory(
     private bool _databaseInitialized;
     private readonly Lock _initLock = new();
 
-    public ApplicationDbContext CreateDbContext()
-    {
-        return new ApplicationDbContext(options);
-    }
+    public ApplicationDbContext CreateDbContext() => new(options);
 
     public async Task EnsureDatabaseCreatedAsync()
     {

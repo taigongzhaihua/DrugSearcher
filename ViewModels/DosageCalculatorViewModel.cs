@@ -137,7 +137,7 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
         var missingParams = Parameters.Where(p => p.IsRequired &&
             (p.Value == null || string.IsNullOrWhiteSpace(p.Value.ToString()))).ToList();
 
-        if (missingParams.Any())
+        if (missingParams.Count != 0)
         {
             var missingNames = string.Join(", ", missingParams.Select(p => p.DisplayName));
             MessageBox.Show($"请填写必填参数: {missingNames}", "参数验证",
@@ -165,7 +165,7 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
                         ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
                         _ => param.Value.ToString() ?? string.Empty
                     };
-                    paramDict[param.Name] = value;
+                    if (param.Name != null) paramDict[param.Name] = value;
                 }
             }
 
@@ -255,10 +255,7 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
     /// <summary>
     /// 外部调用的加载方法
     /// </summary>
-    public async Task LoadCalculatorsForDrugAsync(BaseDrugInfo drugInfo)
-    {
-        await LoadCalculatorsForDrug(drugInfo);
-    }
+    public async Task LoadCalculatorsForDrugAsync(BaseDrugInfo drugInfo) => await LoadCalculatorsForDrug(drugInfo);
 
     /// <summary>
     /// 重置ViewModel状态

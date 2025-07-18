@@ -262,36 +262,30 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     /// <summary>
     /// 创建新药物信息
     /// </summary>
-    private LocalDrugInfo CreateNewDrugInfo()
+    private LocalDrugInfo CreateNewDrugInfo() => new()
     {
-        return new LocalDrugInfo
-        {
-            DrugName = SafeTrim(DrugName),
-            GenericName = SafeTrimOrNull(GenericName),
-            Specification = SafeTrimOrNull(Specification),
-            Manufacturer = SafeTrimOrNull(Manufacturer),
-            ApprovalNumber = SafeTrimOrNull(ApprovalNumber),
-            Indications = SafeTrimOrNull(Indications),
-            Dosage = SafeTrimOrNull(Dosage),
-            TcmDisease = SafeTrimOrNull(TcmDisease),
-            TcmSyndrome = SafeTrimOrNull(TcmSyndrome),
-            Remarks = SafeTrimOrNull(Remarks),
-            Description = SafeTrimOrNull(Description),
-            AdverseReactions = SafeTrimOrNull(SideEffects),
-            Precautions = SafeTrimOrNull(Precautions),
-            DataSource = DataSource.LocalDatabase,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-    }
+        DrugName = SafeTrim(DrugName),
+        GenericName = SafeTrimOrNull(GenericName),
+        Specification = SafeTrimOrNull(Specification),
+        Manufacturer = SafeTrimOrNull(Manufacturer),
+        ApprovalNumber = SafeTrimOrNull(ApprovalNumber),
+        Indications = SafeTrimOrNull(Indications),
+        Dosage = SafeTrimOrNull(Dosage),
+        TcmDisease = SafeTrimOrNull(TcmDisease),
+        TcmSyndrome = SafeTrimOrNull(TcmSyndrome),
+        Remarks = SafeTrimOrNull(Remarks),
+        Description = SafeTrimOrNull(Description),
+        AdverseReactions = SafeTrimOrNull(SideEffects),
+        Precautions = SafeTrimOrNull(Precautions),
+        DataSource = DataSource.LocalDatabase,
+        CreatedAt = DateTime.Now,
+        UpdatedAt = DateTime.Now
+    };
 
     /// <summary>
     /// 安全地修剪字符串
     /// </summary>
-    private static string SafeTrim(string? value)
-    {
-        return value?.Trim() ?? string.Empty;
-    }
+    private static string SafeTrim(string? value) => value?.Trim() ?? string.Empty;
 
     /// <summary>
     /// 安全地修剪字符串，如果为空则返回null

@@ -106,10 +106,7 @@ public static class SystemThemeHelper
     /// 检测系统是否使用浅色主题
     /// </summary>
     /// <returns>如果系统使用浅色主题则返回true，否则返回false</returns>
-    public static bool IsSystemLightTheme()
-    {
-        return !IsSystemDarkTheme();
-    }
+    public static bool IsSystemLightTheme() => !IsSystemDarkTheme();
 
     /// <summary>
     /// 获取当前系统主题的详细信息
@@ -232,19 +229,13 @@ public static class SystemThemeHelper
     /// 检测应用主题是否为深色
     /// </summary>
     /// <returns>如果是深色主题返回true，浅色主题返回false，无法检测返回null</returns>
-    private static bool? IsAppThemeDark()
-    {
-        return GetThemeValueFromRegistry(RegistryValueName);
-    }
+    private static bool? IsAppThemeDark() => GetThemeValueFromRegistry(RegistryValueName);
 
     /// <summary>
     /// 检测系统主题是否为深色
     /// </summary>
     /// <returns>如果是深色主题返回true，浅色主题返回false，无法检测返回null</returns>
-    private static bool? IsSystemThemeDark()
-    {
-        return GetThemeValueFromRegistry(SystemRegistryValueName);
-    }
+    private static bool? IsSystemThemeDark() => GetThemeValueFromRegistry(SystemRegistryValueName);
 
     /// <summary>
     /// 从注册表获取主题值
@@ -363,10 +354,7 @@ public static class SystemThemeHelper
     /// </summary>
     /// <param name="category">用户偏好设置类别</param>
     /// <returns>如果是主题相关的变化则返回true</returns>
-    private static bool IsThemeRelatedPreferenceChange(UserPreferenceCategory category)
-    {
-        return category is UserPreferenceCategory.General or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.Color;
-    }
+    private static bool IsThemeRelatedPreferenceChange(UserPreferenceCategory category) => category is UserPreferenceCategory.General or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.Color;
 
     #endregion
 
@@ -401,13 +389,10 @@ public static class SystemThemeHelper
         /// 获取主题信息的字符串表示
         /// </summary>
         /// <returns>主题信息字符串</returns>
-        public readonly override string ToString()
-        {
-            return $"App: {(IsAppThemeDark?.ToString() ?? "Unknown")}, " +
+        public readonly override string ToString() => $"App: {(IsAppThemeDark?.ToString() ?? "Unknown")}, " +
                    $"System: {(IsSystemThemeDark?.ToString() ?? "Unknown")}, " +
                    $"Effective: {(EffectiveThemeIsDark ? "Dark" : "Light")}, " +
                    $"Success: {IsDetectionSuccessful}";
-        }
     }
 
     /// <summary>
@@ -424,10 +409,7 @@ public static class SystemThemeHelper
         /// 获取处理器信息的字符串表示
         /// </summary>
         /// <returns>处理器信息字符串</returns>
-        public override string ToString()
-        {
-            return $"SystemEventHandler created at {CreatedAt:yyyy-MM-dd HH:mm:ss}";
-        }
+        public override string ToString() => $"SystemEventHandler created at {CreatedAt:yyyy-MM-dd HH:mm:ss}";
     }
 
     #endregion

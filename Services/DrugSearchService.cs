@@ -36,13 +36,13 @@ public class DrugSearchService(
                 var onlineResults = await SearchOnlineDrugsAsync(criteria.SearchTerm ?? string.Empty);
                 allResults.AddRange(onlineResults);
             }
-
-            // 缓存搜索
-            if (criteria.SearchOnline && cachedDrugService != null)
-            {
-                var cachedResults = await SearchCachedDrugsAsync(criteria.SearchTerm ?? string.Empty);
-                allResults.AddRange(cachedResults);
-            }
+            //
+            // // 缓存搜索
+            // if (criteria.SearchOnline && cachedDrugService != null)
+            // {
+            //     var cachedResults = await SearchCachedDrugsAsync(criteria.SearchTerm ?? string.Empty);
+            //     allResults.AddRange(cachedResults);
+            // }
 
             // 去重、排序和限制结果数量
             var deduplicatedResults = DeduplicateResults(allResults);
@@ -112,13 +112,13 @@ public class DrugSearchService(
                     .Distinct();
                 suggestions.AddRange(onlineSuggestions);
             }
-
-            // 从缓存获取建议
-            if (cachedDrugService != null)
-            {
-                var cachedSuggestions = await cachedDrugService.GetCachedDrugNameSuggestionsAsync(keyword);
-                suggestions.AddRange(cachedSuggestions);
-            }
+            //
+            // // 从缓存获取建议
+            // if (cachedDrugService != null)
+            // {
+            //     var cachedSuggestions = await cachedDrugService.GetCachedDrugNameSuggestionsAsync(keyword);
+            //     suggestions.AddRange(cachedSuggestions);
+            // }
 
             // 去重、排序并限制数量
             return
@@ -284,18 +284,13 @@ public class DrugSearchService(
     /// <summary>
     /// 判断是否为精确匹配
     /// </summary>
-    private static bool IsExactMatch(BaseDrugInfo drug, string searchTerm)
-    {
-        return drug.DrugName.Equals(searchTerm, StringComparison.OrdinalIgnoreCase);
-    }
+    private static bool IsExactMatch(BaseDrugInfo drug, string searchTerm) => drug.DrugName.Equals(searchTerm, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// 去重结果
     /// </summary>
-    private static List<UnifiedDrugSearchResult> DeduplicateResults(List<UnifiedDrugSearchResult> results)
-    {
+    private static List<UnifiedDrugSearchResult> DeduplicateResults(List<UnifiedDrugSearchResult> results) =>
         // 基于药物名称、规格和制造商进行去重，保留数据源优先级最高的
-        return
         [
             .. results
                 .GroupBy(r => new
@@ -306,20 +301,15 @@ public class DrugSearchService(
                 })
                 .Select(g => g.OrderBy(r => r.DataSourcePriority).ThenByDescending(r => r.MatchScore).First())
         ];
-    }
 
     /// <summary>
     /// 排序结果
     /// </summary>
-    private static List<UnifiedDrugSearchResult> SortResults(List<UnifiedDrugSearchResult> results)
-    {
-        return
-        [
+    private static List<UnifiedDrugSearchResult> SortResults(List<UnifiedDrugSearchResult> results) => [
             .. results
                 .OrderByDescending(r => r.IsExactMatch)
                 .ThenByDescending(r => r.MatchScore)
                 .ThenBy(r => r.DataSourcePriority)
                 .ThenBy(r => r.DrugInfo.DrugName)
         ];
-    }
 }

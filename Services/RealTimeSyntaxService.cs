@@ -12,7 +12,7 @@ namespace DrugSearcher.Services
     /// <summary>
     /// 实时语法服务 - 集成语法检测、错误标记和动态高亮
     /// </summary>
-    public class RealTimeSyntaxService : IDisposable
+    public partial class RealTimeSyntaxService : IDisposable
     {
         private readonly TextEditor _textEditor;
         private readonly ILogger<RealTimeSyntaxService> _logger;
@@ -27,7 +27,7 @@ namespace DrugSearcher.Services
         private bool _isValidating;
         private int _headerLinesCount;
 
-        public event EventHandler<string>? StatusChanged;
+        public event EventHandler<string?>? StatusChanged;
         public event EventHandler<SyntaxValidationResult>? ValidationCompleted;
 
         public RealTimeSyntaxService(TextEditor textEditor, ILogger<RealTimeSyntaxService> logger)
@@ -90,14 +90,12 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 上下文变化处理
         /// </summary>
-        private void OnContextChanged(object? sender, ContextChangedEventArgs e)
-        {
+        private void OnContextChanged(object? sender, ContextChangedEventArgs e) =>
             // 刷新显示
             _textEditor.Dispatcher.InvokeAsync(() =>
             {
                 _textEditor.TextArea.TextView.Redraw();
             });
-        }
 
         /// <summary>
         /// 请求验证
@@ -202,9 +200,9 @@ namespace DrugSearcher.Services
                 result.Errors.AddRange(v8Errors);
 
                 // 过滤掉无效的错误（行号小于等于0的错误）
-                result.Errors = result.Errors.Where(e => e.Line > 0).ToList();
+                result.Errors = [.. result.Errors.Where(e => e.Line > 0)];
 
-                result.IsValid = !result.Errors.Any();
+                result.IsValid = result.Errors.Count == 0;
             }
             catch (Exception ex)
             {
@@ -225,7 +223,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查字符串字面量
         /// </summary>
-        private List<SyntaxError> CheckStringLiterals(string code)
+        private static List<SyntaxError> CheckStringLiterals(string code)
         {
             var errors = new List<SyntaxError>();
             var lines = code.Split('\n');
@@ -251,7 +249,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查特定类型的字符串字面量
         /// </summary>
-        private List<SyntaxError> CheckStringLiteralType(string line, int lineNumber, char quoteChar)
+        private static List<SyntaxError> CheckStringLiteralType(string line, int lineNumber, char quoteChar)
         {
             var errors = new List<SyntaxError>();
             var inString = false;
@@ -318,15 +316,12 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 预处理代码，移除注释和字符串内容
         /// </summary>
-        private string PreprocessCode(string code)
-        {
-            return RemoveStringContents(code);
-        }
+        private static string PreprocessCode(string code) => RemoveStringContents(code);
 
         /// <summary>
         /// 移除字符串内容
         /// </summary>
-        private string RemoveStringContents(string code)
+        private static string RemoveStringContents(string code)
         {
             var result = new System.Text.StringBuilder();
             var inDoubleQuote = false;
@@ -472,16 +467,13 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查括号匹配
         /// </summary>
-        private List<SyntaxError> CheckBracketMatchingGlobal(string processedCode)
-        {
-            return BracketMatchingService.CheckBracketMatching(processedCode);
-        }
+        private static List<SyntaxError> CheckBracketMatchingGlobal(string processedCode) => BracketMatchingService.CheckBracketMatching(processedCode);
 
 
         /// <summary>
         /// 检查函数调用参数（使用已有的 FindFunctionCalls 方法）
         /// </summary>
-        private List<SyntaxError> CheckFunctionCallParameters(string code, List<DosageParameter> parameters)
+        private static List<SyntaxError> CheckFunctionCallParameters(string code, List<DosageParameter> parameters)
         {
             var errors = new List<SyntaxError>();
             var lines = code.Split('\n');
@@ -494,9 +486,9 @@ namespace DrugSearcher.Services
             knownIdentifiers.UnionWith(declaredVariables);
 
             // 逐行累积作用域变量
-            var scopeVariables = new HashSet<string>(knownIdentifiers);
+            var scopeVariables = new HashSet<string?>(knownIdentifiers);
 
-            for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
+            for (var lineIndex = 0; lineIndex < lines.Length; lineIndex++)
             {
                 var line = lines[lineIndex];
                 var lineNumber = lineIndex + 1;
@@ -543,7 +535,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 查找函数调用
         /// </summary>
-        private List<FunctionCallInfo> FindFunctionCalls(string line)
+        private static List<FunctionCallInfo> FindFunctionCalls(string line)
         {
             var calls = new List<FunctionCallInfo>();
             var processedPositions = new HashSet<int>();
@@ -614,7 +606,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 从指定位置提取参数
         /// </summary>
-        private ArgumentsExtractionResult? ExtractArgumentsFromPosition(string text, int openParenIndex)
+        private static ArgumentsExtractionResult? ExtractArgumentsFromPosition(string text, int openParenIndex)
         {
             if (openParenIndex >= text.Length || text[openParenIndex] != '(')
                 return null;
@@ -660,7 +652,7 @@ namespace DrugSearcher.Services
                                     // 找到匹配的闭括号
                                     return new ArgumentsExtractionResult
                                     {
-                                        ArgumentsText = text.Substring(startIndex, i - startIndex),
+                                        ArgumentsText = text[startIndex..i],
                                         EndIndex = i
                                     };
                                 }
@@ -685,18 +677,15 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查是否是控制流关键字
         /// </summary>
-        private static bool IsControlFlowKeyword(string word)
-        {
-            return word is "if" or "switch" or "while" or "for" or "catch" or "do";
-        }
+        private static bool IsControlFlowKeyword(string? word) => word is "if" or "switch" or "while" or "for" or "catch" or "do";
 
         /// <summary>
         /// 函数调用信息
         /// </summary>
         private class FunctionCallInfo
         {
-            public string FunctionName { get; set; } = "";
-            public string ArgumentsText { get; set; } = "";
+            public string? FunctionName { get; set; } = "";
+            public string? ArgumentsText { get; set; } = "";
             public int StartIndex { get; set; }
             public int ArgumentsStartIndex { get; set; }
             public bool IsControlFlow { get; set; }
@@ -707,16 +696,16 @@ namespace DrugSearcher.Services
         /// </summary>
         private class ArgumentsExtractionResult
         {
-            public string ArgumentsText { get; set; } = "";
-            public int EndIndex { get; set; }
+            public string? ArgumentsText { get; init; } = "";
+            public int EndIndex { get; init; }
         }
         /// <summary>
         /// 验证函数调用
         /// </summary>
-        private List<SyntaxError> ValidateFunctionCall(
-            string functionName,
-            string argumentsText,
-            HashSet<string> knownIdentifiers,
+        private static List<SyntaxError> ValidateFunctionCall(
+            string? functionName,
+            string? argumentsText,
+            HashSet<string?> knownIdentifiers,
             int lineNumber,
             int columnOffset)
         {
@@ -771,15 +760,15 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 验证控制流条件
         /// </summary>
-        private List<SyntaxError> ValidateControlFlowCondition(
-            string keyword,
-            string condition,
-            HashSet<string> knownIdentifiers,
+        private static List<SyntaxError> ValidateControlFlowCondition(
+            string? keyword,
+            string? condition,
+            HashSet<string?> knownIdentifiers,
             int lineNumber,
             int columnOffset)
         {
             var errors = new List<SyntaxError>();
-            condition = condition.Trim();
+            condition = condition?.Trim();
 
             if (string.IsNullOrEmpty(condition))
             {
@@ -837,9 +826,9 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 验证条件表达式（if/while）
         /// </summary>
-        private List<SyntaxError> ValidateConditionExpression(
-            string condition,
-            HashSet<string> knownIdentifiers,
+        private static List<SyntaxError> ValidateConditionExpression(
+            string? condition,
+            HashSet<string?> knownIdentifiers,
             int lineNumber,
             int columnOffset)
         {
@@ -871,8 +860,8 @@ namespace DrugSearcher.Services
             }
 
             // 如果是表达式，验证其中的标识符
-            var identifierPattern = @"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b";
-            var matches = Regex.Matches(condition, identifierPattern);
+            if (condition == null) return errors;
+            var matches = IdentifierPatternRegex().Matches(condition);
 
             foreach (Match match in matches)
             {
@@ -902,30 +891,29 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 验证 switch 表达式
         /// </summary>
-        private List<SyntaxError> ValidateSwitchExpression(
-            string expression,
-            HashSet<string> knownIdentifiers,
+        private static List<SyntaxError> ValidateSwitchExpression(
+            string? expression,
+            HashSet<string?> knownIdentifiers,
             int lineNumber,
-            int columnOffset)
-        {
+            int columnOffset) =>
             // switch 表达式的验证逻辑与条件表达式类似
-            return ValidateConditionExpression(expression, knownIdentifiers, lineNumber, columnOffset);
-        }
+            ValidateConditionExpression(expression, knownIdentifiers, lineNumber, columnOffset);
 
         /// <summary>
         /// 验证 for 循环条件
         /// </summary>
-        private List<SyntaxError> ValidateForLoopCondition(
-            string condition,
-            HashSet<string> knownIdentifiers,
+        private static List<SyntaxError> ValidateForLoopCondition(
+            string? condition,
+            HashSet<string?> knownIdentifiers,
             int lineNumber,
             int columnOffset)
         {
             var errors = new List<SyntaxError>();
 
             // for 循环可能有三个部分，用分号分隔
-            var parts = condition.Split(';');
+            var parts = condition?.Split(';');
 
+            if (parts == null) return errors;
             switch (parts.Length)
             {
                 case 3:
@@ -937,7 +925,8 @@ namespace DrugSearcher.Services
                         {
                             var part = parts[i].Trim();
 
-                            if (i == 0 && part.StartsWith("var ") || part.StartsWith("let ") || part.StartsWith("const "))
+                            if (i == 0 && part.StartsWith("var ") || part.StartsWith("let ") ||
+                                part.StartsWith("const "))
                             {
                                 // 初始化部分可能声明新变量
                                 var varPattern = @"(?:var|let|const)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)";
@@ -950,7 +939,8 @@ namespace DrugSearcher.Services
                             else if (!string.IsNullOrEmpty(part))
                             {
                                 // 验证其他部分的表达式
-                                errors.AddRange(ValidateConditionExpression(part, knownIdentifiers, lineNumber, currentOffset));
+                                errors.AddRange(ValidateConditionExpression(part, knownIdentifiers, lineNumber,
+                                    currentOffset));
                             }
 
                             currentOffset += part.Length + (i < parts.Length - 1 ? 1 : 0); // +1 for semicolon
@@ -961,13 +951,11 @@ namespace DrugSearcher.Services
                 case 1:
                     {
                         // 可能是 for...in 或 for...of 循环
-                        if (condition.Contains(" in ") || condition.Contains(" of "))
+                        if (condition != null && (condition.Contains(" in ") || condition.Contains(" of ")))
                         {
-                            var forInOfPattern = @"(?:var|let|const)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s+(?:in|of)\s+(.+)";
-                            var match = Regex.Match(condition, forInOfPattern);
+                            var match = ForInOfPatternRegex().Match(condition);
                             if (match.Success)
                             {
-                                var iteratorVar = match.Groups[1].Value;
                                 var iterableExpr = match.Groups[2].Value;
 
                                 // 迭代变量是新声明的，不需要检查
@@ -979,7 +967,8 @@ namespace DrugSearcher.Services
                         else
                         {
                             // 其他情况，作为普通表达式验证
-                            errors.AddRange(ValidateConditionExpression(condition, knownIdentifiers, lineNumber, columnOffset));
+                            errors.AddRange(ValidateConditionExpression(condition, knownIdentifiers, lineNumber,
+                                columnOffset));
                         }
 
                         break;
@@ -992,7 +981,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 解析函数参数（增强版，支持嵌套函数调用）
         /// </summary>
-        private List<FunctionArgument> ParseFunctionArguments(string argumentsText)
+        private static List<FunctionArgument> ParseFunctionArguments(string? argumentsText)
         {
             var arguments = new List<FunctionArgument>();
             var currentArg = new System.Text.StringBuilder();
@@ -1004,95 +993,98 @@ namespace DrugSearcher.Services
             var escaped = false;
             var argStartIndex = 0;
 
-            for (var i = 0; i < argumentsText.Length; i++)
-            {
-                var ch = argumentsText[i];
-
-                if (escaped)
+            if (argumentsText != null)
+                for (var i = 0; i < argumentsText.Length; i++)
                 {
-                    escaped = false;
-                    currentArg.Append(ch);
-                    continue;
-                }
+                    var ch = argumentsText[i];
 
-                if (ch == '\\')
-                {
-                    escaped = true;
-                    currentArg.Append(ch);
-                    continue;
-                }
-
-                if (!inString)
-                {
-                    if (ch is '"' or '\'' or '`')
+                    if (escaped)
                     {
-                        inString = true;
-                        stringChar = ch;
+                        escaped = false;
                         currentArg.Append(ch);
                         continue;
                     }
 
-                    switch (ch)
+                    if (ch == '\\')
                     {
-                        case '(':
-                            parenLevel++;
-                            currentArg.Append(ch);
-                            break;
-                        case ')':
-                            parenLevel--;
-                            currentArg.Append(ch);
-                            break;
-                        case '[':
-                            bracketLevel++;
-                            currentArg.Append(ch);
-                            break;
-                        case ']':
-                            bracketLevel--;
-                            currentArg.Append(ch);
-                            break;
-                        case '{':
-                            braceLevel++;
-                            currentArg.Append(ch);
-                            break;
-                        case '}':
-                            braceLevel--;
-                            currentArg.Append(ch);
-                            break;
-                        case ',':
-                            // 只有在所有括号都闭合的情况下，逗号才是参数分隔符
-                            if (parenLevel == 0 && bracketLevel == 0 && braceLevel == 0)
-                            {
-                                var argText = currentArg.ToString();
-                                arguments.Add(new FunctionArgument
-                                {
-                                    Text = argText,
-                                    StartIndex = argStartIndex
-                                });
+                        escaped = true;
+                        currentArg.Append(ch);
+                        continue;
+                    }
 
-                                currentArg.Clear();
-                                argStartIndex = i + 1;
-                            }
-                            else
-                            {
-                                // 否则逗号是参数内容的一部分
-                                currentArg.Append(ch);
-                            }
-                            break;
-                        default:
-                            currentArg.Append(ch);
-                            break;
-                    }
-                }
-                else
-                {
-                    if (ch == stringChar)
+                    if (!inString)
                     {
-                        inString = false;
-                        stringChar = '\0';
+                        if (ch is '"' or '\'' or '`')
+                        {
+                            inString = true;
+                            stringChar = ch;
+                            currentArg.Append(ch);
+                            continue;
+                        }
+
+                        switch (ch)
+                        {
+                            case '(':
+                                parenLevel++;
+                                currentArg.Append(ch);
+                                break;
+                            case ')':
+                                parenLevel--;
+                                currentArg.Append(ch);
+                                break;
+                            case '[':
+                                bracketLevel++;
+                                currentArg.Append(ch);
+                                break;
+                            case ']':
+                                bracketLevel--;
+                                currentArg.Append(ch);
+                                break;
+                            case '{':
+                                braceLevel++;
+                                currentArg.Append(ch);
+                                break;
+                            case '}':
+                                braceLevel--;
+                                currentArg.Append(ch);
+                                break;
+                            case ',':
+                                // 只有在所有括号都闭合的情况下，逗号才是参数分隔符
+                                if (parenLevel == 0 && bracketLevel == 0 && braceLevel == 0)
+                                {
+                                    var argText = currentArg.ToString();
+                                    arguments.Add(new FunctionArgument
+                                    {
+                                        Text = argText,
+                                        StartIndex = argStartIndex
+                                    });
+
+                                    currentArg.Clear();
+                                    argStartIndex = i + 1;
+                                }
+                                else
+                                {
+                                    // 否则逗号是参数内容的一部分
+                                    currentArg.Append(ch);
+                                }
+
+                                break;
+                            default:
+                                currentArg.Append(ch);
+                                break;
+                        }
                     }
-                    currentArg.Append(ch);
+                    else
+                    {
+                        if (ch == stringChar)
+                        {
+                            inString = false;
+                            stringChar = '\0';
+                        }
+
+                        currentArg.Append(ch);
+                    }
                 }
-            }
 
             // 添加最后一个参数
             var lastArgText = currentArg.ToString();
@@ -1103,14 +1095,17 @@ namespace DrugSearcher.Services
             });
 
             // 特殊处理：如果最后一个字符是逗号，说明有一个空参数
-            if (argumentsText.TrimEnd().EndsWith(","))
+            if (argumentsText != null && !argumentsText.TrimEnd().EndsWith(','))
             {
+                return arguments;
+            }
+
+            if (argumentsText != null)
                 arguments.Add(new FunctionArgument
                 {
                     Text = "",
                     StartIndex = argumentsText.Length
                 });
-            }
 
             return arguments;
         }
@@ -1119,10 +1114,10 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 验证参数（增强版）
         /// </summary>
-        private List<SyntaxError> ValidateArgument(FunctionArgument argument, HashSet<string> knownIdentifiers, int lineNumber, int columnOffset)
+        private static List<SyntaxError> ValidateArgument(FunctionArgument argument, HashSet<string?> knownIdentifiers, int lineNumber, int columnOffset)
         {
             var errors = new List<SyntaxError>();
-            var argText = argument.Text.Trim();
+            var argText = argument.Text?.Trim();
 
             // 检查空参数（连续的逗号）
             if (string.IsNullOrEmpty(argText))
@@ -1164,7 +1159,7 @@ namespace DrugSearcher.Services
 
                 case ArgumentType.UnknownIdentifier:
                     // 提取实际的标识符位置
-                    var identifierMatch = Regex.Match(argText, @"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b");
+                    var identifierMatch = IdentifierPatternRegex().Match(argText);
                     if (identifierMatch.Success)
                     {
                         errors.Add(new SyntaxError
@@ -1204,7 +1199,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 获取参数类型（更新版）
         /// </summary>
-        private ArgumentType GetArgumentType(string argText, HashSet<string> knownIdentifiers)
+        private static ArgumentType GetArgumentType(string? argText, HashSet<string?> knownIdentifiers)
         {
             // 空参数
             if (string.IsNullOrWhiteSpace(argText))
@@ -1241,7 +1236,7 @@ namespace DrugSearcher.Services
                 return ArgumentType.FunctionCall;
 
             // 表达式（包括逻辑非）
-            if (IsExpression(argText, knownIdentifiers))
+            if (IsExpression(argText))
                 return ArgumentType.Expression;
 
             // 有效的标识符
@@ -1259,15 +1254,15 @@ namespace DrugSearcher.Services
 
             return ArgumentType.Invalid;
         }
-        /// <summary>
-        /// 检查是否为字符串字面量
-        /// </summary>
-        private bool IsStringLiteral(string text)
-        {
-            if (text.Length < 2) return false;
+        // Updated code to fix CA1866 diagnostic issues by replacing string.StartsWith(string) and string.EndsWith(string) with their char overloads where applicable.
 
+        private static bool IsStringLiteral(string? text)
+        {
+            if (text is { Length: < 2 }) return false;
+
+            if (text == null) return false;
             var firstChar = text[0];
-            var lastChar = text[text.Length - 1];
+            var lastChar = text[^1]; // Using ^1 for the last character
 
             return (firstChar == '"' && lastChar == '"') ||
                    (firstChar == '\'' && lastChar == '\'') ||
@@ -1277,193 +1272,103 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查是否为数字
         /// </summary>
-        private bool IsNumber(string text)
-        {
-            return Regex.IsMatch(text, @"^\d+(\.\d+)?([eE][+-]?\d+)?$") ||
-                   Regex.IsMatch(text, @"^0[xX][0-9a-fA-F]+$");
-        }
+        private static bool IsNumber(string? text) => text != null && (IsNumber10Regex().IsMatch(text) ||
+                                                                       IsNumber16Regex().IsMatch(text));
 
         /// <summary>
         /// 检查是否为数组字面量
         /// </summary>
-        private bool IsArrayLiteral(string text)
+        private static bool IsArrayLiteral(string? text)
         {
-            return text.Trim().StartsWith("[") && text.Trim().EndsWith("]");
+            var trimmedText = text?.Trim();
+            return trimmedText != null && trimmedText.StartsWith('[') && trimmedText.EndsWith(']');
         }
 
         /// <summary>
         /// 检查是否为对象字面量
         /// </summary>
-        private bool IsObjectLiteral(string text)
+        private static bool IsObjectLiteral(string? text)
         {
-            return text.Trim().StartsWith("{") && text.Trim().EndsWith("}");
+            var trimmedText = text?.Trim();
+            return trimmedText != null && trimmedText.StartsWith('{') && trimmedText.EndsWith('}');
         }
 
         /// <summary>
         /// 检查是否为函数调用
         /// </summary>
-        private bool IsFunctionCall(string text)
-        {
-            return Regex.IsMatch(text, @"[a-zA-Z_$][a-zA-Z0-9_$]*\s*\(.*\)");
-        }
+        private static bool IsFunctionCall(string? text) => text != null && IsFunctionCallRegex().IsMatch(text);
 
         /// <summary>
         /// 检查是否为表达式（增强版）
         /// </summary>
-        private bool IsExpression(string text, HashSet<string> knownIdentifiers)
+        private static bool IsExpression(string? text)
         {
-            // 清理文本
-            text = text.Trim();
-
-            // 逻辑非表达式
-            if (text.StartsWith("!"))
+            while (true)
             {
-                var afterNot = text.Substring(1).Trim();
+                text = text?.Trim();
 
-                // !array.includes() 等数组方法调用
-                if (IsArrayMethodCall(afterNot))
-                    return true;
-
-                // !['literal', 'array'].includes()
-                if (afterNot.StartsWith("[") && afterNot.Contains("]."))
-                    return true;
-
-                // !true, !false
-                if (afterNot is "true" or "false")
-                    return true;
-
-                // !variable
-                if (IsValidIdentifier(afterNot) && knownIdentifiers.Contains(afterNot))
-                    return true;
-
-                // !functionCall()
-                if (IsFunctionCall(afterNot))
-                    return true;
-
-                // !(expression)
-                if (afterNot.StartsWith("(") && afterNot.EndsWith(")"))
-                    return true;
-
-                // !object.property
-                if (afterNot.Contains("."))
+                if (text != null && text.StartsWith('!'))
                 {
-                    var parts = afterNot.Split(['.'], 2);
-                    if (parts.Length > 0)
+                    var afterNot = text[1..].Trim();
+                    if (afterNot.StartsWith('[') && afterNot.EndsWith(']')) return true;
+                }
+
+                if (text != null && text.StartsWith("!!"))
+                {
+                    var afterDoubleNot = text[2..].Trim();
+                    text = "!" + afterDoubleNot;
+                    continue;
+                }
+
+                if (text != null && !text.Contains('.')) return false;
+                var parts = text?.Split(['.'], 2);
+                if (parts is { Length: <= 0 }) return false;
+                var firstPart = parts?[0].Trim();
+                return firstPart != null && firstPart.StartsWith('[') && firstPart.EndsWith(']');
+            }
+        }
+
+        /*
+                /// <summary>
+                /// 检查是否为数组方法调用
+                /// </summary>
+                private static bool IsArrayMethodCall(string? text)
+                {
+                    // 常见的数组方法
+                    var arrayMethods = new[] {
+                        "includes", "indexOf", "push", "pop", "shift", "unshift",
+                        "slice", "splice", "filter", "map", "reduce", "forEach",
+                        "find", "findIndex", "some", "every", "sort", "reverse",
+                        "join", "concat", "flat", "flatMap"
+                    };
+
+                    foreach (var method in arrayMethods)
                     {
-                        var firstPart = parts[0].Trim();
-
-                        // 检查是否是数组字面量
-                        if (firstPart.StartsWith("[") && firstPart.EndsWith("]"))
-                            return true;
-
-                        // 检查是否是已知标识符
-                        if (IsValidIdentifier(firstPart) && knownIdentifiers.Contains(firstPart))
+                        if (text.Contains($".{method}("))
                             return true;
                     }
+
+                    return false;
                 }
-            }
-
-            // 双重否定 !!
-            if (text.StartsWith("!!"))
-            {
-                var afterDoubleNot = text.Substring(2).Trim();
-                return IsExpression("!" + afterDoubleNot, knownIdentifiers);
-            }
-
-            // 数组方法调用
-            if (IsArrayMethodCall(text))
-                return true;
-
-            // 其他表达式类型
-            if (text.Contains("+") || text.Contains("-") || text.Contains("*") || text.Contains("/") ||
-                text.Contains("&&") || text.Contains("||") || text.Contains("==") || text.Contains("!=") ||
-                text.Contains("<") || text.Contains(">") || text.Contains("<=") || text.Contains(">=") ||
-                text.Contains("===") || text.Contains("!==") || text.Contains("%") || text.Contains("**"))
-            {
-                return true;
-            }
-
-            // 三元运算符
-            if (text.Contains("?") && text.Contains(":"))
-            {
-                return true;
-            }
-
-            // 属性访问
-            if (text.Contains("."))
-            {
-                var parts = text.Split(['.'], 2);
-                if (parts.Length > 0)
-                {
-                    var firstPart = parts[0].Trim();
-
-                    // 数组字面量的方法调用，如 ['a', 'b'].includes()
-                    if (firstPart.StartsWith("[") && firstPart.EndsWith("]"))
-                        return true;
-
-                    // 已知标识符的属性访问
-                    if (IsValidIdentifier(firstPart) && knownIdentifiers.Contains(firstPart))
-                        return true;
-                }
-            }
-
-            // 数组访问
-            if (text.Contains("[") && text.Contains("]"))
-            {
-                var beforeBracket = text.Substring(0, text.IndexOf('[')).Trim();
-                if (IsValidIdentifier(beforeBracket) && knownIdentifiers.Contains(beforeBracket))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 检查是否为数组方法调用
-        /// </summary>
-        private bool IsArrayMethodCall(string text)
-        {
-            // 常见的数组方法
-            var arrayMethods = new[] {
-                "includes", "indexOf", "push", "pop", "shift", "unshift",
-                "slice", "splice", "filter", "map", "reduce", "forEach",
-                "find", "findIndex", "some", "every", "sort", "reverse",
-                "join", "concat", "flat", "flatMap"
-            };
-
-            foreach (var method in arrayMethods)
-            {
-                if (text.Contains($".{method}("))
-                    return true;
-            }
-
-            return false;
-        }
+        */
 
 
         /// <summary>
         /// 检查是否为有效标识符
         /// </summary>
-        private bool IsValidIdentifier(string text)
-        {
-            return Regex.IsMatch(text, @"^[a-zA-Z_$][a-zA-Z0-9_$]*$");
-        }
+        private static bool IsValidIdentifier(string? text) => text != null && IsValidIdentifierRegex().IsMatch(text);
 
         /// <summary>
         /// 检查是否包含无效字符
         /// </summary>
-        private bool ContainsInvalidCharacters(string text)
-        {
+        private static bool ContainsInvalidCharacters(string? text) =>
             // 检查是否包含中文或其他非ASCII字符
-            return text.Any(c => c > 127 && !char.IsLetterOrDigit(c));
-        }
+            text != null && text.Any(c => c > 127 && !char.IsLetterOrDigit(c));
 
         /// <summary>
         /// 检查常见错误
         /// </summary>
-        private List<SyntaxError> CheckCommonErrors(string code)
+        private static List<SyntaxError> CheckCommonErrors(string code)
         {
             var errors = new List<SyntaxError>();
             var lines = code.Split('\n');
@@ -1512,9 +1417,9 @@ namespace DrugSearcher.Services
                 }
 
                 // 检查可能的无限循环
-                if (Regex.IsMatch(processedLine, @"while\s*\(\s*true\s*\)"))
+                if (DieRingRegex().IsMatch(processedLine))
                 {
-                    var match = Regex.Match(processedLine, @"while\s*\(\s*true\s*\)");
+                    var match = DieRingRegex().Match(processedLine);
                     errors.Add(new SyntaxError
                     {
                         Message = "检测到可能的无限循环",
@@ -1534,7 +1439,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查引号风格一致性
         /// </summary>
-        private void CheckQuoteConsistency(string line, int lineNumber, List<SyntaxError> errors)
+        private static void CheckQuoteConsistency(string line, int lineNumber, List<SyntaxError> errors)
         {
             var hasDoubleQuote = false;
             var hasSingleQuote = false;
@@ -1584,7 +1489,6 @@ namespace DrugSearcher.Services
                 }
             }
 
-            // 如果同一行中同时使用了单引号和双引号
             if (hasDoubleQuote && hasSingleQuote)
             {
                 errors.Add(new SyntaxError
@@ -1599,14 +1503,14 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查未定义的标识符（完整修复版）
         /// </summary>
-        private List<SyntaxError> CheckUndefinedIdentifiers(string code, List<DosageParameter> parameters)
+        private static List<SyntaxError> CheckUndefinedIdentifiers(string code, List<DosageParameter> parameters)
         {
             var errors = new List<SyntaxError>();
-            var lines = code.Split('\n');
+            _ = code.Split('\n');
 
             // 预处理代码
             var processedCode = RemoveStringContents(code);
-            var processedLines = processedCode.Split('\n');
+            string?[] processedLines = processedCode.Split('\n');
 
             // 获取已知标识符（包括参数定义的变量）
             var knownIdentifiers = GetKnownIdentifiers(parameters);
@@ -1616,116 +1520,121 @@ namespace DrugSearcher.Services
             knownIdentifiers.UnionWith(properlyDeclaredVariables);
 
             // 逐行累积作用域中的变量
-            var scopeVariables = new HashSet<string>(knownIdentifiers);
-            var implicitlyDeclaredVariables = new HashSet<string>();
+            var scopeVariables = new HashSet<string?>(knownIdentifiers);
+            var implicitlyDeclaredVariables = new HashSet<string?>();
 
             // 处理每一行
-            for (int i = 0; i < processedLines.Length; i++)
+            for (var i = 0; i < processedLines.Length; i++)
             {
                 var processedLine = processedLines[i];
-                var originalLine = i < lines.Length ? lines[i] : "";
                 var lineNumber = i + 1;
 
                 // 跳过注释行
-                if (processedLine.Trim().StartsWith("//") || processedLine.Trim().StartsWith("/*"))
+                if (processedLine != null && (processedLine.Trim().StartsWith("//") || processedLine.Trim().StartsWith("/*")))
                     continue;
 
                 // 检查直接赋值语句（没有var/let/const）
-                var directAssignmentPattern = @"^\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=(?!=)";
-                var assignmentMatch = Regex.Match(processedLine, directAssignmentPattern);
-
-                if (assignmentMatch.Success)
+                if (processedLine != null)
                 {
-                    var varName = assignmentMatch.Groups[1].Value;
+                    var assignmentMatch = MyRegex().Match(processedLine);
 
-                    // 检查是否是 var/let/const 声明
-                    var declarationPattern = @"^\s*(var|let|const)\s+" + Regex.Escape(varName);
-                    if (!Regex.IsMatch(processedLine, declarationPattern))
+                    if (assignmentMatch.Success)
                     {
-                        // 这是一个没有声明的赋值
-                        if (!scopeVariables.Contains(varName))
-                        {
-                            // 变量未声明就使用
-                            errors.Add(new SyntaxError
-                            {
-                                Message = $"变量 '{varName}' 未声明就赋值（应使用 var、let 或 const 声明）",
-                                Line = lineNumber,
-                                Column = assignmentMatch.Groups[1].Index + 1,
-                                Severity = SyntaxErrorSeverity.Error
-                            });
+                        var varName = assignmentMatch.Groups[1].Value;
 
-                            // 记录为隐式声明的变量（用于后续检查）
-                            implicitlyDeclaredVariables.Add(varName);
+                        // 检查是否是 var/let/const 声明
+                        var declarationPattern = @"^\s*(var|let|const)\s+" + Regex.Escape(varName);
+                        if (!Regex.IsMatch(processedLine, declarationPattern))
+                        {
+                            // 这是一个没有声明的赋值
+                            if (!scopeVariables.Contains(varName))
+                            {
+                                // 变量未声明就使用
+                                errors.Add(new SyntaxError
+                                {
+                                    Message = $"变量 '{varName}' 未声明就赋值（应使用 var、let 或 const 声明）",
+                                    Line = lineNumber,
+                                    Column = assignmentMatch.Groups[1].Index + 1,
+                                    Severity = SyntaxErrorSeverity.Error
+                                });
+
+                                // 记录为隐式声明的变量（用于后续检查）
+                                implicitlyDeclaredVariables.Add(varName);
+                            }
                         }
                     }
                 }
 
                 // 查找函数调用（排除控制流语句）
-                var functionCallPattern = @"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(";
-                var matches = Regex.Matches(processedLine, functionCallPattern);
-
-                foreach (Match match in matches)
+                if (processedLine != null)
                 {
-                    var functionName = match.Groups[1].Value;
+                    var matches = MyRegex1().Matches(processedLine);
 
-                    // 跳过控制流关键字
-                    if (IsControlFlowKeyword(functionName))
-                        continue;
-
-                    // 检查是否是已知的函数
-                    if (!scopeVariables.Contains(functionName) &&
-                        !JavaScriptLanguageDefinition.IsBuiltInFunction(functionName) &&
-                        !JavaScriptLanguageDefinition.IsCustomFunction(functionName))
+                    foreach (Match match in matches)
                     {
+                        var functionName = match.Groups[1].Value;
+
+                        // 跳过控制流关键字
+                        if (IsControlFlowKeyword(functionName))
+                            continue;
+
+                        // 检查是否是已知的函数
+                        if (!scopeVariables.Contains(functionName) &&
+                            !JavaScriptLanguageDefinition.IsBuiltInFunction(functionName) &&
+                            !JavaScriptLanguageDefinition.IsCustomFunction(functionName))
+                        {
+                            errors.Add(new SyntaxError
+                            {
+                                Message = $"未定义的函数: {functionName}",
+                                Line = lineNumber,
+                                Column = match.Index + 1,
+                                Severity = SyntaxErrorSeverity.Warning
+                            });
+                        }
+                    }
+                }
+
+                // 查找变量使用（排除赋值左侧、函数调用、控制流语句）
+                if (processedLine == null) continue;
+                {
+                    var variableMatches = MyRegex2().Matches(processedLine);
+
+                    foreach (Match match in variableMatches)
+                    {
+                        var variableName = match.Groups[1].Value;
+
+                        // 跳过关键字、已知标识符
+                        if (JavaScriptLanguageDefinition.IsKeyword(variableName) ||
+                            IsControlFlowKeyword(variableName) ||
+                            scopeVariables.Contains(variableName) ||
+                            char.IsDigit(variableName[0]))
+                            continue;
+
+                        // 检查是否在赋值语句的左侧
+                        if (IsInAssignmentLeft(processedLine, match.Index))
+                            continue;
+
+                        // 检查是否在属性访问中
+                        if (IsInPropertyAccess(processedLine, match.Index))
+                            continue;
+
+                        // 检查是否是函数调用
+                        if (IsFollowedByParenthesis(processedLine, match.Index + match.Length))
+                            continue;
+
+                        // 如果变量在隐式声明列表中，说明它是通过不当方式"声明"的
+                        if (implicitlyDeclaredVariables.Contains(variableName))
+                            continue;
+
+                        // 如果不在任何已知上下文中，报告未定义
                         errors.Add(new SyntaxError
                         {
-                            Message = $"未定义的函数: {functionName}",
+                            Message = $"未定义的变量: {variableName}",
                             Line = lineNumber,
                             Column = match.Index + 1,
                             Severity = SyntaxErrorSeverity.Warning
                         });
                     }
-                }
-
-                // 查找变量使用（排除赋值左侧、函数调用、控制流语句）
-                var variablePattern = @"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b";
-                var variableMatches = Regex.Matches(processedLine, variablePattern);
-
-                foreach (Match match in variableMatches)
-                {
-                    var variableName = match.Groups[1].Value;
-
-                    // 跳过关键字、已知标识符
-                    if (JavaScriptLanguageDefinition.IsKeyword(variableName) ||
-                        IsControlFlowKeyword(variableName) ||
-                        scopeVariables.Contains(variableName) ||
-                        char.IsDigit(variableName[0]))
-                        continue;
-
-                    // 检查是否在赋值语句的左侧
-                    if (IsInAssignmentLeft(processedLine, match.Index))
-                        continue;
-
-                    // 检查是否在属性访问中
-                    if (IsInPropertyAccess(processedLine, match.Index))
-                        continue;
-
-                    // 检查是否是函数调用
-                    if (IsFollowedByParenthesis(processedLine, match.Index + match.Length))
-                        continue;
-
-                    // 如果变量在隐式声明列表中，说明它是通过不当方式"声明"的
-                    if (implicitlyDeclaredVariables.Contains(variableName))
-                        continue;
-
-                    // 如果不在任何已知上下文中，报告未定义
-                    errors.Add(new SyntaxError
-                    {
-                        Message = $"未定义的变量: {variableName}",
-                        Line = lineNumber,
-                        Column = match.Index + 1,
-                        Severity = SyntaxErrorSeverity.Warning
-                    });
                 }
             }
 
@@ -1735,21 +1644,21 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查是否紧跟着括号（用于识别函数调用）
         /// </summary>
-        private bool IsFollowedByParenthesis(string line, int position)
+        private static bool IsFollowedByParenthesis(string? line, int position)
         {
             // 跳过空白字符
-            while (position < line.Length && char.IsWhiteSpace(line[position]))
+            while (line != null && position < line.Length && char.IsWhiteSpace(line[position]))
             {
                 position++;
             }
 
-            return position < line.Length && line[position] == '(';
+            return line != null && position < line.Length && line[position] == '(';
         }
 
         /// <summary>
         /// 提取正确声明的变量（使用var/let/const）
         /// </summary>
-        private HashSet<string> ExtractProperlyDeclaredVariables(string code)
+        private static HashSet<string> ExtractProperlyDeclaredVariables(string code)
         {
             var variables = new HashSet<string>();
 
@@ -1822,9 +1731,9 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 获取已知标识符（包括参数定义的变量）
         /// </summary>
-        private HashSet<string> GetKnownIdentifiers(List<DosageParameter> parameters)
+        private static HashSet<string?> GetKnownIdentifiers(List<DosageParameter> parameters)
         {
-            var identifiers = new HashSet<string>();
+            var identifiers = new HashSet<string?>();
 
             // 添加参数名称 - 这些是在计算器中可用的全局变量
             foreach (var param in parameters)
@@ -1842,18 +1751,9 @@ namespace DrugSearcher.Services
         }
 
         /// <summary>
-        /// 修改 ExtractDeclaredVariables 方法，不再包含未声明的赋值
-        /// </summary>
-        private HashSet<string> ExtractDeclaredVariables(string code)
-        {
-            // 现在这个方法只返回正确声明的变量
-            return ExtractProperlyDeclaredVariables(code);
-        }
-
-        /// <summary>
         /// 提取函数参数
         /// </summary>
-        private void ExtractFunctionParameters(string paramList, HashSet<string> variables)
+        private static void ExtractFunctionParameters(string paramList, HashSet<string> variables)
         {
             if (string.IsNullOrWhiteSpace(paramList))
                 return;
@@ -1874,53 +1774,51 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 检查变量是否在赋值语句的左侧
         /// </summary>
-        private bool IsInAssignmentLeft(string line, int position)
+        private static bool IsInAssignmentLeft(string? line, int position)
         {
             // 检查是否在声明语句中
-            var beforePosition = line[..position].Trim();
-            if (beforePosition.EndsWith("var ") || beforePosition.EndsWith("let ") || beforePosition.EndsWith("const "))
+            var beforePosition = line?[..position]?.Trim();
+            if (beforePosition != null && (beforePosition.EndsWith("var ") || beforePosition.EndsWith("let ") || beforePosition.EndsWith("const ")))
             {
                 return true;
             }
 
             // 检查是否在赋值表达式的左侧
-            var afterVariable = line[position..];
+            var afterVariable = line?[position..];
 
             // 查找第一个非字母数字字符
             var endOfVariable = 0;
-            while (endOfVariable < afterVariable.Length &&
+            while (afterVariable != null &&
+                   endOfVariable < afterVariable.Length &&
                    (char.IsLetterOrDigit(afterVariable[endOfVariable]) || afterVariable[endOfVariable] == '_'))
             {
                 endOfVariable++;
             }
 
             // 检查变量后面是否紧跟着等号
-            var afterVarName = afterVariable[endOfVariable..].Trim();
-            return afterVarName.StartsWith("=") && !afterVarName.StartsWith("==") && !afterVarName.StartsWith("===");
+            var afterVarName = afterVariable?[endOfVariable..]?.Trim();
+            return afterVarName != null && afterVarName.StartsWith('=') && !afterVarName.StartsWith("==") && !afterVarName.StartsWith("===");
         }
 
         /// <summary>
         /// 检查是否在属性访问中
         /// </summary>
-        private bool IsInPropertyAccess(string line, int position)
+        private static bool IsInPropertyAccess(string? line, int position)
         {
             // 检查前面是否有点号
-            if (position > 0 && line[position - 1] == '.')
+            if (position > 0 && line != null && line[position - 1] == '.')
                 return true;
 
             // 检查后面是否有点号
-            var afterVariable = line[position..];
+            var afterVariable = line?[position..];
             var endOfVariable = 0;
-            while (endOfVariable < afterVariable.Length &&
+            while (afterVariable != null && endOfVariable < afterVariable.Length &&
                    (char.IsLetterOrDigit(afterVariable[endOfVariable]) || afterVariable[endOfVariable] == '_'))
             {
                 endOfVariable++;
             }
 
-            if (endOfVariable < afterVariable.Length && afterVariable[endOfVariable] == '.')
-                return true;
-
-            return false;
+            return afterVariable != null && endOfVariable < afterVariable.Length && afterVariable[endOfVariable] == '.';
         }
 
         /// <summary>
@@ -1944,7 +1842,7 @@ namespace DrugSearcher.Services
             catch (Microsoft.ClearScript.ScriptEngineException ex)
             {
                 var error = ParseV8Error(ex.Message);
-                if (error != null && error.Line > 0)
+                if (error is { Line: > 0 })
                 {
                     errors.Add(error);
                 }
@@ -1960,7 +1858,7 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 构建验证脚本
         /// </summary>
-        private string BuildValidationScript(string userCode, List<DosageParameter> parameters)
+        private string? BuildValidationScript(string userCode, List<DosageParameter> parameters)
         {
             var scriptBuilder = new System.Text.StringBuilder();
 
@@ -2034,35 +1932,32 @@ function safeParseInt(value, defaultValue) {
         /// <summary>
         /// 获取参数的默认值
         /// </summary>
-        private string GetParameterDefaultValue(DosageParameter parameter)
+        private static string? GetParameterDefaultValue(DosageParameter parameter) => parameter.DataType switch
         {
-            return parameter.DataType switch
-            {
-                ParameterTypes.Number => parameter.DefaultValue?.ToString() ?? "0",
-                ParameterTypes.Boolean => parameter.DefaultValue?.ToString()?.ToLower() ?? "false",
-                ParameterTypes.Text => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
-                ParameterTypes.Select => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
-                _ => $"'{parameter.DefaultValue?.ToString() ?? ""}'"
-            };
-        }
+            ParameterTypes.Number => parameter.DefaultValue?.ToString() ?? "0",
+            ParameterTypes.Boolean => parameter.DefaultValue?.ToString()?.ToLower() ?? "false",
+            ParameterTypes.Text => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
+            ParameterTypes.Select => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
+            _ => $"'{parameter.DefaultValue?.ToString() ?? ""}'"
+        };
 
         /// <summary>
         /// 解析V8错误
         /// </summary>
-        private SyntaxError ParseV8Error(string errorMessage)
+        private SyntaxError? ParseV8Error(string errorMessage)
         {
             // 尝试解析行号和列号
-            var lineMatch = Regex.Match(errorMessage, @"at line (\d+)");
-            var columnMatch = Regex.Match(errorMessage, @"at column (\d+)");
+            var lineMatch = V8ErrorLinePlaceRegex().Match(errorMessage);
+            var columnMatch = V8ErrorColumnPlaceRegex().Match(errorMessage);
 
             if (!lineMatch.Success)
             {
-                lineMatch = Regex.Match(errorMessage, @"line (\d+)");
+                lineMatch = V8ErrorLineIndexRegex().Match(errorMessage);
             }
 
             if (!columnMatch.Success)
             {
-                columnMatch = Regex.Match(errorMessage, @"column (\d+)");
+                columnMatch = V8ErrorColumnIndexRegex().Match(errorMessage);
             }
 
             var line = lineMatch.Success ? int.Parse(lineMatch.Groups[1].Value) : 1;
@@ -2072,31 +1967,29 @@ function safeParseInt(value, defaultValue) {
             var adjustedLine = line - _headerLinesCount;
 
             // 确保行号至少为1
-            if (adjustedLine < 1)
-            {
-                _logger.LogDebug($"V8错误行号调整：原始行号 {line}，前置行数 {_headerLinesCount}，调整后行号 {adjustedLine}，将被过滤");
-                return null;
-            }
+            if (adjustedLine >= 1)
+                return new SyntaxError
+                {
+                    Message = CleanErrorMessage(errorMessage),
+                    Line = adjustedLine,
+                    Column = column,
+                    Severity = SyntaxErrorSeverity.Error
+                };
+            _logger.LogDebug($"V8错误行号调整：原始行号 {line}，前置行数 {_headerLinesCount}，调整后行号 {adjustedLine}，将被过滤");
+            return null;
 
-            return new SyntaxError
-            {
-                Message = CleanErrorMessage(errorMessage),
-                Line = adjustedLine,
-                Column = column,
-                Severity = SyntaxErrorSeverity.Error
-            };
         }
 
         /// <summary>
         /// 清理错误消息
         /// </summary>
-        private string CleanErrorMessage(string errorMessage)
+        private static string? CleanErrorMessage(string errorMessage)
         {
             // 移除V8引擎特定的信息
             var cleanMessage = errorMessage;
-            cleanMessage = Regex.Replace(cleanMessage, @"at line \d+", "");
-            cleanMessage = Regex.Replace(cleanMessage, @"at column \d+", "");
-            cleanMessage = Regex.Replace(cleanMessage, @"Script compilation failed\.", "");
+            cleanMessage = V8ErrorLinePlaceRegex().Replace(cleanMessage, "");
+            cleanMessage = V8ErrorColumnPlaceRegex().Replace(cleanMessage, "");
+            cleanMessage = cleanMessage.Replace("Script compilation failed.", "");
             cleanMessage = cleanMessage.Trim();
 
             return string.IsNullOrEmpty(cleanMessage) ? "语法错误" : cleanMessage;
@@ -2105,10 +1998,7 @@ function safeParseInt(value, defaultValue) {
         /// <summary>
         /// 更新状态
         /// </summary>
-        private void UpdateStatus(string status)
-        {
-            StatusChanged?.Invoke(this, status);
-        }
+        private void UpdateStatus(string status) => StatusChanged?.Invoke(this, status);
 
         /// <summary>
         /// 更新验证状态
@@ -2149,7 +2039,7 @@ function safeParseInt(value, defaultValue) {
         public void Dispose()
         {
             _validationTimer?.Stop();
-            _validationTimer.Tick -= OnValidationTimerTick;
+            if (_validationTimer != null) _validationTimer.Tick -= OnValidationTimerTick;
 
             _textEditor.TextChanged -= OnTextChanged;
             _dynamicContext.ContextChanged -= OnContextChanged;
@@ -2161,7 +2051,37 @@ function safeParseInt(value, defaultValue) {
 
             _errorMarkerService?.Dispose();
             _errorToolTipService?.Dispose();
+            GC.SuppressFinalize(this);
         }
+
+        [GeneratedRegex(@"^\d+(\.\d+)?([eE][+-]?\d+)?$")]
+        private static partial Regex IsNumber10Regex();
+        [GeneratedRegex(@"[a-zA-Z_$][a-zA-Z0-9_$]*\s*\(.*\)")]
+        private static partial Regex IsFunctionCallRegex();
+        [GeneratedRegex(@"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b")]
+        private static partial Regex IdentifierPatternRegex();
+        [GeneratedRegex(@"(?:var|let|const)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s+(?:in|of)\s+(.+)")]
+        private static partial Regex ForInOfPatternRegex();
+        [GeneratedRegex(@"^0[xX][0-9a-fA-F]+$")]
+        private static partial Regex IsNumber16Regex();
+        [GeneratedRegex(@"^[a-zA-Z_$][a-zA-Z0-9_$]*$")]
+        private static partial Regex IsValidIdentifierRegex();
+        [GeneratedRegex(@"while\s*\(\s*true\s*\)")]
+        private static partial Regex DieRingRegex();
+        [GeneratedRegex(@"at line (\d+)")]
+        private static partial Regex V8ErrorLinePlaceRegex();
+        [GeneratedRegex(@"at column (\d+)")]
+        private static partial Regex V8ErrorColumnPlaceRegex();
+        [GeneratedRegex(@"line (\d+)")]
+        private static partial Regex V8ErrorLineIndexRegex();
+        [GeneratedRegex(@"column (\d+)")]
+        private static partial Regex V8ErrorColumnIndexRegex();
+        [GeneratedRegex(@"^\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=(?!=)")]
+        private static partial Regex MyRegex();
+        [GeneratedRegex(@"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(")]
+        private static partial Regex MyRegex1();
+        [GeneratedRegex(@"\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b")]
+        private static partial Regex MyRegex2();
     }
     /// <summary>
     /// 括号匹配服务
@@ -2192,14 +2112,14 @@ function safeParseInt(value, defaultValue) {
                     var column = columnIndex + 1;
 
                     // 开括号
-                    if (bracketPairs.ContainsKey(ch))
+                    if (bracketPairs.TryGetValue(ch, out var value))
                     {
                         bracketStack.Push(new BracketInfo
                         {
                             Character = ch,
                             Line = lineNumber,
                             Column = column,
-                            ExpectedClosing = bracketPairs[ch]
+                            ExpectedClosing = value
                         });
                     }
                     // 闭括号
@@ -2309,7 +2229,7 @@ function safeParseInt(value, defaultValue) {
     /// </summary>
     internal class FunctionArgument
     {
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public int StartIndex { get; set; }
     }
 

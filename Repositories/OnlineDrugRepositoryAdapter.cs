@@ -170,10 +170,7 @@ public class OnlineDrugRepositoryAdapter(IDrugDbContextFactory contextFactory) :
             .ToListAsync();
     }
 
-    public async Task<int> GetSuccessCountAsync()
-    {
-        return await GetCountByStatusAsync(CrawlStatus.Success);
-    }
+    public async Task<int> GetSuccessCountAsync() => await GetCountByStatusAsync(CrawlStatus.Success);
 
     public async Task<CrawlStatistics> GetCrawlStatisticsAsync()
     {

@@ -11,7 +11,7 @@ namespace DrugSearcher.Services
     public class RealtimeSyntaxHighlighter : DocumentColorizingTransformer
     {
         private readonly JavaScriptDynamicContext _dynamicContext;
-        private HashSet<string> _localIdentifiers = [];
+        private HashSet<string?> _localIdentifiers = [];
         private readonly bool _isDarkTheme;
 
         public RealtimeSyntaxHighlighter(JavaScriptDynamicContext dynamicContext, bool isDarkTheme)
@@ -21,10 +21,7 @@ namespace DrugSearcher.Services
             _dynamicContext.ContextChanged += OnContextChanged;
         }
 
-        private void OnContextChanged(object sender, ContextChangedEventArgs e)
-        {
-            _localIdentifiers = _dynamicContext.GetAllLocalIdentifiers();
-        }
+        private void OnContextChanged(object? sender, ContextChangedEventArgs e) => _localIdentifiers = _dynamicContext.GetAllLocalIdentifiers();
 
         protected override void ColorizeLine(DocumentLine line)
         {

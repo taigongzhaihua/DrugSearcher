@@ -202,9 +202,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// <param name="baseTime">基准时间</param>
     /// <returns>设置项</returns>
     private static SettingItem CreateDefaultSetting(int id, string key, string valueType, string value,
-        string description, string category, DateTime baseTime)
-    {
-        return new SettingItem
+        string description, string category, DateTime baseTime) => new()
         {
             Id = id,
             Key = key,
@@ -216,7 +214,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             CreatedAt = baseTime,
             UpdatedAt = baseTime
         };
-    }
 
     #endregion
 
@@ -330,10 +327,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// 获取必需的设置键列表
     /// </summary>
     /// <returns>必需设置键列表</returns>
-    private static List<string> GetRequiredSettingKeys()
-    {
-        return
-        [
+    private static List<string> GetRequiredSettingKeys() => [
             SettingKeys.MinimizeToTrayOnClose,
             SettingKeys.ShowTrayIcon,
             SettingKeys.ShowTrayNotifications,
@@ -343,7 +337,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             SettingKeys.Language,
             SettingKeys.AutoStartup
         ];
-    }
 
     /// <summary>
     /// 获取运行时默认设置（不包含ID，用于运行时添加）
@@ -399,9 +392,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// <param name="currentTime">当前时间</param>
     /// <returns>设置项</returns>
     private static SettingItem CreateRuntimeDefaultSetting(string key, string valueType, string value,
-        string description, string category, DateTime currentTime)
-    {
-        return new SettingItem
+        string description, string category, DateTime currentTime) => new()
         {
             Key = key,
             ValueType = valueType,
@@ -412,7 +403,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             CreatedAt = currentTime,
             UpdatedAt = currentTime
         };
-    }
 
     #endregion
 }

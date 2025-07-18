@@ -322,7 +322,7 @@ public partial class CrawlerPageViewModel : ObservableObject
             CrawlButtonText = "开始爬取";
             CanStartCrawl = true;
 
-            AddLog($"爬取完成！总计：{result.TotalProcessed}，成功：{result.SuccessCount}，失败：{result.FailedCount}，耗时：{result.Duration:hh\\:mm\\:ss}", LogLevel.Information);
+            AddLog($@"爬取完成！总计：{result.TotalProcessed}，成功：{result.SuccessCount}，失败：{result.FailedCount}，耗时：{result.Duration:hh\:mm\:ss}", LogLevel.Information);
 
             await UpdateStatistics();
         }
@@ -343,35 +343,32 @@ public partial class CrawlerPageViewModel : ObservableObject
         }
     }
 
-    private void OnCrawlProgress(CrawlProgress progress)
-    {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            TotalProcessed = progress.TotalProcessed;
-            SuccessCount = progress.SuccessCount;
-            FailedCount = progress.FailedCount;
-            CurrentId = progress.CurrentId;
-            ProgressPercentage = progress.ProgressPercentage;
-            ProgressText = $"正在处理 ID: {CurrentId} ({TotalProcessed}/{EndId - StartId + 1})";
+    private void OnCrawlProgress(CrawlProgress progress) => Application.Current.Dispatcher.Invoke(() =>
+                                                                 {
+                                                                     TotalProcessed = progress.TotalProcessed;
+                                                                     SuccessCount = progress.SuccessCount;
+                                                                     FailedCount = progress.FailedCount;
+                                                                     CurrentId = progress.CurrentId;
+                                                                     ProgressPercentage = progress.ProgressPercentage;
+                                                                     ProgressText = $"正在处理 ID: {CurrentId} ({TotalProcessed}/{EndId - StartId + 1})";
 
-            // 计算速度和预估时间
-            var elapsed = DateTime.Now - StartTime;
-            if (elapsed.TotalMinutes > 0)
-            {
-                var speed = TotalProcessed / elapsed.TotalMinutes;
-                CrawlSpeed = $"{speed:F1} 条/分钟";
+                                                                     // 计算速度和预估时间
+                                                                     var elapsed = DateTime.Now - StartTime;
+                                                                     if (elapsed.TotalMinutes > 0)
+                                                                     {
+                                                                         var speed = TotalProcessed / elapsed.TotalMinutes;
+                                                                         CrawlSpeed = $"{speed:F1} 条/分钟";
 
-                var remaining = EndId - StartId + 1 - TotalProcessed;
-                if (speed > 0)
-                {
-                    var estimatedMinutes = remaining / speed;
-                    EstimatedTimeRemaining = TimeSpan.FromMinutes(estimatedMinutes).ToString(@"hh\:mm\:ss");
-                }
-            }
+                                                                         var remaining = EndId - StartId + 1 - TotalProcessed;
+                                                                         if (speed > 0)
+                                                                         {
+                                                                             var estimatedMinutes = remaining / speed;
+                                                                             EstimatedTimeRemaining = TimeSpan.FromMinutes(estimatedMinutes).ToString(@"hh\:mm\:ss");
+                                                                         }
+                                                                     }
 
-            ElapsedTime = elapsed.ToString(@"hh\:mm\:ss");
-        });
-    }
+                                                                     ElapsedTime = elapsed.ToString(@"hh\:mm\:ss");
+                                                                 });
 
     private void ResetProgress()
     {
@@ -407,26 +404,23 @@ public partial class CrawlerPageViewModel : ObservableObject
         }
     }
 
-    private void AddLog(string message, LogLevel level)
-    {
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            var logEntry = new CrawlLogEntry
-            {
-                Timestamp = DateTime.Now,
-                Level = level,
-                Message = message
-            };
+    private void AddLog(string message, LogLevel level) => Application.Current.Dispatcher.Invoke(() =>
+                                                                {
+                                                                    var logEntry = new CrawlLogEntry
+                                                                    {
+                                                                        Timestamp = DateTime.Now,
+                                                                        Level = level,
+                                                                        Message = message
+                                                                    };
 
-            CrawlLogs.Insert(0, logEntry);
+                                                                    CrawlLogs.Insert(0, logEntry);
 
-            // 限制日志数量，避免内存占用过大
-            while (CrawlLogs.Count > 1000)
-            {
-                CrawlLogs.RemoveAt(CrawlLogs.Count - 1);
-            }
-        });
-    }
+                                                                    // 限制日志数量，避免内存占用过大
+                                                                    while (CrawlLogs.Count > 1000)
+                                                                    {
+                                                                        CrawlLogs.RemoveAt(CrawlLogs.Count - 1);
+                                                                    }
+                                                                });
 
     #endregion
 }

@@ -44,18 +44,12 @@ public class KeyDownBehavior : Behavior<UIElement>
     /// <summary>
     /// 附加时绑定事件
     /// </summary>
-    protected override void OnAttached()
-    {
-        AssociatedObject.KeyDown += OnKeyDown;
-    }
+    protected override void OnAttached() => AssociatedObject.KeyDown += OnKeyDown;
 
     /// <summary>
     /// 分离时解绑事件
     /// </summary>
-    protected override void OnDetaching()
-    {
-        AssociatedObject.KeyDown -= OnKeyDown;
-    }
+    protected override void OnDetaching() => AssociatedObject.KeyDown -= OnKeyDown;
 
     /// <summary>
     /// 按键事件处理

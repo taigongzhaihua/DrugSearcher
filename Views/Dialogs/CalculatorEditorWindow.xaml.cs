@@ -170,8 +170,7 @@ namespace DrugSearcher.Views
             {
                 if (_foldingManager == null || CodeEditor?.Document == null) return;
 
-                var foldingStrategy = new BraceFoldingStrategy();
-                foldingStrategy.UpdateFoldings(_foldingManager, CodeEditor.Document);
+                BraceFoldingStrategy.UpdateFoldings(_foldingManager, CodeEditor.Document);
             }
             catch (Exception ex)
             {
@@ -231,8 +230,7 @@ namespace DrugSearcher.Views
         /// <summary>
         /// 语法状态变化处理
         /// </summary>
-        private void OnSyntaxStatusChanged(object? sender, string status)
-        {
+        private void OnSyntaxStatusChanged(object? sender, string? status) =>
             // 更新UI中的语法状态
             Dispatcher.Invoke(() =>
             {
@@ -241,19 +239,19 @@ namespace DrugSearcher.Views
                 SyntaxStatusText.Text = status;
 
                 // 根据状态设置颜色
-                if (status.Contains("✓"))
+                if (status != null && status.Contains('✓'))
                 {
                     SyntaxStatusText.Foreground = new SolidColorBrush(Colors.Green);
                 }
-                else if (status.Contains("✗"))
+                else if (status != null && status.Contains('✗'))
                 {
                     SyntaxStatusText.Foreground = new SolidColorBrush(Colors.Red);
                 }
-                else if (status.Contains("⚠"))
+                else if (status != null && status.Contains('⚠'))
                 {
                     SyntaxStatusText.Foreground = new SolidColorBrush(Colors.Orange);
                 }
-                else if (status.Contains("ℹ"))
+                else if (status != null && status.Contains('ℹ'))
                 {
                     SyntaxStatusText.Foreground = new SolidColorBrush(Colors.Blue);
                 }
@@ -262,7 +260,6 @@ namespace DrugSearcher.Views
                     SyntaxStatusText.Foreground = Application.Current.FindResource("PrimaryTextBrush") as Brush;
                 }
             });
-        }
 
         /// <summary>
         /// 语法验证完成处理
@@ -323,23 +320,20 @@ namespace DrugSearcher.Views
         /// <summary>
         /// 主题变化处理
         /// </summary>
-        private void OnThemeChanged(object? sender, ThemeConfig themeConfig)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    // 更新语法高亮
-                    var isDarkTheme = _themeManager.CurrentTheme.Mode == Enums.ThemeMode.Dark;
-                    var definition = JavaScriptSyntaxHighlightingGenerator.GenerateDefinition(isDarkTheme);
-                    CodeEditor.SyntaxHighlighting = definition;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "更新语法高亮失败");
-                }
-            });
-        }
+        private void OnThemeChanged(object? sender, ThemeConfig themeConfig) => Dispatcher.Invoke(() =>
+                                                                                         {
+                                                                                             try
+                                                                                             {
+                                                                                                 // 更新语法高亮
+                                                                                                 var isDarkTheme = _themeManager.CurrentTheme.Mode == Enums.ThemeMode.Dark;
+                                                                                                 var definition = JavaScriptSyntaxHighlightingGenerator.GenerateDefinition(isDarkTheme);
+                                                                                                 CodeEditor.SyntaxHighlighting = definition;
+                                                                                             }
+                                                                                             catch (Exception ex)
+                                                                                             {
+                                                                                                 _logger.LogError(ex, "更新语法高亮失败");
+                                                                                             }
+                                                                                         });
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -509,12 +503,12 @@ namespace DrugSearcher.Views
     /// </summary>
     public class BraceFoldingStrategy
     {
-        public void UpdateFoldings(FoldingManager manager, ICSharpCode.AvalonEdit.Document.TextDocument document)
+        public static void UpdateFoldings(FoldingManager manager, ICSharpCode.AvalonEdit.Document.TextDocument document)
         {
             var foldings = new List<NewFolding>();
             var stack = new Stack<int>();
 
-            for (int i = 0; i < document.TextLength; i++)
+            for (var i = 0; i < document.TextLength; i++)
             {
                 var ch = document.GetCharAt(i);
 

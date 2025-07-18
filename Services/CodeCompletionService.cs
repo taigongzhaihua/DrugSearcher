@@ -1,6 +1,7 @@
 using DrugSearcher.Models;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.CodeCompletion;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
@@ -9,13 +10,14 @@ namespace DrugSearcher.Services
     /// <summary>
     /// 代码提示服务
     /// </summary>
-    public class CodeCompletionService : IDisposable
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
+    public partial class CodeCompletionService : IDisposable
     {
         private readonly TextEditor _textEditor;
         private readonly JavaScriptDynamicContext _dynamicContext;
         private readonly RealtimeJavaScriptCompletionProvider _completionProvider;
         private ThemedCompletionWindow? _completionWindow;
-        private readonly HashSet<string> _declaredVariables = [];
+        private readonly HashSet<string?> _declaredVariables = [];
         private readonly Lock _lock = new();
 
         public CodeCompletionService(TextEditor textEditor)
@@ -63,11 +65,9 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 处理上下文变化
         /// </summary>
-        private void OnContextChanged(object? sender, ContextChangedEventArgs e)
-        {
+        private void OnContextChanged(object? sender, ContextChangedEventArgs e) =>
             // 更新完成提供程序的局部标识符
-            _completionProvider.UpdateLocalIdentifiers(e.CurrentScope ?? []);
-        }
+            _completionProvider.UpdateLocalIdentifiers(e.CurrentScope);
 
         /// <summary>
         /// 更新声明的变量
@@ -100,9 +100,9 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 提取代码中的变量（仅正确声明的）
         /// </summary>
-        private HashSet<string> ExtractCodeVariables(string code)
+        private static HashSet<string?> ExtractCodeVariables(string code)
         {
-            var variables = new HashSet<string>();
+            var variables = new HashSet<string?>();
             var lines = code.Split('\n');
 
             foreach (var line in lines)
@@ -120,45 +120,47 @@ namespace DrugSearcher.Services
 
             return variables;
         }
-        /// <summary>
-        /// 提取所有变量（包括参数定义的变量）
-        /// </summary>
-        private HashSet<string> ExtractAllVariables(string code)
-        {
-            var variables = new HashSet<string>();
-            var lines = code.Split('\n');
-
-            // 首先添加参数定义的变量
-            if (_completionProvider != null)
-            {
-                var parameters = _completionProvider.GetParameters();
-                foreach (var param in parameters.Where(param => !string.IsNullOrWhiteSpace(param.Name)))
+        /*
+                /// <summary>
+                /// 提取所有变量（包括参数定义的变量）
+                /// </summary>
+                private HashSet<string> ExtractAllVariables(string code)
                 {
-                    variables.Add(param.Name);
+                    var variables = new HashSet<string>();
+                    var lines = code.Split('\n');
+
+                    // 首先添加参数定义的变量
+                    if (_completionProvider != null)
+                    {
+                        var parameters = _completionProvider.GetParameters();
+                        foreach (var param in parameters.Where(param => !string.IsNullOrWhiteSpace(param.Name)))
+                        {
+                            variables.Add(param.Name);
+                        }
+                    }
+
+                    // 逐行分析，累积变量
+                    foreach (var line in lines)
+                    {
+                        // 跳过注释
+                        if (line.Trim().StartsWith("//") || line.Trim().StartsWith("/*"))
+                            continue;
+
+                        // var/let/const 声明
+                        ExtractDeclarations(line, variables);
+
+                        // 函数声明
+                        ExtractFunctionDeclarations(line, variables);
+                    }
+
+                    return variables;
                 }
-            }
-
-            // 逐行分析，累积变量
-            foreach (var line in lines)
-            {
-                // 跳过注释
-                if (line.Trim().StartsWith("//") || line.Trim().StartsWith("/*"))
-                    continue;
-
-                // var/let/const 声明
-                ExtractDeclarations(line, variables);
-
-                // 函数声明
-                ExtractFunctionDeclarations(line, variables);
-            }
-
-            return variables;
-        }
+        */
 
         /// <summary>
         /// 提取声明
         /// </summary>
-        private void ExtractDeclarations(string line, HashSet<string> variables)
+        private static void ExtractDeclarations(string line, HashSet<string?> variables)
         {
             var patterns = new[]
             {
@@ -173,7 +175,7 @@ namespace DrugSearcher.Services
                 foreach (System.Text.RegularExpressions.Match match in matches)
                 {
                     var varList = match.Groups[1].Value;
-                    var varNames = varList.Split(',').Select(v => v.Trim().Split('=')[0].Trim());
+                    IEnumerable<string?> varNames = varList.Split(',').Select(v => v.Trim().Split('=')[0].Trim());
                     foreach (var varName in varNames.Where(n => !string.IsNullOrWhiteSpace(n)))
                     {
                         variables.Add(varName);
@@ -185,11 +187,10 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 提取函数声明
         /// </summary>
-        private void ExtractFunctionDeclarations(string line, HashSet<string> variables)
+        private static void ExtractFunctionDeclarations(string line, HashSet<string?> variables)
         {
             // 函数声明
-            const string funcPattern = @"\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([^)]*)\)";
-            var funcMatches = System.Text.RegularExpressions.Regex.Matches(line, funcPattern);
+            var funcMatches = FuncMatchesRegex().Matches(line);
 
             foreach (System.Text.RegularExpressions.Match match in funcMatches)
             {
@@ -200,21 +201,13 @@ namespace DrugSearcher.Services
                 var paramList = match.Groups[2].Value;
                 if (!string.IsNullOrWhiteSpace(paramList))
                 {
-                    var paramNames = paramList.Split(',').Select(p => p.Trim().Split('=')[0].Trim());
+                    IEnumerable<string?> paramNames = paramList.Split(',').Select(p => p.Trim().Split('=')[0].Trim());
                     foreach (var paramName in paramNames.Where(n => !string.IsNullOrWhiteSpace(n)))
                     {
                         variables.Add(paramName);
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// 提取赋值语句
-        /// </summary>
-        private void ExtractAssignments(string line, HashSet<string> variables)
-        {
-
         }
 
         /// <summary>
@@ -257,17 +250,15 @@ namespace DrugSearcher.Services
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             // Ctrl+Space 手动触发代码提示
-            if (e.Key == Key.Space && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
-            {
-                ShowCompletion(null);
-                e.Handled = true;
-            }
+            if (e.Key != Key.Space || e.KeyboardDevice.Modifiers != ModifierKeys.Control) return;
+            ShowCompletion(null);
+            e.Handled = true;
         }
 
         /// <summary>
         /// 显示代码提示
         /// </summary>
-        private void ShowCompletion(string triggerText)
+        private void ShowCompletion(string? triggerText)
         {
             // 如果已经有提示窗口，先关闭
             if (_completionWindow != null)
@@ -310,13 +301,13 @@ namespace DrugSearcher.Services
 
             // 显示窗口
             _completionWindow.Show();
-            _completionWindow.Closed += (sender, args) => _completionWindow = null;
+            _completionWindow.Closed += (_, _) => _completionWindow = null;
         }
 
         /// <summary>
         /// 判断是否应该显示代码提示
         /// </summary>
-        private bool ShouldShowCompletion(string triggerText)
+        private static bool ShouldShowCompletion(string? triggerText)
         {
             // 手动触发（Ctrl+Space）
             if (triggerText == null)
@@ -376,12 +367,7 @@ namespace DrugSearcher.Services
                 endOffset++;
             }
 
-            if (startOffset == endOffset)
-            {
-                return string.Empty;
-            }
-
-            return document.GetText(startOffset, endOffset - startOffset);
+            return startOffset == endOffset ? string.Empty : document.GetText(startOffset, endOffset - startOffset);
         }
 
         /// <summary>
@@ -403,7 +389,11 @@ namespace DrugSearcher.Services
             }
 
             _completionWindow?.Close();
+            GC.SuppressFinalize(this);
         }
+
+        [System.Text.RegularExpressions.GeneratedRegex(@"\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([^)]*)\)")]
+        private static partial System.Text.RegularExpressions.Regex FuncMatchesRegex();
     }
 
     /// <summary>
@@ -412,30 +402,18 @@ namespace DrugSearcher.Services
     public class RealtimeJavaScriptCompletionProvider(JavaScriptDynamicContext dynamicContext)
         : JavaScriptCompletionDataProvider
     {
-        private HashSet<string> _localIdentifiers = [];
+        private HashSet<string?> _localIdentifiers = [];
         private HashSet<string> _declaredVariables = [];
         private List<DosageParameter> _parameters = [];
 
-        public void UpdateLocalIdentifiers(HashSet<string> identifiers)
-        {
-            _localIdentifiers = new HashSet<string>(identifiers);
-        }
+        public void UpdateLocalIdentifiers(HashSet<string> identifiers) => _localIdentifiers = [.. identifiers];
 
-        public void UpdateDeclaredVariables(HashSet<string> variables)
-        {
-            _declaredVariables = new HashSet<string>(variables);
-        }
+        public void UpdateDeclaredVariables(HashSet<string?> variables) => _declaredVariables = [.. variables];
 
 
-        public List<DosageParameter> GetParameters()
-        {
-            return _parameters;
-        }
+        public List<DosageParameter> GetParameters() => _parameters;
 
-        public new void UpdateParameters(List<DosageParameter>? parameters)
-        {
-            _parameters = parameters ?? [];
-        }
+        public new void UpdateParameters(List<DosageParameter>? parameters) => _parameters = parameters ?? [];
 
         public override IList<ICompletionData> GetCompletionData(string currentWord, int currentPosition)
         {
@@ -468,39 +446,33 @@ namespace DrugSearcher.Services
             // 过滤和排序
             if (!string.IsNullOrEmpty(currentWord))
             {
-                completionData = completionData
-                    .Where(cd => cd.Text.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                completionData = [.. completionData.Where(cd => cd.Text.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))];
             }
 
-            return completionData
+            return [.. completionData
                 .OrderBy(GetCompletionPriority)
-                .ThenBy(cd => cd.Text)
-                .ToList();
+                .ThenBy(cd => cd.Text)];
         }
 
-        private string DetermineVariableType(string identifier)
+        private static string DetermineVariableType(string? identifier)
         {
             // 简单的类型推断
-            if (identifier.StartsWith("is") || identifier.StartsWith("has"))
+            if (identifier != null && (identifier.StartsWith("is") || identifier.StartsWith("has")))
                 return "boolean";
-            if (identifier.EndsWith("Count") || identifier.EndsWith("Index"))
+            if (identifier != null && (identifier.EndsWith("Count") || identifier.EndsWith("Index")))
                 return "number";
-            if (identifier.EndsWith("Name") || identifier.EndsWith("Text"))
+            if (identifier != null && (identifier.EndsWith("Name") || identifier.EndsWith("Text")))
                 return "string";
             return "var";
         }
 
-        private double GetCompletionPriority(ICompletionData data)
+        private static double GetCompletionPriority(ICompletionData data) => data switch
         {
-            return data switch
-            {
-                LocalVariableCompletionData => 0.5,
-                ParameterCompletionData => 0.6,
-                MethodCompletionData => 0.7,
-                KeywordCompletionData => 0.8,
-                _ => 1.0
-            };
-        }
+            LocalVariableCompletionData => 0.5,
+            ParameterCompletionData => 0.6,
+            MethodCompletionData => 0.7,
+            KeywordCompletionData => 0.8,
+            _ => 1.0
+        };
     }
 }

@@ -25,8 +25,5 @@ public static class FontSizeConstraints
     /// </summary>
     /// <param name="size">字体大小</param>
     /// <returns>是否有效</returns>
-    public static bool IsValidSize(int size)
-    {
-        return size is >= MinSize and <= MaxSize;
-    }
+    public static bool IsValidSize(int size) => size is >= MinSize and <= MaxSize;
 }

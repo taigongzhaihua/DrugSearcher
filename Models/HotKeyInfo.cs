@@ -72,10 +72,7 @@ public class HotKeyInfo
 
         return string.Join(" + ", parts);
     }
-    public override string ToString()
-    {
-        return $"{DisplayName} - {Description}";
-    }
+    public override string ToString() => $"{DisplayName} - {Description}";
 }
 
 /// <summary>
@@ -93,10 +90,7 @@ public class LocalHotKeyInfo : HotKeyInfo
     /// </summary>
     public new bool IsEnabled { get; set; } = true;
 
-    public override string ToString()
-    {
-        return $"{Name}: {DisplayName} - {Description} ({(IsEnabled ? "启用" : "禁用")})";
-    }
+    public override string ToString() => $"{Name}: {DisplayName} - {Description} ({(IsEnabled ? "启用" : "禁用")})";
 }
 
 
@@ -118,8 +112,5 @@ public class HotKeySetting
         IsEnabled = isEnabled;
     }
 
-    public override string ToString()
-    {
-        return HotKeyInfo.GetDisplayText(Key, Modifiers);
-    }
+    public override string ToString() => HotKeyInfo.GetDisplayText(Key, Modifiers);
 }

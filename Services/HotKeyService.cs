@@ -243,42 +243,27 @@ public class HotKeyService : IHotKeyService
     /// <summary>
     /// 注册全局快捷键
     /// </summary>
-    public int RegisterGlobalHotKey(Key key, ModifierKeys modifiers, Action callback, string description = "")
-    {
-        return _hotKeyManager.RegisterGlobalHotKey(key, modifiers, callback, description);
-    }
+    public int RegisterGlobalHotKey(Key key, ModifierKeys modifiers, Action callback, string description = "") => _hotKeyManager.RegisterGlobalHotKey(key, modifiers, callback, description);
 
     /// <summary>
     /// 注册局部快捷键
     /// </summary>
-    public bool RegisterLocalHotKey(string name, Key key, ModifierKeys modifiers, Action callback, string description = "")
-    {
-        return _hotKeyManager.RegisterLocalHotKey(name, key, modifiers, callback, description);
-    }
+    public bool RegisterLocalHotKey(string name, Key key, ModifierKeys modifiers, Action callback, string description = "") => _hotKeyManager.RegisterLocalHotKey(name, key, modifiers, callback, description);
 
     /// <summary>
     /// 注销全局快捷键
     /// </summary>
-    public bool UnregisterGlobalHotKey(int hotKeyId)
-    {
-        return _hotKeyManager.UnregisterGlobalHotKey(hotKeyId);
-    }
+    public bool UnregisterGlobalHotKey(int hotKeyId) => _hotKeyManager.UnregisterGlobalHotKey(hotKeyId);
 
     /// <summary>
     /// 注销局部快捷键
     /// </summary>
-    public bool UnregisterLocalHotKey(string name)
-    {
-        return _hotKeyManager.UnregisterLocalHotKey(name);
-    }
+    public bool UnregisterLocalHotKey(string name) => _hotKeyManager.UnregisterLocalHotKey(name);
 
     /// <summary>
     /// 启用/禁用局部快捷键
     /// </summary>
-    public bool SetLocalHotKeyEnabled(string name, bool enabled)
-    {
-        return _hotKeyManager.SetLocalHotKeyEnabled(name, enabled);
-    }
+    public bool SetLocalHotKeyEnabled(string name, bool enabled) => _hotKeyManager.SetLocalHotKeyEnabled(name, enabled);
 
     /// <summary>
     /// 获取所有快捷键
@@ -307,18 +292,12 @@ public class HotKeyService : IHotKeyService
     /// <summary>
     /// 检查快捷键是否已被注册
     /// </summary>
-    public bool IsHotKeyRegistered(Key key, ModifierKeys modifiers)
-    {
-        return _hotKeyManager.IsHotKeyRegistered(key, modifiers);
-    }
+    public bool IsHotKeyRegistered(Key key, ModifierKeys modifiers) => _hotKeyManager.IsHotKeyRegistered(key, modifiers);
 
     /// <summary>
     /// 获取已注册的快捷键信息
     /// </summary>
-    public IReadOnlyDictionary<string, HotKeyInfo> GetRegisteredHotKeys()
-    {
-        return _registeredHotKeys.AsReadOnly();
-    }
+    public IReadOnlyDictionary<string, HotKeyInfo> GetRegisteredHotKeys() => _registeredHotKeys.AsReadOnly();
 
     /// <summary>
     /// 重新加载所有快捷键
@@ -396,10 +375,8 @@ public class HotKeyService : IHotKeyService
     /// <summary>
     /// 获取快捷键动作映射
     /// </summary>
-    private Dictionary<string, (Action callback, string description, bool isGlobal)> GetHotKeyActionMappings()
+    private Dictionary<string, (Action callback, string description, bool isGlobal)> GetHotKeyActionMappings() => new()
     {
-        return new Dictionary<string, (Action callback, string description, bool isGlobal)>
-        {
             { SettingKeys.HotKeyShowMainWindow, (OnShowMainWindow, "显示主窗口", true) },
             { SettingKeys.HotKeyQuickSearch, (OnQuickSearch, "快速搜索", true) },
             { SettingKeys.HotKeySearch, (OnSearch, "搜索", false) },
@@ -407,7 +384,6 @@ public class HotKeyService : IHotKeyService
             { SettingKeys.HotKeySettings, (OnSettings, "设置", false) },
             { SettingKeys.HotKeyExit, (OnExit, "退出", false) }
         };
-    }
 
     #endregion
 

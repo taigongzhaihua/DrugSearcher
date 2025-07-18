@@ -195,7 +195,7 @@ namespace DrugSearcher.Services
 
         #region 私有方法
 
-        private Task<UpdateCheckResult> GetMockUpdateCheckResult(VersionInfo currentVersion)
+        private static Task<UpdateCheckResult> GetMockUpdateCheckResult(VersionInfo currentVersion)
         {
             // 模拟检查结果
             var latestVersion = new VersionInfo
@@ -233,9 +233,7 @@ namespace DrugSearcher.Services
             });
         }
 
-        private IEnumerable<VersionInfo> GetMockVersionHistory()
-        {
-            return new List<VersionInfo>
+        private static IEnumerable<VersionInfo> GetMockVersionHistory() => new List<VersionInfo>
             {
                 new()
                 {
@@ -265,9 +263,8 @@ namespace DrugSearcher.Services
                     IsPreRelease = true
                 }
             };
-        }
 
-        private DateTime GetBuildDate(Assembly assembly)
+        private static DateTime GetBuildDate(Assembly assembly)
         {
             try
             {
@@ -295,9 +292,7 @@ namespace DrugSearcher.Services
             }
         }
 
-        private Task<List<string>> GetCurrentVersionFeaturesAsync()
-        {
-            return Task.FromResult<List<string>>([
+        private static Task<List<string>> GetCurrentVersionFeaturesAsync() => Task.FromResult<List<string>>([
                 "🔍 智能药物搜索",
                 "📊 本地数据管理",
                 "🎨 多主题支持",
@@ -307,27 +302,20 @@ namespace DrugSearcher.Services
                 "🔧 高级设置选项",
                 "🌐 在线更新检查"
             ]);
-        }
 
-        private Task<List<string>> GetCurrentVersionFixesAsync()
-        {
-            return Task.FromResult<List<string>>([
+        private static Task<List<string>> GetCurrentVersionFixesAsync() => Task.FromResult<List<string>>([
                 "搜索性能优化",
                 "内存使用改进",
                 "界面响应速度提升",
                 "主题切换稳定性改善"
             ]);
-        }
 
-        private bool IsPreReleaseVersion(string version)
-        {
-            return version.Contains("beta", StringComparison.OrdinalIgnoreCase) ||
+        private static bool IsPreReleaseVersion(string version) => version.Contains("beta", StringComparison.OrdinalIgnoreCase) ||
                    version.Contains("alpha", StringComparison.OrdinalIgnoreCase) ||
                    version.Contains("rc", StringComparison.OrdinalIgnoreCase) ||
                    version.Contains("preview", StringComparison.OrdinalIgnoreCase);
-        }
 
-        private long GetApplicationSize()
+        private static long GetApplicationSize()
         {
             try
             {
@@ -341,7 +329,7 @@ namespace DrugSearcher.Services
             }
         }
 
-        private int CompareVersions(string version1, string version2)
+        private static int CompareVersions(string version1, string version2)
         {
             try
             {
@@ -355,7 +343,7 @@ namespace DrugSearcher.Services
             }
         }
 
-        private List<string> ParseReleaseNotes(string? body, params string[] sectionHeaders)
+        private static List<string> ParseReleaseNotes(string? body, params string[] sectionHeaders)
         {
             var features = new List<string>();
 
@@ -390,7 +378,7 @@ namespace DrugSearcher.Services
             return features;
         }
 
-        private long GetAssetSize(GitHubAsset[]? assets)
+        private static long GetAssetSize(GitHubAsset[]? assets)
         {
             if (assets == null || assets.Length == 0)
                 return 0;

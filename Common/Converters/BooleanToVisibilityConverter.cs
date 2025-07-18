@@ -9,16 +9,13 @@ namespace DrugSearcher.Converters;
 /// </summary>
 public class BooleanToVisibilityConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value switch
     {
-        return value switch
-        {
-            bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
-            string strValue => string.IsNullOrEmpty(strValue) ? Visibility.Collapsed : Visibility.Visible,
-            > 0 => Visibility.Visible,
-            _ => Visibility.Collapsed
-        };
-    }
+        bool boolValue => boolValue ? Visibility.Visible : Visibility.Collapsed,
+        string strValue => string.IsNullOrEmpty(strValue) ? Visibility.Collapsed : Visibility.Visible,
+        > 0 => Visibility.Visible,
+        _ => Visibility.Collapsed
+    };
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

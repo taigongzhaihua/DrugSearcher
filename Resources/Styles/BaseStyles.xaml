@@ -471,6 +471,16 @@
         </Setter>
     </Style>
 
+    <!-- 数字输入框样式 -->
+    <Style x:Key="NumericTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource BaseTextBoxStyle}">
+        <Style.Triggers>
+            <!-- 当输入无效时显示红色边框 -->
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/>
+                <Setter Property="BorderThickness" Value="1.5"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <!-- Fluent Design 工具提示样式 -->
     <Style TargetType="ToolTip">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>

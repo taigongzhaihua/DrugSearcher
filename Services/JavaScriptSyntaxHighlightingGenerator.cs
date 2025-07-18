@@ -11,7 +11,7 @@ namespace DrugSearcher.Services
     /// <summary>
     /// JavaScript语法高亮生成器
     /// </summary>
-    public class JavaScriptSyntaxHighlightingGenerator
+    public partial class JavaScriptSyntaxHighlightingGenerator
     {
         /// <summary>
         /// 生成语法高亮定义
@@ -102,94 +102,92 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 添加多行注释
         /// </summary>
-        private static void AddMultilineCommentSpan(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddMultilineCommentSpan(HighlightingRuleSet? ruleSet, HighlightingColor color)
         {
             var multilineComment = new HighlightingSpan
             {
-                StartExpression = new Regex(@"/\*"),
-                EndExpression = new Regex(@"\*/"),
+                StartExpression = MultilineCommentSpanStartRegex(),
+                EndExpression = MultilineCommentSpanEndRegex(),
                 SpanColor = color,
                 SpanColorIncludesStart = true,
                 SpanColorIncludesEnd = true
             };
-            ruleSet.Spans.Add(multilineComment);
+            ruleSet?.Spans.Add(multilineComment);
         }
 
         /// <summary>
         /// 添加字符串规则
         /// </summary>
-        private static void AddStringSpans(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddStringSpans(HighlightingRuleSet? ruleSet, HighlightingColor color)
         {
             // 双引号字符串 - 使用正则表达式处理转义字符
             var doubleQuoteString = new HighlightingSpan
             {
-                StartExpression = new Regex("\""),
-                EndExpression = new Regex("(?<!\\\\)\""),
+                StartExpression = DoubleQuoteStringSpansStartRegex(),
+                EndExpression = DoubleQuoteStringSpansEndRegex(),
                 SpanColor = color,
                 SpanColorIncludesStart = true,
                 SpanColorIncludesEnd = true
             };
-            ruleSet.Spans.Add(doubleQuoteString);
+            ruleSet?.Spans.Add(doubleQuoteString);
 
             // 单引号字符串
             var singleQuoteString = new HighlightingSpan
             {
-                StartExpression = new Regex("'"),
-                EndExpression = new Regex("(?<!\\\\)'"),
+                StartExpression = SingleQuoteStringSpansStartRegex(),
+                EndExpression = SingleQuoteStringSpansEndRegex(),
                 SpanColor = color,
                 SpanColorIncludesStart = true,
                 SpanColorIncludesEnd = true
             };
-            ruleSet.Spans.Add(singleQuoteString);
+            ruleSet?.Spans.Add(singleQuoteString);
 
             // 模板字符串
             var templateString = new HighlightingSpan
             {
-                StartExpression = new Regex("`"),
-                EndExpression = new Regex("(?<!\\\\)`"),
+                StartExpression = TemplateStringSpansStartRegex(),
+                EndExpression = TemplateStringSpansEndRegex(),
                 SpanColor = color,
                 SpanColorIncludesStart = true,
                 SpanColorIncludesEnd = true
             };
-            ruleSet.Spans.Add(templateString);
+            ruleSet?.Spans.Add(templateString);
         }
 
         /// <summary>
         /// 添加单行注释规则
         /// </summary>
-        private static void AddSingleLineCommentRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddSingleLineCommentRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(@"//.*$", RegexOptions.Multiline)
-            });
-        }
+            Color = color,
+            Regex = SingleLineCommentRegex()
+        });
 
         /// <summary>
         /// 添加数字规则
         /// </summary>
-        private static void AddNumberRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddNumberRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(@"\b0[xX][0-9a-fA-F]+|(\b\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?")
-            });
-        }
+            Color = color,
+            Regex = NumberRegex()
+        });
 
         /// <summary>
         /// 添加关键字规则
         /// </summary>
-        private static void AddKeywordRules(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddKeywordRules(HighlightingRuleSet? ruleSet, HighlightingColor color)
         {
             var keywords = JavaScriptLanguageDefinition.Keywords.All;
-            if (!keywords.Any()) return;
+            if (keywords.Count == 0) return;
 
             // 创建关键字正则表达式
-            var keywordPattern = string.Join("|", keywords.Select(k => @"\b" + Regex.Escape(k) + @"\b"));
+            var keywordPattern = string.Join("|", keywords.Select(k =>
+            {
+                if (k != null) return @"\b" + Regex.Escape(k) + @"\b";
+                return null;
+            }));
 
-            ruleSet.Rules.Add(new HighlightingRule
+            ruleSet?.Rules.Add(new HighlightingRule
             {
                 Color = color,
                 Regex = new Regex(keywordPattern)
@@ -199,14 +197,14 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 添加内置函数和对象规则
         /// </summary>
-        private static void AddBuiltInRules(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddBuiltInRules(HighlightingRuleSet? ruleSet, HighlightingColor color)
         {
             // 内置函数
             var builtInFunctions = JavaScriptLanguageDefinition.BuiltIns.GlobalFunctions.Keys;
-            if (builtInFunctions.Any())
+            if (builtInFunctions.Count != 0)
             {
                 var functionPattern = string.Join("|", builtInFunctions.Select(f => @"\b" + Regex.Escape(f) + @"\b"));
-                ruleSet.Rules.Add(new HighlightingRule
+                ruleSet?.Rules.Add(new HighlightingRule
                 {
                     Color = color,
                     Regex = new Regex(functionPattern)
@@ -215,10 +213,10 @@ namespace DrugSearcher.Services
 
             // 内置对象
             var builtInObjects = JavaScriptLanguageDefinition.BuiltIns.GlobalObjects.Keys;
-            if (builtInObjects.Any())
+            if (builtInObjects.Count != 0)
             {
                 var objectPattern = string.Join("|", builtInObjects.Select(o => @"\b" + Regex.Escape(o) + @"\b"));
-                ruleSet.Rules.Add(new HighlightingRule
+                ruleSet?.Rules.Add(new HighlightingRule
                 {
                     Color = color,
                     Regex = new Regex(objectPattern)
@@ -229,13 +227,17 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 添加自定义函数规则
         /// </summary>
-        private static void AddCustomFunctionRules(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddCustomFunctionRules(HighlightingRuleSet? ruleSet, HighlightingColor color)
         {
             var customFunctions = JavaScriptLanguageDefinition.CustomFunctions.Names;
-            if (!customFunctions.Any()) return;
+            if (customFunctions.Count == 0) return;
 
-            var customFunctionPattern = string.Join("|", customFunctions.Select(f => @"\b" + Regex.Escape(f) + @"\b"));
-            ruleSet.Rules.Add(new HighlightingRule
+            var customFunctionPattern = string.Join("|", customFunctions.Select(f =>
+            {
+                if (f != null) return @"\b" + Regex.Escape(f) + @"\b";
+                return null;
+            }));
+            ruleSet?.Rules.Add(new HighlightingRule
             {
                 Color = color,
                 Regex = new Regex(customFunctionPattern)
@@ -245,85 +247,85 @@ namespace DrugSearcher.Services
         /// <summary>
         /// 添加函数调用规则
         /// </summary>
-        private static void AddFunctionCallRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddFunctionCallRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(@"\b[a-zA-Z_$][a-zA-Z0-9_$]*(?=\s*\()")
-            });
-        }
+            Color = color,
+            Regex = FunctionCallRegex()
+        });
 
         /// <summary>
         /// 添加属性访问规则
         /// </summary>
-        private static void AddPropertyAccessRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddPropertyAccessRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(@"(?<=\.)[a-zA-Z_$][a-zA-Z0-9_$]*")
-            });
-        }
+            Color = color,
+            Regex = PropertyAccessRegex()
+        });
 
         /// <summary>
         /// 添加操作符规则
         /// </summary>
-        private static void AddOperatorRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddOperatorRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(JavaScriptLanguageDefinition.Operators.AllCharacters)
-            });
-        }
+            Color = color,
+            Regex = new Regex(JavaScriptLanguageDefinition.Operators.AllCharacters)
+        });
 
         /// <summary>
         /// 添加变量规则
         /// </summary>
-        private static void AddVariableRule(HighlightingRuleSet ruleSet, HighlightingColor color)
+        private static void AddVariableRule(HighlightingRuleSet? ruleSet, HighlightingColor color) => ruleSet?.Rules.Add(new HighlightingRule
         {
-            ruleSet.Rules.Add(new HighlightingRule
-            {
-                Color = color,
-                Regex = new Regex(@"\b[a-zA-Z_$][a-zA-Z0-9_$]*\b")
-            });
-        }
+            Color = color,
+            Regex = VariableRegex()
+        });
+
+        [GeneratedRegex(@"/\*")]
+        private static partial Regex MultilineCommentSpanStartRegex();
+        [GeneratedRegex(@"\*/")]
+        private static partial Regex MultilineCommentSpanEndRegex();
+        [GeneratedRegex("\"")]
+        private static partial Regex DoubleQuoteStringSpansStartRegex();
+        [GeneratedRegex("(?<!\\\\)\"")]
+        private static partial Regex DoubleQuoteStringSpansEndRegex();
+        [GeneratedRegex("'")]
+        private static partial Regex SingleQuoteStringSpansStartRegex();
+        [GeneratedRegex(@"(?<!\\)'")]
+        private static partial Regex SingleQuoteStringSpansEndRegex();
+        [GeneratedRegex("`")]
+        private static partial Regex TemplateStringSpansStartRegex();
+        [GeneratedRegex(@"(?<!\\)`")]
+        private static partial Regex TemplateStringSpansEndRegex();
+        [GeneratedRegex(@"//.*$", RegexOptions.Multiline)]
+        private static partial Regex SingleLineCommentRegex();
+        [GeneratedRegex(@"\b0[xX][0-9a-fA-F]+|(\b\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?")]
+        private static partial Regex NumberRegex();
+        [GeneratedRegex(@"\b[a-zA-Z_$][a-zA-Z0-9_$]*(?=\s*\()")]
+        private static partial Regex FunctionCallRegex();
+        [GeneratedRegex(@"(?<=\.)[a-zA-Z_$][a-zA-Z0-9_$]*")]
+        private static partial Regex PropertyAccessRegex();
+        [GeneratedRegex(@"\b[a-zA-Z_$][a-zA-Z0-9_$]*\b")]
+        private static partial Regex VariableRegex();
     }
 
     /// <summary>
     /// 自定义高亮定义实现
     /// </summary>
-    internal class CustomHighlightingDefinition : IHighlightingDefinition
+    internal class CustomHighlightingDefinition(string name) : IHighlightingDefinition
     {
-        private readonly string _name;
-        private readonly IList<HighlightingColor> _namedHighlightingColors = new List<HighlightingColor>();
-        private readonly IDictionary<string, string> _properties = new Dictionary<string, string>();
+        public string Name => name;
 
-        public CustomHighlightingDefinition(string name)
-        {
-            _name = name;
-        }
+        public HighlightingRuleSet? MainRuleSet { get; set; }
 
-        public string Name => _name;
+        public IEnumerable<HighlightingColor> NamedHighlightingColors => NamedHighlightingColorsList;
 
-        public HighlightingRuleSet MainRuleSet { get; set; }
+        public IList<HighlightingColor> NamedHighlightingColorsList { get; } = [];
 
-        public IEnumerable<HighlightingColor> NamedHighlightingColors => _namedHighlightingColors;
+        public IDictionary<string, string> Properties { get; } = new Dictionary<string, string>();
 
-        public IList<HighlightingColor> NamedHighlightingColorsList => _namedHighlightingColors;
+        public HighlightingColor? GetNamedColor(string colorName) => NamedHighlightingColorsList.FirstOrDefault(c => c.Name == colorName);
 
-        public IDictionary<string, string> Properties => _properties;
-
-        public HighlightingColor GetNamedColor(string name)
-        {
-            return _namedHighlightingColors.FirstOrDefault(c => c.Name == name);
-        }
-
-        public HighlightingRuleSet GetNamedRuleSet(string name)
-        {
-            return null; // 简化实现，只使用主规则集
-        }
+        public HighlightingRuleSet? GetNamedRuleSet(string name) => null; // 简化实现，只使用主规则集
     }
 
     /// <summary>
@@ -339,14 +341,8 @@ namespace DrugSearcher.Services
             _brush.Freeze();
         }
 
-        public override Brush GetBrush(ITextRunConstructionContext context)
-        {
-            return _brush;
-        }
+        public override Brush GetBrush(ITextRunConstructionContext context) => _brush;
 
-        public override Color? GetColor(ITextRunConstructionContext context)
-        {
-            return _brush.Color;
-        }
+        public override Color? GetColor(ITextRunConstructionContext context) => _brush.Color;
     }
 }

@@ -34,7 +34,7 @@ namespace DrugSearcher.Services
                 var backgroundBrush = Application.Current.FindResource("BackgroundBrush") as Brush;
                 var surfaceBrush = Application.Current.FindResource("SurfaceBrush") as Brush;
                 var primaryTextBrush = Application.Current.FindResource("PrimaryTextBrush") as Brush;
-                var secondaryTextBrush = Application.Current.FindResource("SecondaryTextBrush") as Brush;
+                _ = Application.Current.FindResource("SecondaryTextBrush") as Brush;
                 var borderBrush = Application.Current.FindResource("BorderBrush") as Brush;
                 var accentBrush = Application.Current.FindResource("AccentBrush") as Brush;
                 var primaryBrush = Application.Current.FindResource("PrimaryBrush") as Brush;

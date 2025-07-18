@@ -15,7 +15,7 @@ namespace DrugSearcher.Models
     /// </summary>
     public class SyntaxError
     {
-        public string Message { get; set; }
+        public string? Message { get; set; }
         public int Line { get; set; }
         public int Column { get; set; }
         public SyntaxErrorSeverity Severity { get; set; }
