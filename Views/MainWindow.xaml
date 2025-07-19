@@ -441,13 +441,17 @@
                         Margin="15,10,0,10">
 
                 <!-- 应用图标 -->
-                <TextBlock x:Name="ApplicationIcon"
-                           Text="&#xe622;"
-                           FontFamily="{DynamicResource IconFont}"
-                           FontSize="18"
-                           Foreground="{DynamicResource PrimaryBrush}"
-                           VerticalAlignment="Center"
-                           Margin="0,0,10,0" />
+                <Border Background="{DynamicResource PrimaryBrush}"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0" 
+                        Padding="4"
+                        CornerRadius="4">
+                    <TextBlock x:Name="ApplicationIcon"
+                                       Text="&#xe629;"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       FontSize="14"
+                                       Foreground="White"/>
+                </Border>
 
                 <!-- 应用标题 -->
                 <TextBlock Text="{Binding Title}"

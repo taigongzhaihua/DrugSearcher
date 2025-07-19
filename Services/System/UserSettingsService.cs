@@ -207,42 +207,16 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
             }
 
             // 数据库中也没有，使用定义的默认值
-            if (_settingDefinitions.TryGetValue(key, out var definition))
-            {
-                var definitionDefaultValue = ConvertValue(definition.DefaultValue, defaultValue);
-                _settingsCache[key] = definitionDefaultValue;
-                return definitionDefaultValue;
-            }
+            if (!_settingDefinitions.TryGetValue(key, out var definition)) return defaultValue;
+            var definitionDefaultValue = ConvertValue(definition.DefaultValue, defaultValue);
+            _settingsCache[key] = definitionDefaultValue;
+            return definitionDefaultValue;
 
-            return defaultValue;
         }
         finally
         {
             _cacheLock.Release();
         }
-    }
-
-    /// <summary>
-    /// 同步获取设置值（仅从缓存读取）
-    /// </summary>
-    /// <typeparam name="T">设置值类型</typeparam>
-    /// <param name="key">设置键</param>
-    /// <param name="defaultValue">默认值</param>
-    /// <returns>设置值</returns>
-    public T? GetSetting<T>(string key, T? defaultValue = default)
-    {
-        if (!_isInitialized)
-            return defaultValue;
-
-        if (_settingsCache.TryGetValue(key, out var cachedValue))
-        {
-            return ConvertValue(cachedValue, defaultValue);
-        }
-
-        // 如果缓存中没有，返回定义的默认值或传入的默认值
-        return _settingDefinitions.TryGetValue(key, out var definition)
-            ? ConvertValue(definition.DefaultValue, defaultValue)
-            : defaultValue;
     }
 
     /// <summary>
@@ -304,32 +278,6 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         {
             _cacheLock.Release();
         }
-    }
-
-    /// <summary>
-    /// 同步设置值（立即更新缓存，异步保存到数据库）
-    /// </summary>
-    /// <typeparam name="T">设置值类型</typeparam>
-    /// <param name="key">设置键</param>
-    /// <param name="value">设置值</param>
-    public void SetSetting<T>(string key, T value)
-    {
-        // 立即更新缓存
-        _settingsCache[key] = value;
-        OnPropertyChanged(key);
-
-        // 异步保存到数据库
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await SetSettingAsync(key, value);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"异步保存设置 '{key}' 失败: {ex.Message}");
-            }
-        });
     }
 
     /// <summary>
@@ -697,10 +645,14 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
 
     #region 导入导出方法
 
-    /// <summary>
-    /// 导出设置为JSON字符串
-    /// </summary>
-    /// <returns>包含所有设置和定义的JSON字符串</returns>
+    // Add a private static readonly field to cache the JsonSerializerOptions instance
+    private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    // Update the ExportSettingsAsync method to use the cached JsonSerializerOptions instance
     public async Task<string> ExportSettingsAsync()
     {
         var allSettings = await GetAllSettingsAsync();
@@ -719,11 +671,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
             })
         };
 
-        return JsonSerializer.Serialize(exportData, new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        });
+        return JsonSerializer.Serialize(exportData, CachedJsonSerializerOptions);
     }
 
     /// <summary>

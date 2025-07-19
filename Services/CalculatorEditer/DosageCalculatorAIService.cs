@@ -42,7 +42,6 @@ public class DosageCalculatorAiService
         string additionalRequirements = "",
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-
         _logger.LogInformation("开始为药物 {DrugName} 生成计算器（流式）", drugInfo.DrugName);
 
         // 发送初始状态
@@ -68,13 +67,15 @@ public class DosageCalculatorAiService
         var startTime = DateTime.Now;
         var chunkCount = 0;
 
-        await foreach (var chunk in CallDeepSeekApiStreamAsync(prompt, cancellationToken))
+        // 使用本地变量存储进度，避免在try-catch中使用yield
+
+        await foreach (var chunk in CallDeepSeekApiStreamAsync(prompt, cancellationToken).ConfigureAwait(false))
         {
             completeResponse.Append(chunk);
-            chunkCount++;
+            chunkCount += chunk.Length;
 
             // 计算进度（基于经验值）
-            var progress = Math.Min(10 + chunkCount * 2, 90); // 10-90%
+            var progress = Math.Min(10 + chunkCount * 80 / 4096, 90); // 10-90%
 
             yield return new DosageCalculatorGenerationProgress
             {
@@ -108,37 +109,10 @@ public class DosageCalculatorAiService
         };
 
         _logger.LogInformation("成功为药物 {DrugName} 生成计算器", drugInfo.DrugName);
-
     }
 
     /// <summary>
-    /// 根据药物信息生成计算器（非流式版本，保留兼容性）
-    /// </summary>
-    public async Task<DosageCalculatorGenerationResult> GenerateCalculatorAsync(
-        BaseDrugInfo drugInfo,
-        string calculatorType = "通用剂量计算器",
-        string additionalRequirements = "",
-        CancellationToken cancellationToken = default)
-    {
-        DosageCalculatorGenerationResult? result = null;
-
-        await foreach (var progress in GenerateCalculatorStreamAsync(drugInfo, calculatorType, additionalRequirements, cancellationToken))
-        {
-            if (progress.Result != null)
-            {
-                result = progress.Result;
-            }
-        }
-
-        return result ?? new DosageCalculatorGenerationResult
-        {
-            Success = false,
-            ErrorMessage = "生成过程未返回结果"
-        };
-    }
-
-    /// <summary>
-    /// 调用Deepseek API（流式版本）
+    /// 调用Deepseek API（真正的流式版本）
     /// </summary>
     private async IAsyncEnumerable<string> CallDeepSeekApiStreamAsync(
         string prompt,
@@ -146,7 +120,7 @@ public class DosageCalculatorAiService
     {
         var request = new
         {
-            model = "deepseek-chat",
+            model = "deepseek-reasoner",
             messages = new[]
             {
                 new { role = "system", content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。你需要根据药物信息生成完整的剂量计算器配置。" },
@@ -155,65 +129,128 @@ public class DosageCalculatorAiService
             max_tokens = 8192,
             temperature = 0.2,
             response_format = new { type = "json_object" },
-            stream = true  // 启用流式响应
+            stream = true
         };
 
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint)
-        {
-            Content = content
-        };
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint);
+        requestMessage.Content = content;
         requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
         requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
-        using var response = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        using var response = await _httpClient
+            .SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
-            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new Exception($"Deepseek API调用失败: {response.StatusCode} - {errorContent}");
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            throw new HttpRequestException($"Deepseek API调用失败: {response.StatusCode} - {errorContent}");
         }
 
-        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         using var reader = new StreamReader(stream);
 
-        while (!reader.EndOfStream)
+        var buffer = new char[1024];
+        var lineBuilder = new StringBuilder();
+
+        while (!cancellationToken.IsCancellationRequested)
         {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
+            var charsRead = await reader.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
 
-            var line = await reader.ReadLineAsync();
+            if (charsRead == 0)
+                break;
 
-            if (string.IsNullOrEmpty(line))
-                continue;
-
-            if (line.StartsWith("data: "))
+            for (var i = 0; i < charsRead; i++)
             {
-                var data = line[6..];
-
-                if (data == "[DONE]")
-                    break;
-
-                DeepseekStreamingResponse? streamResponse;
-                try
+                if (buffer[i] == '\n')
                 {
-                    streamResponse = JsonSerializer.Deserialize<DeepseekStreamingResponse>(data);
+                    var line = lineBuilder.ToString();
+                    lineBuilder.Clear();
+
+                    if (!line.StartsWith("data: "))
+                        continue;
+
+                    var data = line[6..];
+
+                    if (data == "[DONE]")
+                        yield break;
+
+                    // 简单的JSON解析，避免异常
+                    if (!TryDeserializeStreamResponse(data, out var streamResponse)) continue;
+                    var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
+                    if (!string.IsNullOrEmpty(deltaContent))
+                    {
+                        yield return deltaContent;
+                    }
                 }
-                catch (JsonException)
+                else if (buffer[i] != '\r')
                 {
-                    continue;
-                }
-
-                var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
-
-                if (!string.IsNullOrEmpty(deltaContent))
-                {
-                    yield return deltaContent;
+                    lineBuilder.Append(buffer[i]);
                 }
             }
         }
+
+        // 处理最后一行（如果有）
+        if (lineBuilder.Length <= 0) yield break;
+        {
+            var lastLine = lineBuilder.ToString();
+            if (!lastLine.StartsWith("data: ") || lastLine.Length <= 6) yield break;
+            var data = lastLine[6..];
+            if (data == "[DONE]") yield break;
+            if (!TryDeserializeStreamResponse(data, out var streamResponse)) yield break;
+            var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
+            if (!string.IsNullOrEmpty(deltaContent))
+            {
+                yield return deltaContent;
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 安全地尝试反序列化流响应
+    /// </summary>
+    private static bool TryDeserializeStreamResponse(string data, out DeepseekStreamingResponse? response)
+    {
+        response = null;
+
+        if (string.IsNullOrWhiteSpace(data))
+            return false;
+
+        // 使用 JsonDocument 进行更安全的解析
+        using var doc = JsonDocument.Parse(data);
+
+        response = new DeepseekStreamingResponse();
+
+        if (!doc.RootElement.TryGetProperty("choices", out var choices) ||
+            choices.ValueKind != JsonValueKind.Array) return false;
+        response.Choices = [];
+
+        foreach (var choice in choices.EnumerateArray())
+        {
+            var streamingChoice = new StreamingChoice();
+
+            if (choice.TryGetProperty("index", out var index))
+                streamingChoice.Index = index.GetInt32();
+
+            if (choice.TryGetProperty("delta", out var delta))
+            {
+                streamingChoice.Delta = new StreamingDelta();
+
+                if (delta.TryGetProperty("content", out var content))
+                    streamingChoice.Delta.Content = content.GetString();
+
+                if (delta.TryGetProperty("role", out var role))
+                    streamingChoice.Delta.Role = role.GetString();
+            }
+
+            response.Choices.Add(streamingChoice);
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -368,18 +405,20 @@ public class DosageCalculatorAiService
         return sb.ToString();
     }
 
-    /// <summary>
-    /// 解析AI响应（保持原有实现）
-    /// </summary>
+    // Add a static readonly field to cache the JsonSerializerOptions instance
+    private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    // Update the ParseAiResponse method to use the cached instance
     private DosageCalculatorGenerationResult ParseAiResponse(string aiResponse, BaseDrugInfo drugInfo)
     {
         try
         {
-            // 由于使用了response_format，返回的应该直接是JSON格式
-            var config = JsonSerializer.Deserialize<CalculatorConfig>(aiResponse, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) ?? throw new Exception("无法解析AI响应");
+            // Use the cached JsonSerializerOptions instance
+            var config = JsonSerializer.Deserialize<CalculatorConfig>(aiResponse, CachedJsonSerializerOptions)
+                         ?? throw new Exception("无法解析AI响应");
 
             // 创建计算器对象
             var calculator = new DosageCalculator
@@ -450,43 +489,32 @@ public enum GenerationStatus
 /// </summary>
 public class DeepseekStreamingResponse
 {
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
+    [JsonPropertyName("id")] public string? Id { get; set; }
 
-    [JsonPropertyName("object")]
-    public string? Object { get; set; }
+    [JsonPropertyName("object")] public string? Object { get; set; }
 
-    [JsonPropertyName("created")]
-    public long Created { get; set; }
+    [JsonPropertyName("created")] public long Created { get; set; }
 
-    [JsonPropertyName("model")]
-    public string? Model { get; set; }
+    [JsonPropertyName("model")] public string? Model { get; set; }
 
-    [JsonPropertyName("choices")]
-    public List<StreamingChoice>? Choices { get; set; }
+    [JsonPropertyName("choices")] public List<StreamingChoice>? Choices { get; set; }
 }
 
 public class StreamingChoice
 {
-    [JsonPropertyName("index")]
-    public int Index { get; set; }
+    [JsonPropertyName("index")] public int Index { get; set; }
 
-    [JsonPropertyName("delta")]
-    public StreamingDelta? Delta { get; set; }
+    [JsonPropertyName("delta")] public StreamingDelta? Delta { get; set; }
 
-    [JsonPropertyName("finish_reason")]
-    public string? FinishReason { get; set; }
+    [JsonPropertyName("finish_reason")] public string? FinishReason { get; set; }
 }
 
 public class StreamingDelta
 {
-    [JsonPropertyName("role")]
-    public string? Role { get; set; }
+    [JsonPropertyName("role")] public string? Role { get; set; }
 
-    [JsonPropertyName("content")]
-    public string? Content { get; set; }
+    [JsonPropertyName("content")] public string? Content { get; set; }
 }
-
 
 /// <summary>
 /// 计算器配置（移除category）

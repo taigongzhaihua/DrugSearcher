@@ -99,7 +99,7 @@
                                        Text="{Binding Unit}"
                                        FontSize="14"
                                        VerticalAlignment="Center"
-                                       Margin="10,0,5,0"
+                                       Margin="10,0,0,0"
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <!-- 说明文本 -->
@@ -165,7 +165,7 @@
                                        Text="{Binding Unit}"
                                        FontSize="14"
                                        VerticalAlignment="Center"
-                                       Margin="10,0,5,0"
+                                       Margin="10,0,0,0"
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <!-- 说明文本 -->
@@ -800,6 +800,11 @@
 
                                                         <!-- 标题和操作按钮 -->
                                                         <Grid Grid.Row="0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                            </Grid.RowDefinitions>
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" />
@@ -812,7 +817,7 @@
                                                                        VerticalAlignment="Center"
                                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
 
-                                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                                                                 <Button Content="创建计算器"
                                                                         Command="{Binding CreateCalculatorCommand}"
                                                                         Style="{StaticResource BaseButtonStyle}"
@@ -830,6 +835,47 @@
                                                                         Visibility="{Binding HasCalculators, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                                                         Margin="10,0,0,0" />
                                                             </StackPanel>
+
+                                                            <!-- 添加生成进度面板 -->
+                                                            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                                    Background="{DynamicResource SurfaceBrush}"
+                                                                    BorderBrush="{DynamicResource BorderBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="6"
+                                                                    Padding="15"
+                                                                    Margin="0,10,0,0"
+                                                                    Visibility="{Binding IsGeneratingCalculator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                                <Grid>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition Height="Auto" />
+                                                                    </Grid.RowDefinitions>
+
+                                                                    <!-- 状态文本 -->
+                                                                    <TextBlock Grid.Row="0" 
+                                                                               Text="{Binding GenerationStatus}"
+                                                                               FontSize="14"
+                                                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                                                               Margin="0,0,0,10" />
+
+                                                                    <!-- 进度条 -->
+                                                                    <ProgressBar Grid.Row="1"
+                                                                        Value="{Binding GenerationProgress}"
+                                                                        Maximum="100"
+                                                                        Height="8"
+                                                                        Foreground="{DynamicResource PrimaryBrush}"
+                                                                        Background="{DynamicResource SecondaryBackgroundBrush}" />
+
+                                                                    <!-- 百分比显示 -->
+                                                                    <TextBlock Grid.Row="2"
+                                                                               Text="{Binding GenerationProgress, StringFormat='{}{0}%'}"
+                                                                               FontSize="12"
+                                                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                               HorizontalAlignment="Right"
+                                                                               Margin="0,5,0,0" />
+                                                                </Grid>
+                                                            </Border>
                                                         </Grid>
 
                                                         <!-- 计算器选择 -->
@@ -880,23 +926,24 @@
                                                         </Grid.RowDefinitions>
 
                                                         <!-- 参数标题 -->
-                                                        <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                                            <TextBlock Text="计算参数( "
+                                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                                                            <TextBlock Text="计算参数 "
                                                                        FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                                                       Margin="0,0,0,10" />
+                                                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
+                                                            <TextBlock Text="("
+                                                                       FontSize="14"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
                                                             <TextBlock Text="*"
                                                                        FontSize="10"
-                                                                       Margin="3,0,3,10"
+                                                                       Margin="3,0"
                                                                        VerticalAlignment="Top"
-                                                                       Foreground="{DynamicResource ErrorBrush}"
-                                                                       Visibility="{Binding IsRequired, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                            <TextBlock Text="号标记为必填）"
+                                                                       Foreground="{DynamicResource ErrorBrush}"/>
+                                                            <TextBlock Text="号标记为必填)"
                                                                        FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                                                       Margin="0,0,0,10" />
+                                                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
                                                         </StackPanel>
                                                         <!-- 参数输入 -->
                                                         <ItemsControl Grid.Row="1"

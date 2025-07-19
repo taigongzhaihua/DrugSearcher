@@ -144,6 +144,11 @@ public partial class HomePageViewModel : ObservableObject
     [ObservableProperty]
     private string _calculatorStatusMessage = "请选择药物以查看可用的计算器";
 
+    [ObservableProperty]
+    private int _generationProgress;
+
+    [ObservableProperty]
+    private string _generationStreamContent = string.Empty;
     public ObservableCollection<DosageCalculator> AvailableCalculators { get; }
     public ObservableCollection<DosageParameter> CalculatorParameters { get; }
     public ObservableCollection<DosageCalculationResult> CalculationResults { get; }
@@ -429,52 +434,96 @@ public partial class HomePageViewModel : ObservableObject
         if (result == null) return;
 
         IsGeneratingCalculator = true;
-        GenerationStatus = "正在生成计算器...";
+        GenerationStatus = "正在准备生成计算器...";
+        GenerationProgress = 0;
+        GenerationStreamContent = string.Empty;
 
         try
         {
-            var generationResult = await _aiService.GenerateCalculatorAsync(
-                SelectedDrugInfo,
-                result.CalculatorType,
-                result.AdditionalRequirements);
-            Debug.WriteLine(generationResult.Calculator?.CalculationCode);
-            if (generationResult is { Success: true, Calculator: not null })
+            DosageCalculatorGenerationResult? finalResult = null;
+
+            // 在后台线程运行流式生成
+            await Task.Run(async () =>
             {
-
-                // 验证并保存生成的计算器
-                var savedCalculator = await _calculatorService.SaveCalculatorAsync(generationResult.Calculator);
-
-                // 重新加载计算器列表
-                await LoadCalculatorsForDrug(SelectedDrugInfo);
-
-                // 选择新生成的计算器
-                var newCalculator = AvailableCalculators.FirstOrDefault(c => c.Id == savedCalculator.Id);
-                if (newCalculator != null)
+                await foreach (var progress in _aiService.GenerateCalculatorStreamAsync(
+                    SelectedDrugInfo,
+                    result.CalculatorType,
+                    result.AdditionalRequirements))
                 {
-                    SelectedCalculator = newCalculator;
-                    await LoadCalculatorParameters();
-                }
+                    // 在UI线程更新进度
+                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        GenerationStatus = progress.Message;
+                        GenerationProgress = progress.Progress;
 
-                GenerationStatus = "计算器生成成功！";
-                MessageBox.Show($"计算器 '{savedCalculator.CalculatorName}' 已生成并保存", "成功",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                        // 显示部分内容（可选）
+                        if (!string.IsNullOrEmpty(progress.StreamChunk))
+                        {
+                            GenerationStreamContent += progress.StreamChunk;
+                        }
+
+                        // 保存最终结果
+                        if (progress.Result != null)
+                        {
+                            finalResult = progress.Result;
+                        }
+                    }, System.Windows.Threading.DispatcherPriority.Background);
+                }
+            }).ConfigureAwait(false);
+
+            if (finalResult is { Success: true, Calculator: not null })
+            {
+                GenerationStatus = "正在保存计算器...";
+
+                // 在后台线程保存计算器
+                var savedCalculator = await _calculatorService.SaveCalculatorAsync(finalResult.Calculator).ConfigureAwait(false);
+
+                // 在UI线程更新界面
+                await Application.Current.Dispatcher.InvokeAsync(async () =>
+                {
+                    // 重新加载计算器列表
+                    await LoadCalculatorsForDrug(SelectedDrugInfo);
+
+                    // 选择新生成的计算器
+                    var newCalculator = AvailableCalculators.FirstOrDefault(c => c.Id == savedCalculator.Id);
+                    if (newCalculator != null)
+                    {
+                        SelectedCalculator = newCalculator;
+                        await LoadCalculatorParameters();
+                    }
+
+                    GenerationStatus = "计算器生成成功！";
+                    MessageBox.Show($"计算器 '{savedCalculator.CalculatorName}' 已生成并保存", "成功",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                });
             }
             else
             {
-                GenerationStatus = "计算器生成失败";
-                MessageBox.Show($"生成计算器失败: {generationResult.ErrorMessage}", "错误",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    GenerationStatus = "计算器生成失败";
+                    MessageBox.Show($"生成计算器失败: {finalResult?.ErrorMessage ?? "未知错误"}", "错误",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
         catch (Exception ex)
         {
-            GenerationStatus = "计算器生成失败";
-            MessageBox.Show($"生成计算器时发生错误: {ex.Message}", "错误",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                GenerationStatus = "计算器生成失败";
+                MessageBox.Show($"生成计算器时发生错误: {ex.Message}", "错误",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            });
         }
         finally
         {
-            IsGeneratingCalculator = false;
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                IsGeneratingCalculator = false;
+                GenerationProgress = 0;
+                GenerationStreamContent = string.Empty;
+            });
         }
     }
 

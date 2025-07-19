@@ -1602,7 +1602,6 @@ public partial class RealTimeSyntaxService : IDisposable
                         // 如果是方法调用，检查是否是已知的方法
                         if (JavaScriptLanguageDefinition.IsBuiltInMethod(functionName))
                         {
-                            continue; // 跳过内置方法
                         }
                     }
                     else

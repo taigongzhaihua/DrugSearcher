@@ -94,7 +94,7 @@
                         Background="{DynamicResource PrimaryBrush}"
                         CornerRadius="16"
                         Margin="0,0,20,0">
-                    <TextBlock Text="&#xe622;"
+                    <TextBlock Text="&#xe629;"
                                FontFamily="{DynamicResource IconFont}"
                                FontSize="36"
                                Foreground="White"
