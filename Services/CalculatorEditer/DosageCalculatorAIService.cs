@@ -74,7 +74,7 @@ public class DosageCalculatorAiService
             chunkCount++;
 
             // 计算进度（基于经验值）
-            var progress = Math.Min(10 + (chunkCount * 2), 90); // 10-90%
+            var progress = Math.Min(10 + chunkCount * 2, 90); // 10-90%
 
             yield return new DosageCalculatorGenerationProgress
             {

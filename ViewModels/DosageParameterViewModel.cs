@@ -90,31 +90,37 @@ public partial class DosageParameterViewModel : ObservableObject
         get => DefaultValue?.ToString() ?? string.Empty;
         set
         {
-            if (DataType == ParameterTypes.Number)
+            switch (DataType)
             {
-                if (double.TryParse(value, out var numValue))
-                {
-                    DefaultValue = numValue;
-                }
-                else
-                {
-                    DefaultValue = 0;
-                }
-            }
-            else if (DataType == ParameterTypes.Boolean)
-            {
-                if (bool.TryParse(value, out var boolValue))
-                {
-                    DefaultValue = boolValue;
-                }
-                else
-                {
-                    DefaultValue = false;
-                }
-            }
-            else
-            {
-                DefaultValue = value;
+                case ParameterTypes.Number:
+                    {
+                        if (double.TryParse(value, out var numValue))
+                        {
+                            DefaultValue = numValue;
+                        }
+                        else
+                        {
+                            DefaultValue = 0;
+                        }
+
+                        break;
+                    }
+                case ParameterTypes.Boolean:
+                    {
+                        if (bool.TryParse(value, out var boolValue))
+                        {
+                            DefaultValue = boolValue;
+                        }
+                        else
+                        {
+                            DefaultValue = false;
+                        }
+
+                        break;
+                    }
+                default:
+                    DefaultValue = value;
+                    break;
             }
         }
     }

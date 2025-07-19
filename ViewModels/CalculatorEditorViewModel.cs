@@ -577,66 +577,70 @@ public partial class CalculatorEditorViewModel : ObservableObject
         _ => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n"
     };
 
-    private static string GetDefaultCalculationCode() => @"// 获取并验证参数
-weight = parseFloat(weight) || 0;
-age = parseFloat(age) || 0;
-severity = severity || '中度';
+    private static string GetDefaultCalculationCode() => """
+                                                         // 获取并验证参数
+                                                         weight = parseFloat(weight) || 0;
+                                                         age = parseFloat(age) || 0;
+                                                         severity = severity || '中度';
 
-// 输入验证
-if (weight <= 0 || weight > 200) {
-    addWarning('体重范围', 0, 'mg', '', '体重应在1-200kg之间');
-    return;
-}
+                                                         // 输入验证
+                                                         if (weight <= 0 || weight > 200) {
+                                                             addWarning('体重范围', 0, 'mg', '', '体重应在1-200kg之间');
+                                                             return;
+                                                         }
 
-if (age < 0 || age > 120) {
-    addWarning('年龄范围', 0, 'mg', '', '年龄应在0-120岁之间');
-    return;
-}
+                                                         if (age < 0 || age > 120) {
+                                                             addWarning('年龄范围', 0, 'mg', '', '年龄应在0-120岁之间');
+                                                             return;
+                                                         }
 
-// 基础剂量计算
-var baseDose = weight * 10; // 示例：10mg/kg
+                                                         // 基础剂量计算
+                                                         var baseDose = weight * 10; // 示例：10mg/kg
 
-// 严重程度调整
-if (severity === '重度') {
-    baseDose *= 1.5;
-} else if (severity === '轻度') {
-    baseDose *= 0.8;
-}
+                                                         // 严重程度调整
+                                                         if (severity === '重度') {
+                                                             baseDose *= 1.5;
+                                                         } else if (severity === '轻度') {
+                                                             baseDose *= 0.8;
+                                                         }
 
-// 年龄调整
-if (age > 65) {
-    baseDose *= 0.9;
-} else if (age < 18) {
-    baseDose *= 1.1;
-}
+                                                         // 年龄调整
+                                                         if (age > 65) {
+                                                             baseDose *= 0.9;
+                                                         } else if (age < 18) {
+                                                             baseDose *= 1.1;
+                                                         }
 
-// 计算单次剂量
-var singleDose = round(baseDose / 3, 1);
+                                                         // 计算单次剂量
+                                                         var singleDose = round(baseDose / 3, 1);
 
-// 输出结果
-addNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-14天', '餐后服用');";
+                                                         // 输出结果
+                                                         addNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-14天', '餐后服用');
+                                                         """;
 
-    private static string GetCodeTemplate() => @"// 代码模板
-// 1. 参数获取和验证
-weight = parseFloat(weight) || 0;
-age = parseFloat(age) || 0;
+    private static string GetCodeTemplate() => """
+                                               // 代码模板
+                                               // 1. 参数获取和验证
+                                               weight = parseFloat(weight) || 0;
+                                               age = parseFloat(age) || 0;
 
-// 2. 输入验证
-if (weight <= 0) {
-    addWarning('参数错误', 0, 'mg', '', '请输入有效的体重');
-    return;
-}
+                                               // 2. 输入验证
+                                               if (weight <= 0) {
+                                                   addWarning('参数错误', 0, 'mg', '', '请输入有效的体重');
+                                                   return;
+                                               }
 
-// 3. 剂量计算
-var dose = weight * 10; // 根据实际药物调整
+                                               // 3. 剂量计算
+                                               var dose = weight * 10; // 根据实际药物调整
 
-// 4. 特殊情况调整
-if (age > 65) {
-    dose *= 0.8; // 老年人减量
-}
+                                               // 4. 特殊情况调整
+                                               if (age > 65) {
+                                                   dose *= 0.8; // 老年人减量
+                                               }
 
-// 5. 输出结果
-addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '餐后服用');";
+                                               // 5. 输出结果
+                                               addNormalResult('推荐剂量', round(dose, 1), 'mg', '每日3次', '7-14天', '餐后服用');
+                                               """;
 
     private bool ValidateCalculator()
     {

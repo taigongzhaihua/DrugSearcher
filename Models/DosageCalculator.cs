@@ -259,6 +259,7 @@ public static class ParameterTypes
     public const string Text = "text";
     public const string Select = "select";
     public const string Boolean = "boolean";
+    public const string Array = "array";
 
     public static readonly List<string> All = [Number, Text, Select, Boolean];
 }

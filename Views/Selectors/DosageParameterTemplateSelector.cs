@@ -2,28 +2,27 @@ using DrugSearcher.Models;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DrugSearcher.Views.Selectors
+namespace DrugSearcher.Views.Selectors;
+
+public class DosageParameterTemplateSelector : DataTemplateSelector
 {
-    public class DosageParameterTemplateSelector : DataTemplateSelector
+    public DataTemplate? TextTemplate { get; set; }
+    public DataTemplate? NumberTemplate { get; set; }
+    public DataTemplate? BooleanTemplate { get; set; }
+    public DataTemplate? SelectionTemplate { get; set; }
+
+    public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
     {
-        public DataTemplate? TextTemplate { get; set; }
-        public DataTemplate? NumberTemplate { get; set; }
-        public DataTemplate? BooleanTemplate { get; set; }
-        public DataTemplate? SelectionTemplate { get; set; }
+        if (item is not DosageParameter parameter)
+            return null;
 
-        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
+        return parameter.DataType switch
         {
-            if (item is not DosageParameter parameter)
-                return null;
-
-            return parameter.DataType switch
-            {
-                ParameterTypes.Text => TextTemplate,
-                ParameterTypes.Number => NumberTemplate,
-                ParameterTypes.Boolean => BooleanTemplate,
-                ParameterTypes.Select => SelectionTemplate,
-                _ => TextTemplate
-            };
-        }
+            ParameterTypes.Text => TextTemplate,
+            ParameterTypes.Number => NumberTemplate,
+            ParameterTypes.Boolean => BooleanTemplate,
+            ParameterTypes.Select => SelectionTemplate,
+            _ => TextTemplate
+        };
     }
 }
