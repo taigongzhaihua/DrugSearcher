@@ -37,17 +37,14 @@ public static partial class DrugInfoMarkdownHelper
     {
         var list = new List<string>
         {
-            "MainIngredients", "Appearance", "DrugDescription", "Indications", "Dosage",
+            "FullDetails","MainIngredients", "Appearance", "DrugDescription", "Indications", "Dosage",
             "SideEffects", "Precautions", "Contraindications", "PregnancyAndLactation",
             "PediatricUse", "GeriatricUse", "DrugInteractions", "Pharmacology",
-            "Pharmacokinetics", "Storage", "TcmRemarks", "FullDetails"
+            "Pharmacokinetics", "Storage", "TcmRemarks"
         };
-        foreach (var key in list)
+        foreach (var key in list.Where(key => !dict.ContainsKey(key)))
         {
-            if (!dict.ContainsKey(key))
-            {
-                dict[key] = string.Empty;
-            }
+            dict[key] = string.Empty;
         }
     }
 
@@ -193,33 +190,31 @@ public static partial class DrugInfoMarkdownHelper
         // 定义显示顺序和标题
         var sectionOrder = new List<(string Key, string Title, string Icon)>
         {
-            ("MainIngredients", "主要成分", "🧪"),
-            ("Appearance", "性状", "👁️"),
-            ("DrugDescription", "药物说明", "📋"),
-            ("Indications", "适应症", "🎯"),
-            ("Dosage", "用法用量", "💊"),
-            ("SideEffects", "不良反应", "⚠️"),
-            ("Precautions", "注意事项", "⚡"),
-            ("Contraindications", "禁忌", "🚫"),
-            ("PregnancyAndLactation", "孕妇及哺乳期妇女用药", "🤱"),
-            ("PediatricUse", "儿童用药", "👶"),
-            ("GeriatricUse", "老人用药", "👴"),
-            ("DrugInteractions", "药物相互作用", "🔄"),
-            ("Pharmacology", "药理毒理", "🔬"),
-            ("Pharmacokinetics", "药代动力学", "📈"),
-            ("Storage", "储存信息", "📦"),
-            ("TcmRemarks", "中医备注", "🏥")
+            ("MainIngredients", "主要成分", "\ue62b"),
+            ("Appearance", "性状", "\ue62c"),
+            ("DrugDescription", "药物说明", "\ue62d"),
+            ("Indications", "适应症", "\ue63a"),
+            ("Dosage", "用法用量", "\ue622"),
+            ("SideEffects", "不良反应", "\ue630"),
+            ("Precautions", "注意事项", "\ue63e"),
+            ("Contraindications", "禁忌", "\ue636"),
+            ("PregnancyAndLactation", "孕妇及哺乳期妇女用药", "\ue631"),
+            ("PediatricUse", "儿童用药", "\ue633"),
+            ("GeriatricUse", "老人用药", "\ue634"),
+            ("DrugInteractions", "药物相互作用", "\ue635"),
+            ("Pharmacology", "药理毒理", "\ue637"),
+            ("Pharmacokinetics", "药代动力学", "\ue63d"),
+            ("Storage", "储存信息", "\ue638"),
+            ("TcmRemarks", "中医备注", "\ue632")
         };
 
         foreach (var (key, title, icon) in sectionOrder)
         {
-            if (markdownDict.TryGetValue(key, out var content) && !string.IsNullOrWhiteSpace(content))
-            {
-                sb.AppendLine($"## {icon} {title}");
-                sb.AppendLine();
-                sb.AppendLine(content);
-                sb.AppendLine();
-            }
+            if (!markdownDict.TryGetValue(key, out var content) || string.IsNullOrWhiteSpace(content)) continue;
+            sb.AppendLine($"## {icon} **{title}**");
+            sb.AppendLine();
+            sb.AppendLine(content);
+            sb.AppendLine();
         }
 
         // 移除最后的分隔线
@@ -344,7 +339,7 @@ public static partial class DrugInfoMarkdownHelper
 
         var preprocessedText = PreprocessText(precautions);
         var sb = new StringBuilder();
-        sb.AppendLine("> ⚡ **注意**");
+        sb.AppendLine("> \ue63e **注意**");
         sb.AppendLine("> ---");
 
         var lines = preprocessedText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -355,7 +350,7 @@ public static partial class DrugInfoMarkdownHelper
             // 处理数字列表
             if (Number4Regex().IsMatch(trimmedLine))
             {
-                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
+                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. ");
                 sb.AppendLine($"> {formattedLine}");
             }
             else
@@ -377,7 +372,7 @@ public static partial class DrugInfoMarkdownHelper
 
         var preprocessedText = PreprocessText(warning);
         var sb = new StringBuilder();
-        sb.AppendLine("> 🚨 **重要警告**");
+        sb.AppendLine("> \ue63c **重要警告**");
         sb.AppendLine("> ---");
 
         var lines = preprocessedText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -389,7 +384,7 @@ public static partial class DrugInfoMarkdownHelper
                 // 处理数字列表
                 if (Number4Regex().IsMatch(trimmedLine))
                 {
-                    var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
+                    var formattedLine = Number5Regex().Replace(trimmedLine, "$1. ");
                     sb.AppendLine($"> {formattedLine}");
                 }
                 else
@@ -458,15 +453,15 @@ public static partial class DrugInfoMarkdownHelper
             // 处理数字列表
             if (Number4Regex().IsMatch(trimmedLine))
             {
-                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. "); ;
+                var formattedLine = Number5Regex().Replace(trimmedLine, "$1. ");
 
                 if (formattedLine.Contains("禁止") || formattedLine.Contains("避免") || formattedLine.Contains("不可"))
                 {
-                    sb.AppendLine($"- 🚫 **{formattedLine}**");
+                    sb.AppendLine($"- \ue636 **{formattedLine}**");
                 }
                 else if (formattedLine.Contains("注意") || formattedLine.Contains("小心"))
                 {
-                    sb.AppendLine($"- ⚠️ {formattedLine}");
+                    sb.AppendLine($"- \ue630 {formattedLine}");
                 }
                 else
                 {
@@ -477,11 +472,11 @@ public static partial class DrugInfoMarkdownHelper
             {
                 if (trimmedLine.Contains("禁止") || trimmedLine.Contains("避免") || trimmedLine.Contains("不可"))
                 {
-                    sb.AppendLine($"- 🚫 **{trimmedLine}**");
+                    sb.AppendLine($"- \ue636 **{trimmedLine}**");
                 }
                 else if (trimmedLine.Contains("注意") || trimmedLine.Contains("小心"))
                 {
-                    sb.AppendLine($"- ⚠️ {trimmedLine}");
+                    sb.AppendLine($"- \ue630 {trimmedLine}");
                 }
                 else
                 {
@@ -503,26 +498,54 @@ public static partial class DrugInfoMarkdownHelper
         if (!string.IsNullOrEmpty(storage))
         {
             var preprocessedStorage = PreprocessText(storage);
-            sb.AppendLine("### 📦 储存条件");
+            var storageLines = preprocessedStorage.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            sb.AppendLine("### \ue638 储存条件");
             sb.AppendLine();
-            sb.AppendLine("```");
-            sb.AppendLine(preprocessedStorage);
-            sb.AppendLine("```");
+            foreach (var line in storageLines)
+            {
+                var trimmedLine = line.Trim();
+                if (string.IsNullOrEmpty(trimmedLine)) continue;
+                // 处理数字列表
+                if (Number4Regex().IsMatch(trimmedLine))
+                {
+                    var formattedLine = Number5Regex().Replace(trimmedLine, "> $1. ");
+                    sb.AppendLine(formattedLine);
+                }
+                else
+                {
+                    sb.AppendLine($"> {trimmedLine}");
+                }
+            }
             sb.AppendLine();
         }
 
         if (string.IsNullOrEmpty(shelfLife)) return sb.ToString().Trim();
         var preprocessedShelfLife = PreprocessText(shelfLife);
-        sb.AppendLine("### ⏰ 有效期");
+        var shelfLifeLines = preprocessedShelfLife.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        sb.AppendLine("### \ue63b 有效期");
         sb.AppendLine();
-        sb.AppendLine($"**{preprocessedShelfLife}**");
+        foreach (var line in shelfLifeLines)
+        {
+            var trimmedLine = line.Trim();
+            if (string.IsNullOrEmpty(trimmedLine)) continue;
+            // 处理数字列表
+            if (Number4Regex().IsMatch(trimmedLine))
+            {
+                var formattedLine = Number5Regex().Replace(trimmedLine, "> $1. ");
+                sb.AppendLine(formattedLine);
+            }
+            else
+            {
+                sb.AppendLine($"> {trimmedLine}");
+            }
+        }
 
-        return sb.ToString().Trim();
+        return sb.ToString();
     }
     [GeneratedRegex(@"\n\s*\n")]
     private static partial Regex SpaceLineRegex();
 
-    [GeneratedRegex(@"(?:[。；;]\s*|\s+|^)[\t\s\|]*(\d+[\.、])(?<!\d)\s*")]
+    [GeneratedRegex(@"(?:[。；;]\s*|\s+|\||^)[\t\s\|]*(\d+[\.、])(?<!\d)\s*")]
     private static partial Regex NumberRegex();
 
     [GeneratedRegex(@"\|?\((\d+)\)")]

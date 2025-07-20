@@ -8,6 +8,7 @@ using DrugSearcher.Views;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
@@ -20,8 +21,8 @@ public partial class HomePageViewModel : ObservableObject
     private readonly JavaScriptDosageCalculatorService _calculatorService;
     private CancellationTokenSource? _searchCancellationTokenSource;
     private readonly DosageCalculatorAiService _aiService;
-
-
+    private Dictionary<string, string> _cachedMarkdownContents = [];
+    private List<(string Key, string Header, bool IsSpecial)> _tabDefinitions;
     public HomePageViewModel(DrugSearchService drugSearchService,
         JavaScriptDosageCalculatorService calculatorService,
         DosageCalculatorAiService aiService)
@@ -30,7 +31,7 @@ public partial class HomePageViewModel : ObservableObject
         _calculatorService = calculatorService;
         SearchResults = [];
         SearchSuggestions = [];
-        MarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(new LocalDrugInfo());
+        TabItems = [];
 
         // 初始化计算器相关集合
         AvailableCalculators = [];
@@ -43,9 +44,41 @@ public partial class HomePageViewModel : ObservableObject
         ResultCount = "搜索结果: 0 条";
         CalculatorStatusMessage = "请选择药物以查看可用的计算器";
         _aiService = aiService;
+
+        // 初始化标签页
+        InitializeTabItems();
     }
 
-    #region 原有属性 (搜索相关)
+
+    #region 初始化方法
+
+    private void InitializeTabItems()
+    {
+        // 定义所有可能的标签页
+        _tabDefinitions =
+        [
+            ("FullDetails", "全部详情", false),
+            ("MainIngredients", "主要成分", false),
+            ("Appearance", "性状", false),
+            ("DrugDescription", "药物说明", false),
+            ("Indications", "适应症", false),
+            ("Dosage", "用法用量", true), // 特殊标签页
+            ("SideEffects", "不良反应", false),
+            ("Precautions", "注意事项", false),
+            ("Contraindications", "禁忌", false),
+            ("PregnancyAndLactation", "孕妇及哺乳期妇女用药", false),
+            ("PediatricUse", "儿童用药", false),
+            ("GeriatricUse", "老人用药", false),
+            ("DrugInteractions", "药物相互作用", false),
+            ("Pharmacology", "药理毒理", false),
+            ("Pharmacokinetics", "药代动力学", false),
+            ("Storage", "储存信息", false),
+            ("TcmRemarks", "备注", false)
+        ];
+    }
+
+    #endregion
+    #region 原有属性 (搜索相关) - 保持不变
 
     [ObservableProperty]
     private string _searchTerm = string.Empty;
@@ -112,12 +145,14 @@ public partial class HomePageViewModel : ObservableObject
 
     [ObservableProperty]
     private string _generationStatus = string.Empty;
-    // Markdown 内容字典
+
+    // 新增：Tab相关属性
     [ObservableProperty]
-    private Dictionary<string, string> _markdownContents;
+    private TabItemViewModel? _selectedTab;
 
     public ObservableCollection<UnifiedDrugSearchResult?> SearchResults { get; }
     public ObservableCollection<string> SearchSuggestions { get; }
+    public ObservableCollection<TabItemViewModel> TabItems { get; }
 
     // 计算器相关属性
     public BaseDrugInfo? SelectedDrugInfo => SelectedDrug?.DrugInfo;
@@ -531,6 +566,7 @@ public partial class HomePageViewModel : ObservableObject
 
     #region 私有方法 (搜索相关)
 
+    [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
     private async Task PerformSearch()
     {
         // 取消之前的搜索
@@ -585,7 +621,6 @@ public partial class HomePageViewModel : ObservableObject
             SetLoadingState(false);
         }
     }
-
     private async Task DisplayDrugDetails(UnifiedDrugSearchResult? drugResult)
     {
         try
@@ -604,7 +639,7 @@ public partial class HomePageViewModel : ObservableObject
                 if (detailInfo != null)
                 {
                     // 更新详细信息
-                    UpdateDetailInfo(detailInfo);
+                    await UpdateDetailInfo(detailInfo);
                 }
             }
 
@@ -731,13 +766,37 @@ public partial class HomePageViewModel : ObservableObject
         public string CalculatorType { get; set; } = "通用剂量计算器";
         public string AdditionalRequirements { get; set; } = string.Empty;
     }
-    private void UpdateDetailInfo(BaseDrugInfo drugInfo)
+
+    private async Task UpdateDetailInfo(BaseDrugInfo drugInfo)
     {
         // 使用 Helper 类生成 Markdown 内容
-        var newMarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(drugInfo);
+        _cachedMarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(drugInfo);
 
-        // 更新字典（这会触发 UI 更新）
-        MarkdownContents = newMarkdownContents;
+        // 更新标签页可见性和内容
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            TabItems.Clear();
+            foreach (var content in _cachedMarkdownContents.Where(content => !string.IsNullOrWhiteSpace(content.Value)))
+            {
+                var (key, header, isSpecial) = _tabDefinitions.FirstOrDefault(t => t.Key == content.Key);
+
+                var tabItem = new TabItemViewModel(header, key, isSpecial)
+                {
+                    Content = content.Value,
+                    IsVisible = true,
+                    IsLoaded = true
+                };
+                TabItems.Add(tabItem);
+            }
+
+
+            // 选择第一个可见的标签页
+            var firstVisibleTab = TabItems.FirstOrDefault(t => t.IsVisible);
+            if (firstVisibleTab != null)
+            {
+                SelectedTab = firstVisibleTab;
+            }
+        });
     }
 
     private void SetLoadingState(bool isLoading)
@@ -753,7 +812,15 @@ public partial class HomePageViewModel : ObservableObject
     private void HideDetailPanel()
     {
         IsDetailPanelVisible = false;
-        MarkdownContents.Clear();
+        _cachedMarkdownContents.Clear();
+
+        // 重置所有标签页
+        foreach (var tabItem in TabItems)
+        {
+            tabItem.IsVisible = false;
+            tabItem.IsLoaded = false;
+            tabItem.Content = string.Empty;
+        }
 
         // 隐藏详情面板时也重置计算器状态
         ResetCalculatorState();

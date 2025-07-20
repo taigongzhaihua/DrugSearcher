@@ -4,8 +4,8 @@
     <!-- Fluent Design TabControl 样式 -->
     <Style x:Key="FluentTabControlStyle" TargetType="TabControl">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -13,7 +13,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
-                    <Grid KeyboardNavigation.TabNavigation="Local">
+                    <Grid KeyboardNavigation.TabNavigation="Local"
+                          Background="{DynamicResource SecondaryBackgroundBrush}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -22,15 +23,17 @@
                         <!-- Tab Header 区域 -->
                         <Border x:Name="HeaderBorder"
                                 Grid.Row="0"
-                                Background="{DynamicResource SecondaryBackgroundBrush}"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="0,0,0,0"
-                                Padding="0">
+                                Padding="0"
+                                Panel.ZIndex="10"
+                                ClipToBounds="False">
                             <TabPanel x:Name="HeaderPanel"
                                       IsItemsHost="True"
                                       Margin="8,0,8,0"
-                                      KeyboardNavigation.TabIndex="1"
-                                      Panel.ZIndex="1"/>
+                                      KeyboardNavigation.TabIndex="3"
+                                      Panel.ZIndex="3"
+                                      ClipToBounds="False"/>
                         </Border>
 
                         <!-- Tab Content 区域 -->
@@ -40,6 +43,7 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="4"
+                                Margin="0,-2,0,0"
                                 HorizontalAlignment="Stretch"
                                 KeyboardNavigation.TabNavigation="Local"
                                 KeyboardNavigation.DirectionalNavigation="Contained"
@@ -60,53 +64,38 @@
     <Style x:Key="FluentTabItemStyle" TargetType="TabItem">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"></Setter>
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="12,10"/>
         <Setter Property="Margin" Value="0,0,2,0"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="Medium"/>
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Top"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="HeaderTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding}" 
-                                   TextAlignment="Center"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   LineHeight="18"/>
-                    </Grid>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Grid x:Name="TabRoot">
-                        <Border x:Name="TabBorder"
+                    <Grid x:Name="TabRoot" 
+                          ClipToBounds="False"
+                          Margin="4,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="TabBorder" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8,8,0,0"
-                                Margin="1,2,1,0"
+                                CornerRadius="4,4,0,0"
+                                Margin="-1,2,-1,1"
                                 RenderTransformOrigin="0.5,0.5">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="TabScale" ScaleX="1" ScaleY="1"/>
-                            </Border.RenderTransform>
-
-                            <Grid>
-                                <!-- 底部指示器 -->
-                                <Border x:Name="SelectedIndicator"
-                                        Height="3"
-                                        Background="{DynamicResource PrimaryBrush}"
-                                        VerticalAlignment="Bottom"
-                                        CornerRadius="1.5"
-                                        Opacity="0"
-                                        Margin="8,0,8,0"/>
 
                                 <!-- 内容区域 -->
                                 <ContentPresenter x:Name="ContentSite"
@@ -114,34 +103,55 @@
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                                   Margin="{TemplateBinding Padding}"
-                                                  RecognizesAccessKey="True"/>
-                            </Grid>
+                                                  RecognizesAccessKey="True"
+                                                  />
                         </Border>
+                        <!-- 底部指示器 -->
+                        <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                x:Name="SelectedIndicator"
+                                Height="4" MinWidth="30" 
+                                Background="{DynamicResource PrimaryHoverBrush}"
+                                VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                                CornerRadius="2"
+                                Opacity="0"
+                                Panel.ZIndex="5"
+                                Margin="12,0">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="IndicatorScale" ScaleX="0"/>
+                            </Border.RenderTransform>
+                        </Border>
+                        <Border x:Name="LeftSpace"
+                                Grid.Column="0" Grid.Row="1"
+                                Width="4" Height="4"
+                                CornerRadius="0,0,4,0"
+                                BorderThickness="0,0,1,1"
+                                Margin="0,0,0,1"
+                                Panel.ZIndex="10"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                Visibility="Collapsed"/>
+                        <Border x:Name="BottomBackground" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                Background="{DynamicResource SurfaceBrush}"
+                                Height="5"
+                                Margin="0,0,0,-1"
+                                BorderThickness="0"
+                                Panel.ZIndex="1"
+                                Visibility="Collapsed"/>
+                        <Border x:Name="RightSpace"
+                                Grid.Column="2" Grid.Row="1"
+                                Width="4" Height="4"
+                                CornerRadius="0,0,0,4"
+                                BorderThickness="1,0,0,1"
+                                Margin="0,0,0,1"
+                                Panel.ZIndex="10"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                Visibility="Collapsed"/>
                     </Grid>
 
                     <ControlTemplate.Triggers>
                         <!-- 鼠标悬停效果 -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Trigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="TabScale"
-                                                         Storyboard.TargetProperty="ScaleY"
-                                                         To="1.02"
-                                                         Duration="0:0:0.15"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetName="TabScale"
-                                                         Storyboard.TargetProperty="ScaleY"
-                                                         To="1"
-                                                         Duration="0:0:0.15"/>
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </Trigger.ExitActions>
                             <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource HoverBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                             <Setter TargetName="TabBorder" Property="BorderThickness" Value="0,0,0,1"/>
@@ -152,16 +162,28 @@
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="IndicatorScale"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="1"
+                                                         Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="SelectedIndicator"
                                                          Storyboard.TargetProperty="Opacity"
                                                          To="1"
-                                                         Duration="0:0:0.3"/>
+                                                         Duration="0:0:0.2"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
                             <Trigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="IndicatorScale"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="0"
+                                                         Duration="0:0:0.2"/>
                                         <DoubleAnimation Storyboard.TargetName="SelectedIndicator"
                                                          Storyboard.TargetProperty="Opacity"
                                                          To="0"
@@ -175,6 +197,10 @@
                             <Setter TargetName="TabBorder" Property="BorderThickness" Value="1,1,1,0"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="Panel.ZIndex" Value="1"/>
+
+                            <Setter TargetName="LeftSpace" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="BottomBackground" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="RightSpace" Property="Visibility" Value="Visible"/>
                         </Trigger>
 
                         <!-- 禁用状态 -->

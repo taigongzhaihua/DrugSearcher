@@ -12,7 +12,8 @@
       xmlns:selectors="clr-namespace:DrugSearcher.Views.Selectors"
       mc:Ignorable="d"
       d:DesignHeight="600" d:DesignWidth="1000" d:DataContext="{d:DesignInstance viewModels:HomePageViewModel}"
-      Title="药物查询">
+      Title="药物查询"
+      x:Name="Page">
 
     <Page.Resources>
         <Style TargetType="ListBoxItem">
@@ -50,7 +51,6 @@
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
         <converters:ListToStringConverter x:Key="ListToStringConverter" />
 
-
         <!-- 参数模板选择器 -->
         <selectors:DosageParameterTemplateSelector x:Key="ParameterTemplateSelector">
             <!-- 文本类型模板 -->
@@ -75,9 +75,8 @@
 
                             <!-- 参数名称 -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding DisplayName}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource DefaultTextStyle}"
+                                           FontWeight="SemiBold" />
                                 <TextBlock Text="*"
                                            FontSize="10"
                                            Margin="3,0,0,5"
@@ -137,9 +136,8 @@
 
                             <!-- 参数名称 -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding DisplayName}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource DefaultTextStyle}"
+                                           FontWeight="SemiBold" />
                                 <TextBlock Text="*"
                                            FontSize="10"
                                            Margin="3,0,0,5"
@@ -204,9 +202,8 @@
                             <!-- 参数名称 -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
                                         Margin="0,0,5,0">
-                                <TextBlock Text="{Binding DisplayName}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource DefaultTextStyle}"
+                                           FontWeight="SemiBold" />
                                 <TextBlock Text="*"
                                            FontSize="10"
                                            Margin="3,0,0,5"
@@ -276,9 +273,8 @@
 
                             <!-- 参数名称 -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding DisplayName}"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource DefaultTextStyle}"
+                                           FontWeight="SemiBold" />
                                 <TextBlock Text="*"
                                            FontSize="10"
                                            Margin="3,0,0,5"
@@ -317,6 +313,402 @@
                 </DataTemplate>
             </selectors:DosageParameterTemplateSelector.SelectionTemplate>
         </selectors:DosageParameterTemplateSelector>
+
+
+        <!-- 新增：TabItem 内容模板 -->
+        <DataTemplate x:Key="TabContentTemplate" DataType="{x:Type viewModels:TabItemViewModel}">
+            <Grid>
+                <!-- 加载中提示 -->
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ProgressBar Width="100"
+                                 Height="20"
+                                 IsIndeterminate="True"
+                                 Margin="0,0,0,10" />
+                    <TextBlock Text="正在加载内容..." Style="{DynamicResource DefaultTextStyle}"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+
+                <!-- 实际内容 -->
+                <markdig:MarkdownViewer Markdown="{Binding Content}"
+                                        Background="Transparent"
+                                        Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+            </Grid>
+        </DataTemplate>
+
+        <!-- 特殊的用法用量标签页模板 -->
+        <DataTemplate x:Key="DosageTabContentTemplate" DataType="{x:Type viewModels:TabItemViewModel}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- 加载中提示 -->
+                <StackPanel Grid.Row="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ProgressBar Width="100"
+                                 Height="20"
+                                 IsIndeterminate="True"
+                                 Margin="0,0,0,10" />
+                    <TextBlock Text="正在加载内容..."
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                </StackPanel>
+
+                <!-- 原有的用法用量说明 -->
+                <markdig:MarkdownViewer Grid.Row="0"
+                                        Markdown="{Binding Content}"
+                                        Background="Transparent"
+                                        Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+                <!-- 分隔线 -->
+                <Separator Grid.Row="1" Margin="0,10"
+                           Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+
+                <!-- 剂量计算器 - 保持原有内容 -->
+                <!-- 剂量计算器 - 保持原有内容 -->
+                <Grid Grid.Row="2"
+                      Visibility="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                      DataContext="{Binding ElementName=Page,Path=DataContext}">
+                    <!-- 剂量计算器 - 直接使用ViewModel属性 -->
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- 计算器选择和状态 -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="15"
+                            Margin="0,0,0,10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- 标题和操作按钮 -->
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="剂量计算器"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="创建计算器"
+                                            Command="{Binding CreateCalculatorCommand}"
+                                            Style="{StaticResource BaseButtonStyle}"
+                                            Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button Content="编辑计算器"
+                                            Command="{Binding EditCalculatorCommand}"
+                                            Style="{StaticResource BaseButtonStyle}"
+                                            IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Margin="10,0,0,0" />
+                                    <Button Content="AI生成计算器"
+                                            Command="{Binding GenerateCalculatorWithAiCommand}"
+                                            Style="{StaticResource BaseButtonStyle}"
+                                            IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Visibility="{Binding HasCalculators, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                            Margin="10,0,0,0" />
+                                </StackPanel>
+
+                                <!-- 添加生成进度面板 -->
+                                <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                        Background="{DynamicResource SurfaceBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="15"
+                                        Margin="0,10,0,0"
+                                        Visibility="{Binding IsGeneratingCalculator, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- 状态文本 -->
+                                        <TextBlock Grid.Row="0"
+                                                   Text="{Binding GenerationStatus}"
+                                                   FontSize="14"
+                                                   Foreground="{DynamicResource PrimaryTextBrush}"
+                                                   Margin="0,0,0,10" />
+
+                                        <!-- 进度条 -->
+                                        <ProgressBar Grid.Row="1"
+                                                     Value="{Binding GenerationProgress}"
+                                                     Maximum="100"
+                                                     Height="8"
+                                                     Foreground="{DynamicResource PrimaryBrush}"
+                                                     Background="{DynamicResource SecondaryBackgroundBrush}" />
+
+                                        <!-- 百分比显示 -->
+                                        <TextBlock Grid.Row="2"
+                                                   Text="{Binding GenerationProgress, StringFormat='{}{0}%'}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                   HorizontalAlignment="Right"
+                                                   Margin="0,5,0,0" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <!-- 计算器选择 -->
+                            <ComboBox Grid.Row="1"
+                                      ItemsSource="{Binding AvailableCalculators}"
+                                      SelectedItem="{Binding SelectedCalculator}"
+                                      DisplayMemberPath="CalculatorName"
+                                      MinWidth="200"
+                                      Style="{DynamicResource FluentComboBoxStyle}"
+                                      HorizontalAlignment="Left"
+                                      Margin="0,10,0,0"
+                                      Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction
+                                            Command="{Binding LoadCalculatorParametersCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ComboBox>
+
+                            <!-- 状态信息 -->
+                            <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                        Margin="0,10,0,0">
+                                <TextBlock Text="{Binding CalculatorStatusMessage}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <ProgressBar Width="20"
+                                             Height="20"
+                                             IsIndeterminate="True"
+                                             Margin="10,0,0,0"
+                                             Visibility="{Binding IsCalculatorLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 参数输入区域 -->
+                    <Border Grid.Row="1"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="15"
+                            Margin="0,0,0,10"
+                            Visibility="{Binding CalculatorParameters.Count, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- 参数标题 -->
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="计算参数 "
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource PrimaryTextBrush}" />
+                                <TextBlock Text="("
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="*"
+                                           FontSize="10"
+                                           Margin="3,0"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource ErrorBrush}" />
+                                <TextBlock Text="号标记为必填)"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                            </StackPanel>
+                            <!-- 参数输入 -->
+                            <ItemsControl Grid.Row="1"
+                                          ItemsSource="{Binding CalculatorParameters}"
+                                          ItemTemplateSelector="{StaticResource ParameterTemplateSelector}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                            <!-- 计算按钮 -->
+                            <StackPanel Grid.Row="2" Orientation="Horizontal"
+                                        Margin="0,10,0,0">
+                                <Button Content="计算剂量"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        Command="{Binding CalculateCommand}"
+                                        IsEnabled="{Binding IsCalculating, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="清空结果"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        Command="{Binding ClearCalculationResultsCommand}"
+                                        Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Margin="10,0,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                                    <ProgressBar Width="50"
+                                                 Height="5"
+                                                 IsIndeterminate="True"
+                                                 Margin="0,0,10,0"
+                                                 Foreground="{DynamicResource PrimaryBrush}"
+                                                 Visibility="{Binding IsCalculating, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <TextBlock Text="计算中..."
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                               Visibility="{Binding IsCalculating, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 计算结果 -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="15"
+                            Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0"
+                                       Text="计算结果"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Margin="0,0,0,10" />
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding CalculationResults}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate
+                                            DataType="{x:Type models:DosageCalculationResult}">
+                                            <Border
+                                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                                BorderBrush="{DynamicResource BorderBrush}"
+                                                BorderThickness="1.5"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="0,5,0,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger
+                                                                Binding="{Binding IsWarning}"
+                                                                Value="True">
+                                                                <Setter
+                                                                    Property="BorderBrush"
+                                                                    Value="#FF6B47" />
+                                                                <Setter
+                                                                    Property="Background"
+                                                                    Value="#FFF3F0" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+
+                                                    <!-- 描述 -->
+                                                    <TextBlock Grid.Row="0"
+                                                               Text="{Binding Description}" VerticalAlignment="Center"
+                                                               FontWeight="SemiBold"
+                                                               FontSize="14"
+                                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+
+                                                    <!-- 剂量信息 -->
+                                                    <StackPanel Grid.Row="1"
+                                                                Orientation="Horizontal"
+                                                                Margin="0,5,0,0">
+                                                        <TextBlock Text="剂量: " VerticalAlignment="Center"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                        <TextBlock Text="{Binding Dose}" VerticalAlignment="Center"
+                                                                   FontWeight="SemiBold"
+                                                                   FontSize="16"
+                                                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                        <TextBlock Text="{Binding Unit}" VerticalAlignment="Center"
+                                                                   Margin="2,0,0,0"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource PrimaryTextBrush}" />
+                                                        <TextBlock Text=" | " VerticalAlignment="Center"
+                                                                   Margin="10,0"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                        <TextBlock VerticalAlignment="Center"
+                                                                   Text="{Binding Frequency}"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                                                    </StackPanel>
+
+                                                    <!-- 疗程 -->
+                                                    <TextBlock Grid.Row="2"
+                                                               Text="{Binding Duration}"
+                                                               Margin="0,2,0,0"
+                                                               Foreground="{DynamicResource SecondaryTextBrush}"
+                                                               Visibility="{Binding Duration, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                                                    <!-- 警告和备注 -->
+                                                    <StackPanel Grid.Row="3"
+                                                                Margin="0,5,0,0">
+                                                        <TextBlock
+                                                            Text="{Binding WarningMessage}"
+                                                            Foreground="#FF6B47"
+                                                            FontWeight="SemiBold"
+                                                            TextWrapping="Wrap"
+                                                            Visibility="{Binding IsWarning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                        <TextBlock Text="{Binding Notes}"
+                                                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                                                   TextWrapping="Wrap"
+                                                                   Margin="0,3,0,0"
+                                                                   Visibility="{Binding Notes, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <!-- TabItem 内容选择器 -->
+        <selectors:TabContentTemplateSelector x:Key="TabContentSelector"
+                                              DefaultTemplate="{StaticResource TabContentTemplate}"
+                                              DosageTemplate="{StaticResource DosageTabContentTemplate}" />
     </Page.Resources>
 
     <Grid Margin="20">
@@ -398,7 +790,8 @@
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="8"
-                    Margin="0,0,10,0">
+                    Margin="0,0,10,0"
+                    ClipToBounds="True">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -409,7 +802,8 @@
                     <!-- 结果统计 -->
                     <Border Grid.Row="0"
                             Background="{DynamicResource SecondaryBackgroundBrush}"
-                            Padding="15,10">
+                            Padding="15,10"
+                            CornerRadius="9,9,0,0">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding ResultCount}"
                                        Foreground="{DynamicResource PrimaryTextBrush}"
@@ -559,24 +953,28 @@
                                                Visibility="{Binding DrugName,Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Text="药品名称:"
                                                FontWeight="SemiBold"
-                                               Style="{DynamicResource DefaultTextStyle}" />
+                                               Style="{DynamicResource DefaultTextStyle}"
+                                               Margin="0,5,0,0" />
                                     <TextBlock
                                         Visibility="{Binding DrugName,Converter={StaticResource BooleanToVisibilityConverter}}"
                                         Text="{Binding DrugName}"
                                         Style="{DynamicResource DefaultTextStyle}"
-                                        TextWrapping="Wrap" />
+                                        TextWrapping="Wrap"
+                                        Margin="0,5,0,0" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="120"
                                                Visibility="{Binding ApprovalNumber,Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Text="批准文号:"
                                                FontWeight="SemiBold"
-                                               Style="{DynamicResource DefaultTextStyle}" />
+                                               Style="{DynamicResource DefaultTextStyle}"
+                                               Margin="0,5,0,0" />
                                     <TextBlock
                                         Visibility="{Binding ApprovalNumber,Converter={StaticResource BooleanToVisibilityConverter}}"
                                         Text="{Binding ApprovalNumber}"
                                         Style="{DynamicResource DefaultTextStyle}"
-                                        TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                        TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"
+                                        Margin="0,5,0,0" />
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Width="120"
@@ -706,7 +1104,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- 详细信息选项卡 - 使用 Markdown 显示 -->
+                            <!-- 详细信息选项卡 - 使用动态加载 -->
                             <Border Background="{DynamicResource SecondaryBackgroundBrush}"
                                     BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
@@ -715,484 +1113,16 @@
                                     Margin="0,0,0,20">
                                 <TabControl Margin="0,10,0,0"
                                             HorizontalAlignment="Stretch"
-                                            MinHeight="400">
+                                            MinHeight="400"
+                                            ItemsSource="{Binding TabItems}"
+                                            SelectedItem="{Binding SelectedTab}"
+                                            ContentTemplateSelector="{StaticResource TabContentSelector}">
 
-                                    <!-- 全部详情 -->
-                                    <TabItem Header="📋 全部详情" Style="{StaticResource FluentTabItemStyle}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[FullDetails]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 主要成分 -->
-                                    <TabItem Header="🧪 主要成分" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[MainIngredients], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[MainIngredients]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 性状 -->
-                                    <TabItem Header="👁️ 性状" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Appearance], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Appearance]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 药物说明 -->
-                                    <TabItem Header="📋 药物说明" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[DrugDescription], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[DrugDescription]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 适应症 -->
-                                    <TabItem Header="🎯 适应症" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Indications], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Indications]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-
-                                    <!-- 用法用量标签页 -->
-                                    <TabItem Header="💊 用法用量" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Dosage], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="*" />
-                                            </Grid.RowDefinitions>
-
-                                            <!-- 原有的用法用量说明 -->
-                                            <markdig:MarkdownViewer Grid.Row="0"
-                                                                    Markdown="{Binding MarkdownContents[Dosage]}"
-                                                                    Background="Transparent" />
-
-                                            <!-- 分隔线 -->
-                                            <Separator Grid.Row="1" Margin="0,10" />
-
-                                            <!-- 剂量计算器 - 直接使用ViewModel属性 -->
-                                            <Grid Grid.Row="2">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="*" />
-                                                </Grid.RowDefinitions>
-
-                                                <!-- 计算器选择和状态 -->
-                                                <Border Grid.Row="0"
-                                                        Background="{DynamicResource SurfaceBrush}"
-                                                        BorderBrush="{DynamicResource BorderBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="6"
-                                                        Padding="15"
-                                                        Margin="0,0,0,10">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                        </Grid.RowDefinitions>
-
-                                                        <!-- 标题和操作按钮 -->
-                                                        <Grid Grid.Row="0">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition />
-                                                                <RowDefinition />
-                                                                <RowDefinition />
-                                                            </Grid.RowDefinitions>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
-
-                                                            <TextBlock Grid.Column="0"
-                                                                       Text="剂量计算器"
-                                                                       FontSize="16"
-                                                                       FontWeight="SemiBold"
-                                                                       VerticalAlignment="Center"
-                                                                       Foreground="{DynamicResource PrimaryTextBrush}" />
-
-                                                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                                                                <Button Content="创建计算器"
-                                                                        Command="{Binding CreateCalculatorCommand}"
-                                                                        Style="{StaticResource BaseButtonStyle}"
-                                                                        Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                <Button Content="编辑计算器"
-                                                                        Command="{Binding EditCalculatorCommand}"
-                                                                        Style="{StaticResource BaseButtonStyle}"
-                                                                        IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                        Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                        Margin="10,0,0,0" />
-                                                                <Button Content="AI生成计算器"
-                                                                        Command="{Binding GenerateCalculatorWithAiCommand}"
-                                                                        Style="{StaticResource BaseButtonStyle}"
-                                                                        IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                        Visibility="{Binding HasCalculators, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                                                        Margin="10,0,0,0" />
-                                                            </StackPanel>
-
-                                                            <!-- 添加生成进度面板 -->
-                                                            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                                                    Background="{DynamicResource SurfaceBrush}"
-                                                                    BorderBrush="{DynamicResource BorderBrush}"
-                                                                    BorderThickness="1"
-                                                                    CornerRadius="6"
-                                                                    Padding="15"
-                                                                    Margin="0,10,0,0"
-                                                                    Visibility="{Binding IsGeneratingCalculator, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                                <Grid>
-                                                                    <Grid.RowDefinitions>
-                                                                        <RowDefinition Height="Auto" />
-                                                                        <RowDefinition Height="Auto" />
-                                                                        <RowDefinition Height="Auto" />
-                                                                    </Grid.RowDefinitions>
-
-                                                                    <!-- 状态文本 -->
-                                                                    <TextBlock Grid.Row="0" 
-                                                                               Text="{Binding GenerationStatus}"
-                                                                               FontSize="14"
-                                                                               Foreground="{DynamicResource PrimaryTextBrush}"
-                                                                               Margin="0,0,0,10" />
-
-                                                                    <!-- 进度条 -->
-                                                                    <ProgressBar Grid.Row="1"
-                                                                        Value="{Binding GenerationProgress}"
-                                                                        Maximum="100"
-                                                                        Height="8"
-                                                                        Foreground="{DynamicResource PrimaryBrush}"
-                                                                        Background="{DynamicResource SecondaryBackgroundBrush}" />
-
-                                                                    <!-- 百分比显示 -->
-                                                                    <TextBlock Grid.Row="2"
-                                                                               Text="{Binding GenerationProgress, StringFormat='{}{0}%'}"
-                                                                               FontSize="12"
-                                                                               Foreground="{DynamicResource SecondaryTextBrush}"
-                                                                               HorizontalAlignment="Right"
-                                                                               Margin="0,5,0,0" />
-                                                                </Grid>
-                                                            </Border>
-                                                        </Grid>
-
-                                                        <!-- 计算器选择 -->
-                                                        <ComboBox Grid.Row="1"
-                                                                  ItemsSource="{Binding AvailableCalculators}"
-                                                                  SelectedItem="{Binding SelectedCalculator}"
-                                                                  DisplayMemberPath="CalculatorName"
-                                                                  MinWidth="200"
-                                                                  HorizontalAlignment="Left"
-                                                                  Margin="0,10,0,0"
-                                                                  Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                            <i:Interaction.Triggers>
-                                                                <i:EventTrigger EventName="SelectionChanged">
-                                                                    <i:InvokeCommandAction
-                                                                        Command="{Binding LoadCalculatorParametersCommand}" />
-                                                                </i:EventTrigger>
-                                                            </i:Interaction.Triggers>
-                                                        </ComboBox>
-
-                                                        <!-- 状态信息 -->
-                                                        <StackPanel Grid.Row="2" Orientation="Horizontal"
-                                                                    Margin="0,10,0,0">
-                                                            <TextBlock Text="{Binding CalculatorStatusMessage}"
-                                                                       Foreground="{DynamicResource SecondaryTextBrush}" />
-                                                            <ProgressBar Width="20"
-                                                                         Height="20"
-                                                                         IsIndeterminate="True"
-                                                                         Margin="10,0,0,0"
-                                                                         Visibility="{Binding IsCalculatorLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </Border>
-
-                                                <!-- 参数输入区域 -->
-                                                <Border Grid.Row="1"
-                                                        Background="{DynamicResource SurfaceBrush}"
-                                                        BorderBrush="{DynamicResource BorderBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="6"
-                                                        Padding="15"
-                                                        Margin="0,0,0,10"
-                                                        Visibility="{Binding CalculatorParameters.Count, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                        </Grid.RowDefinitions>
-
-                                                        <!-- 参数标题 -->
-                                                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                                            <TextBlock Text="计算参数 "
-                                                                       FontSize="14"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
-                                                            <TextBlock Text="("
-                                                                       FontSize="14"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                                                            <TextBlock Text="*"
-                                                                       FontSize="10"
-                                                                       Margin="3,0"
-                                                                       VerticalAlignment="Top"
-                                                                       Foreground="{DynamicResource ErrorBrush}"/>
-                                                            <TextBlock Text="号标记为必填)"
-                                                                       FontSize="14"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                                                        </StackPanel>
-                                                        <!-- 参数输入 -->
-                                                        <ItemsControl Grid.Row="1"
-                                                                      ItemsSource="{Binding CalculatorParameters}"
-                                                                      ItemTemplateSelector="{StaticResource ParameterTemplateSelector}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <WrapPanel Orientation="Horizontal" />
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                        </ItemsControl>
-
-                                                        <!-- 计算按钮 -->
-                                                        <StackPanel Grid.Row="2" Orientation="Horizontal"
-                                                                    Margin="0,10,0,0">
-                                                            <Button Content="计算剂量"
-                                                                    Style="{StaticResource BaseButtonStyle}"
-                                                                    Command="{Binding CalculateCommand}"
-                                                                    IsEnabled="{Binding IsCalculating, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-                                                            <Button Content="清空结果"
-                                                                    Style="{StaticResource BaseButtonStyle}"
-                                                                    Command="{Binding ClearCalculationResultsCommand}"
-                                                                    Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                    Margin="10,0,0,0" />
-                                                            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                                                                <ProgressBar Width="50"
-                                                                             Height="5"
-                                                                             IsIndeterminate="True"
-                                                                             Margin="0,0,10,0"
-                                                                             Foreground="{DynamicResource PrimaryBrush}"
-                                                                             Visibility="{Binding IsCalculating, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                <TextBlock Text="计算中..."
-                                                                           VerticalAlignment="Center"
-                                                                           Foreground="{DynamicResource SecondaryTextBrush}"
-                                                                           Visibility="{Binding IsCalculating, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                            </StackPanel>
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </Border>
-
-                                                <!-- 计算结果 -->
-                                                <Border Grid.Row="2"
-                                                        Background="{DynamicResource SurfaceBrush}"
-                                                        BorderBrush="{DynamicResource BorderBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="6"
-                                                        Padding="15"
-                                                        Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="*" />
-                                                        </Grid.RowDefinitions>
-
-                                                        <TextBlock Grid.Row="0"
-                                                                   Text="计算结果"
-                                                                   FontSize="14"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                                                   Margin="0,0,0,10" />
-
-                                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                                            <ItemsControl ItemsSource="{Binding CalculationResults}">
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate
-                                                                        DataType="{x:Type models:DosageCalculationResult}">
-                                                                        <Border
-                                                                            Background="{DynamicResource SecondaryBackgroundBrush}"
-                                                                            BorderBrush="{DynamicResource BorderBrush}"
-                                                                            BorderThickness="1"
-                                                                            CornerRadius="4"
-                                                                            Padding="12"
-                                                                            Margin="0,5,0,0">
-                                                                            <Border.Style>
-                                                                                <Style TargetType="Border">
-                                                                                    <Style.Triggers>
-                                                                                        <DataTrigger
-                                                                                            Binding="{Binding IsWarning}"
-                                                                                            Value="True">
-                                                                                            <Setter
-                                                                                                Property="BorderBrush"
-                                                                                                Value="#FF6B47" />
-                                                                                            <Setter
-                                                                                                Property="Background"
-                                                                                                Value="#FFF3F0" />
-                                                                                        </DataTrigger>
-                                                                                    </Style.Triggers>
-                                                                                </Style>
-                                                                            </Border.Style>
-
-                                                                            <Grid>
-                                                                                <Grid.RowDefinitions>
-                                                                                    <RowDefinition Height="Auto" />
-                                                                                    <RowDefinition Height="Auto" />
-                                                                                    <RowDefinition Height="Auto" />
-                                                                                    <RowDefinition Height="Auto" />
-                                                                                </Grid.RowDefinitions>
-
-                                                                                <!-- 描述 -->
-                                                                                <TextBlock Grid.Row="0"
-                                                                                    Text="{Binding Description}"
-                                                                                    FontWeight="SemiBold"
-                                                                                    FontSize="14"
-                                                                                    Foreground="{DynamicResource PrimaryTextBrush}" />
-
-                                                                                <!-- 剂量信息 -->
-                                                                                <StackPanel Grid.Row="1"
-                                                                                    Orientation="Horizontal"
-                                                                                    Margin="0,5,0,0">
-                                                                                    <TextBlock Text="剂量: "
-                                                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
-                                                                                    <TextBlock Text="{Binding Dose}"
-                                                                                        FontWeight="SemiBold"
-                                                                                        FontSize="16"
-                                                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
-                                                                                    <TextBlock Text="{Binding Unit}"
-                                                                                        Margin="2,0,0,0"
-                                                                                        FontWeight="SemiBold"
-                                                                                        Foreground="{DynamicResource PrimaryTextBrush}" />
-                                                                                    <TextBlock Text=" | "
-                                                                                        Margin="10,0"
-                                                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
-                                                                                    <TextBlock
-                                                                                        Text="{Binding Frequency}"
-                                                                                        Foreground="{DynamicResource SecondaryTextBrush}" />
-                                                                                </StackPanel>
-
-                                                                                <!-- 疗程 -->
-                                                                                <TextBlock Grid.Row="2"
-                                                                                    Text="{Binding Duration}"
-                                                                                    Margin="0,2,0,0"
-                                                                                    Foreground="{DynamicResource SecondaryTextBrush}"
-                                                                                    Visibility="{Binding Duration, Converter={StaticResource BooleanToVisibilityConverter}}" />
-
-                                                                                <!-- 警告和备注 -->
-                                                                                <StackPanel Grid.Row="3"
-                                                                                    Margin="0,5,0,0">
-                                                                                    <TextBlock
-                                                                                        Text="{Binding WarningMessage}"
-                                                                                        Foreground="#FF6B47"
-                                                                                        FontWeight="SemiBold"
-                                                                                        TextWrapping="Wrap"
-                                                                                        Visibility="{Binding IsWarning, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                                    <TextBlock Text="{Binding Notes}"
-                                                                                        Foreground="{DynamicResource SecondaryTextBrush}"
-                                                                                        TextWrapping="Wrap"
-                                                                                        Margin="0,3,0,0"
-                                                                                        Visibility="{Binding Notes, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                                                                </StackPanel>
-                                                                            </Grid>
-                                                                        </Border>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </ScrollViewer>
-                                                    </Grid>
-                                                </Border>
-                                            </Grid>
-                                        </Grid>
-                                    </TabItem>
-
-                                    <!-- 其他标签页保持不变... -->
-                                    <!-- 不良反应 -->
-                                    <TabItem Header="⚠️ 不良反应" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[SideEffects], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[SideEffects]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 注意事项 -->
-                                    <TabItem Header="⚡ 注意事项" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Precautions], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Precautions]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 禁忌 -->
-                                    <TabItem Header="🚫 禁忌" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Contraindications], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Contraindications]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 孕妇及哺乳期妇女用药 -->
-                                    <TabItem Header="🤱 孕妇及哺乳期妇女用药" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[PregnancyAndLactation], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[PregnancyAndLactation]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 儿童用药 -->
-                                    <TabItem Header="👶 儿童用药" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[PediatricUse], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[PediatricUse]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 老人用药 -->
-                                    <TabItem Header="👴 老人用药" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[GeriatricUse], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[GeriatricUse]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 药物相互作用 -->
-                                    <TabItem Header="🔄 药物相互作用" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[DrugInteractions], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[DrugInteractions]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 药理毒理 -->
-                                    <TabItem Header="🔬 药理毒理" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Pharmacology], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Pharmacology]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 药代动力学 -->
-                                    <TabItem Header="📈 药代动力学" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Pharmacokinetics], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Pharmacokinetics]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 储存信息 -->
-                                    <TabItem Header="📦 储存信息" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[Storage], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[Storage]}"
-                                            Background="Transparent" />
-                                    </TabItem>
-
-                                    <!-- 中医备注 -->
-                                    <TabItem Header="🏥 备注" Style="{StaticResource FluentTabItemStyle}"
-                                             Visibility="{Binding MarkdownContents[TcmRemarks], Converter={StaticResource BooleanToVisibilityConverter}}">
-                                        <markdig:MarkdownViewer
-                                            Markdown="{Binding MarkdownContents[TcmRemarks]}"
-                                            Background="Transparent" />
-                                    </TabItem>
+                                    <TabControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type viewModels:TabItemViewModel}">
+                                            <TextBlock Text="{Binding Header}" />
+                                        </DataTemplate>
+                                    </TabControl.ItemTemplate>
                                 </TabControl>
                             </Border>
                         </StackPanel>

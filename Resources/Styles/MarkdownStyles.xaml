@@ -38,37 +38,36 @@
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading2StyleKey}">
         <Setter Property="FontSize" Value="18"/>
         <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Margin" Value="0,16,0,8"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="Padding" Value="0,0,0,4"/>
-        <Setter Property="FontFamily" Value="宋体, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, Monospace Neon"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
     </Style>
 
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading3StyleKey}">
-        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontSize" Value="16"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Margin" Value="0,12,0,6"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
     </Style>
 
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading4StyleKey}">
-        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontSize" Value="14"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
         <Setter Property="Margin" Value="0,10,0,5"/>
     </Style>
 
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading5StyleKey}">
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
-        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
         <Setter Property="Margin" Value="0,8,0,4"/>
     </Style>
 
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading6StyleKey}">
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
         <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="Margin" Value="0,6,0,3"/>
@@ -198,7 +197,7 @@
     <!-- MarkdownViewer 默认样式 -->
     <Style TargetType="{x:Type markdig:MarkdownViewer}">
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei"/>
+        <Setter Property="FontFamily" Value="{DynamicResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="8"/>

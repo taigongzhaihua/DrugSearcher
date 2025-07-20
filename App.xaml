@@ -7,7 +7,8 @@
                 <!-- 字体 -->
                 <ResourceDictionary>
                     <FontFamily x:Key="IconFont">pack://application:,,,/Resources/Fonts/iconfont.ttf#iconfont</FontFamily>
-                </ResourceDictionary>
+                    <FontFamily x:Key="AppFontFamily">pack://application:,,,/Resources/Fonts/iconfont.ttf#iconfont, Microsoft YaHei UI, Segoe UI宋体, ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, Monospace Neon</FontFamily>
+</ResourceDictionary>
                 
                 <!-- 基础样式 -->
                 <ResourceDictionary Source="/Resources/Styles/BaseStyles.xaml" />
