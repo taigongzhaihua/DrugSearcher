@@ -18,15 +18,10 @@ public class DosageCalculatorAiService
     private readonly ILogger<DosageCalculatorAiService> _logger;
     private readonly HttpClient _httpClient;
 
-    /// <summary>
-    /// AI药物计算器生成服务
-    /// </summary>
-    public DosageCalculatorAiService(ILogger<DosageCalculatorAiService> logger,
-        HttpClient httpClient)
+    public DosageCalculatorAiService(ILogger<DosageCalculatorAiService> logger, HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;
-
         httpClient.Timeout = TimeSpan.FromMinutes(10);
     }
 
@@ -34,7 +29,7 @@ public class DosageCalculatorAiService
     private const string ApiEndpoint = "https://api.deepseek.com/v1/chat/completions";
 
     /// <summary>
-    /// 根据药物信息生成计算器（流式版本）
+    /// 根据药物信息生成计算器（流式版本，包含思维链）
     /// </summary>
     public async IAsyncEnumerable<DosageCalculatorGenerationProgress> GenerateCalculatorStreamAsync(
         BaseDrugInfo drugInfo,
@@ -44,7 +39,6 @@ public class DosageCalculatorAiService
     {
         _logger.LogInformation("开始为药物 {DrugName} 生成计算器（流式）", drugInfo.DrugName);
 
-        // 发送初始状态
         yield return new DosageCalculatorGenerationProgress
         {
             Status = GenerationStatus.Preparing,
@@ -52,7 +46,6 @@ public class DosageCalculatorAiService
             Progress = 0
         };
 
-        // 构建AI提示词
         var prompt = BuildPrompt(drugInfo, calculatorType, additionalRequirements);
 
         yield return new DosageCalculatorGenerationProgress
@@ -62,49 +55,59 @@ public class DosageCalculatorAiService
             Progress = 10
         };
 
-        // 调用AI API（流式）
         var completeResponse = new StringBuilder();
+        var reasoningContent = new StringBuilder();
         var startTime = DateTime.Now;
         var chunkCount = 0;
-
-        // 使用本地变量存储进度，避免在try-catch中使用yield
+        const int totalEstimatedChunks = 8000; // 估计的chunk数量
 
         await foreach (var chunk in CallDeepSeekApiStreamAsync(prompt, cancellationToken).ConfigureAwait(false))
         {
-            completeResponse.Append(chunk);
-            chunkCount += chunk.Length;
+            chunkCount++;
 
-            // 计算进度（基于经验值）
-            var progress = Math.Min(10 + chunkCount * 80 / 4096, 90); // 10-90%
+            // 处理推理内容
+            if (!string.IsNullOrEmpty(chunk.ReasoningContent))
+            {
+                reasoningContent.Append(chunk.ReasoningContent);
+            }
+
+            // 处理响应内容
+            if (!string.IsNullOrEmpty(chunk.Content))
+            {
+                completeResponse.Append(chunk.Content);
+            }
+
+            var progress = Math.Min(10 + (chunkCount * 80 / totalEstimatedChunks), 90);
 
             yield return new DosageCalculatorGenerationProgress
             {
                 Status = GenerationStatus.Generating,
-                Message = "正在生成计算器配置...",
+                Message = !string.IsNullOrEmpty(chunk.ReasoningContent) ? "AI正在思考..." : "正在生成计算器配置...",
                 Progress = progress,
                 PartialContent = completeResponse.ToString(),
-                StreamChunk = chunk,
+                StreamChunk = chunk.Content,
+                ReasoningContent = reasoningContent.ToString(),
                 ElapsedTime = DateTime.Now - startTime
             };
         }
 
-        // 解析AI响应
         yield return new DosageCalculatorGenerationProgress
         {
             Status = GenerationStatus.Parsing,
             Message = "正在解析生成的配置...",
-            Progress = 95
+            Progress = 95,
+            ReasoningContent = reasoningContent.ToString()
         };
 
         var result = ParseAiResponse(completeResponse.ToString(), drugInfo);
 
-        // 返回最终结果
         yield return new DosageCalculatorGenerationProgress
         {
             Status = result.Success ? GenerationStatus.Completed : GenerationStatus.Failed,
             Message = result.Success ? "计算器生成成功！" : $"生成失败: {result.ErrorMessage}",
             Progress = 100,
             Result = result,
+            ReasoningContent = reasoningContent.ToString(),
             ElapsedTime = DateTime.Now - startTime
         };
 
@@ -112,9 +115,9 @@ public class DosageCalculatorAiService
     }
 
     /// <summary>
-    /// 调用Deepseek API（真正的流式版本）
+    /// 调用Deepseek API（流式版本，支持推理模型）
     /// </summary>
-    private async IAsyncEnumerable<string> CallDeepSeekApiStreamAsync(
+    private async IAsyncEnumerable<DeepseekStreamChunk> CallDeepSeekApiStreamAsync(
         string prompt,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -123,7 +126,11 @@ public class DosageCalculatorAiService
             model = "deepseek-reasoner",
             messages = new[]
             {
-                new { role = "system", content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。你需要根据药物信息生成完整的剂量计算器配置。" },
+                new {
+                    role = "system",
+                    content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。" +
+                             "你需要根据药物信息生成完整的剂量计算器配置。"
+                },
                 new { role = "user", content = prompt }
             },
             max_tokens = 8192,
@@ -178,12 +185,28 @@ public class DosageCalculatorAiService
                     if (data == "[DONE]")
                         yield break;
 
-                    // 简单的JSON解析，避免异常
                     if (!TryDeserializeStreamResponse(data, out var streamResponse)) continue;
-                    var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
-                    if (!string.IsNullOrEmpty(deltaContent))
+
+                    var choice = streamResponse?.Choices?.FirstOrDefault();
+                    if (choice == null) continue;
+
+                    var chunk = new DeepseekStreamChunk();
+
+                    // 处理响应内容
+                    if (!string.IsNullOrEmpty(choice.Delta?.Content))
                     {
-                        yield return deltaContent;
+                        chunk.Content = choice.Delta.Content;
+                    }
+
+                    // 处理推理内容
+                    if (!string.IsNullOrEmpty(choice.Delta?.ReasoningContent))
+                    {
+                        chunk.ReasoningContent = choice.Delta.ReasoningContent;
+                    }
+
+                    if (!string.IsNullOrEmpty(chunk.Content) || !string.IsNullOrEmpty(chunk.ReasoningContent))
+                    {
+                        yield return chunk;
                     }
                 }
                 else if (buffer[i] != '\r')
@@ -199,16 +222,27 @@ public class DosageCalculatorAiService
             var lastLine = lineBuilder.ToString();
             if (!lastLine.StartsWith("data: ") || lastLine.Length <= 6) yield break;
             var data = lastLine[6..];
-            if (data == "[DONE]") yield break;
-            if (!TryDeserializeStreamResponse(data, out var streamResponse)) yield break;
-            var deltaContent = streamResponse?.Choices?.FirstOrDefault()?.Delta?.Content;
-            if (!string.IsNullOrEmpty(deltaContent))
+            if (data == "[DONE]" || !TryDeserializeStreamResponse(data, out var streamResponse)) yield break;
+            var choice = streamResponse?.Choices?.FirstOrDefault();
+            if (choice == null) yield break;
+            var chunk = new DeepseekStreamChunk();
+
+            if (!string.IsNullOrEmpty(choice.Delta?.Content))
             {
-                yield return deltaContent;
+                chunk.Content = choice.Delta.Content;
+            }
+
+            if (!string.IsNullOrEmpty(choice.Delta?.ReasoningContent))
+            {
+                chunk.ReasoningContent = choice.Delta.ReasoningContent;
+            }
+
+            if (!string.IsNullOrEmpty(chunk.Content) || !string.IsNullOrEmpty(chunk.ReasoningContent))
+            {
+                yield return chunk;
             }
         }
     }
-
 
     /// <summary>
     /// 安全地尝试反序列化流响应
@@ -220,50 +254,67 @@ public class DosageCalculatorAiService
         if (string.IsNullOrWhiteSpace(data))
             return false;
 
-        // 使用 JsonDocument 进行更安全的解析
-        using var doc = JsonDocument.Parse(data);
-
-        response = new DeepseekStreamingResponse();
-
-        if (!doc.RootElement.TryGetProperty("choices", out var choices) ||
-            choices.ValueKind != JsonValueKind.Array) return false;
-        response.Choices = [];
-
-        foreach (var choice in choices.EnumerateArray())
+        try
         {
-            var streamingChoice = new StreamingChoice();
+            using var doc = JsonDocument.Parse(data);
 
-            if (choice.TryGetProperty("index", out var index))
-                streamingChoice.Index = index.GetInt32();
+            response = new DeepseekStreamingResponse();
 
-            if (choice.TryGetProperty("delta", out var delta))
+            if (!doc.RootElement.TryGetProperty("choices", out var choices) ||
+                choices.ValueKind != JsonValueKind.Array) return false;
+
+            response.Choices = [];
+
+            foreach (var choice in choices.EnumerateArray())
             {
-                streamingChoice.Delta = new StreamingDelta();
+                var streamingChoice = new StreamingChoice();
 
-                if (delta.TryGetProperty("content", out var content))
-                    streamingChoice.Delta.Content = content.GetString();
+                if (choice.TryGetProperty("index", out var index))
+                    streamingChoice.Index = index.GetInt32();
 
-                if (delta.TryGetProperty("role", out var role))
-                    streamingChoice.Delta.Role = role.GetString();
+                if (choice.TryGetProperty("delta", out var delta))
+                {
+                    streamingChoice.Delta = new StreamingDelta();
+
+                    if (delta.TryGetProperty("content", out var content))
+                        streamingChoice.Delta.Content = content.GetString();
+
+                    if (delta.TryGetProperty("role", out var role))
+                        streamingChoice.Delta.Role = role.GetString();
+
+                    // 处理推理内容
+                    if (delta.TryGetProperty("reasoning_content", out var reasoningContent))
+                        streamingChoice.Delta.ReasoningContent = reasoningContent.GetString();
+                }
+
+                response.Choices.Add(streamingChoice);
             }
 
-            response.Choices.Add(streamingChoice);
+            return true;
         }
-
-        return true;
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
-    /// 构建AI提示词（保持原有实现）
+    /// 构建AI提示词
     /// </summary>
     private static string BuildPrompt(BaseDrugInfo drugInfo, string calculatorType, string additionalRequirements)
     {
-        // ... 保持原有的 BuildPrompt 实现不变 ...
         var sb = new StringBuilder();
 
         sb.AppendLine("# 药物计算器生成任务");
         sb.AppendLine();
         sb.AppendLine("请根据以下药物信息生成一个完整的剂量计算器配置。");
+        sb.AppendLine();
+        sb.AppendLine("## 思考步骤：");
+        sb.AppendLine("1. 分析药物的主要特性和适应症");
+        sb.AppendLine("2. 确定计算所需的关键参数（如年龄、体重、病情等）");
+        sb.AppendLine("3. 根据药物说明书设计剂量计算逻辑");
+        sb.AppendLine("4. 考虑特殊人群（儿童、老人、肝肾功能不全等）的剂量调整");
+        sb.AppendLine("5. 添加必要的安全限制和警告");
         sb.AppendLine();
 
         // 药物基本信息
@@ -275,7 +326,6 @@ public class DosageCalculatorAiService
 
         switch (drugInfo)
         {
-            // 详细信息（如果有）
             case LocalDrugInfo localDrug:
                 sb.AppendLine($"- 适应症: {localDrug.Indications}");
                 sb.AppendLine($"- 用法用量: {localDrug.Dosage}");
@@ -326,35 +376,18 @@ public class DosageCalculatorAiService
         sb.AppendLine("- 不要使用var、let等重新声明参数变量，会导致脚本错误");
         sb.AppendLine("- 使用 addNormalResult(description, dose, unit, frequency, duration, notes) 添加正常结果");
         sb.AppendLine("- 使用 addWarning(description, dose, unit, frequency, warningMessage) 添加警告");
+        sb.AppendLine("- 注：dose 参数必须为数字类型，否则会直接转换成 0");
         sb.AppendLine("- 使用 round(value, decimals) 四舍五入");
         sb.AppendLine("- 使用 clamp(value, min, max) 限制数值范围");
         sb.AppendLine("- 包含详细的输入验证");
         sb.AppendLine("- 包含年龄、体重相关的剂量调整");
         sb.AppendLine("- 包含安全上限检查");
-        sb.AppendLine("- 若有多种用药方案，可以全部列举出来，不用考虑用法单一性");
-        sb.AppendLine("- 注意年龄单位");
-        sb.AppendLine("- 注意每日剂量和每次剂量的区别");
-        sb.AppendLine("- 注意剂量单位（mg/kg、mg/m²等）");
-        sb.AppendLine("- 注意剂量频率（每日、每次等）");
-        sb.AppendLine("- 注意：如无特别声明，医学上儿童是指12岁以下年龄段，12岁以上均按成人处理。");
-        sb.AppendLine("- 注意：如标明为未成年人，则为18岁以下，请注意儿童/成人 与 未成年人/成人 的区别。");
-        sb.AppendLine("- 可以使用return语句在验证失败时提前退出");
+        sb.AppendLine("- 若有多种用药方案，可以全部列举出来");
+        sb.AppendLine("- 注意年龄单位和剂量单位的转换");
+        sb.AppendLine("- 注意：如无特别声明，医学上儿童是指12岁以下年龄段");
         sb.AppendLine();
 
-        sb.AppendLine("### 4. 常见参数建议");
-        sb.AppendLine("- weight: 体重（kg）");
-        sb.AppendLine("- age: 年龄（岁）");
-        sb.AppendLine("- ageUnit: 年龄单位（岁/月/天）");
-        sb.AppendLine("- height: 身高（cm）");
-        sb.AppendLine("- severity: 病情严重程度（轻度/中度/重度）");
-        sb.AppendLine("- renalFunction: 肾功能状态（正常/轻度损伤/中度损伤/重度损伤）");
-        sb.AppendLine("- hepaticFunction: 肝功能状态（正常/轻度损伤/中度损伤/重度损伤）");
-        sb.AppendLine("- isPregnant: 是否怀孕");
-        sb.AppendLine("- isLactating: 是否哺乳");
-        sb.AppendLine("- hasAllergy: 是否有过敏史");
-        sb.AppendLine();
-
-        sb.AppendLine("### 5. 输出格式示例");
+        sb.AppendLine("### 4. 输出格式示例");
         sb.AppendLine("""
                       {
                         "calculatorName": "阿莫西林成人剂量计算器",
@@ -372,17 +405,6 @@ public class DosageCalculatorAiService
                             "description": "患者体重（千克）"
                           },
                           {
-                            "name": "age",
-                            "displayName": "年龄",
-                            "dataType": "number",
-                            "unit": "岁",
-                            "isRequired": true,
-                            "defaultValue": 35,
-                            "minValue": 18,
-                            "maxValue": 100,
-                            "description": "患者年龄（岁）"
-                          },
-                          {
                             "name": "severity",
                             "displayName": "感染严重程度",
                             "dataType": "select",
@@ -393,34 +415,29 @@ public class DosageCalculatorAiService
                             "description": "根据感染严重程度选择"
                           }
                         ],
-                        "calculationCode": "// 获取参数\nweight = parseFloat(weight) || 0;\nage = parseFloat(age) || 0;\nseverity = severity || '中度';\n\n// 输入验证\nif (weight < 30 || weight > 200) {\n    addWarning('体重范围', 0, 'mg', '', '体重应在30-200kg之间');\n    return;\n}\n\n// 基础剂量计算\nvar baseDose = weight * 25; // 25mg/kg/日\n\n// 严重程度调整\nif (severity === '重度') {\n    baseDose *= 1.5;\n} else if (severity === '轻度') {\n    baseDose *= 0.8;\n}\n\n// 年龄调整\nif (age > 65) {\n    baseDose *= 0.85;\n}\n\n// 计算单次剂量\nvar singleDose = round(baseDose / 3, 1);\n\n// 输出结果\naddNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-10天', '餐后服用');"
+                        "calculationCode": "// 推理过程已在AI思考中完成\n// 以下是基于药物说明书的剂量计算实现\n\n// 输入验证\nif (weight < 30 || weight > 200) {\n    addWarning('体重范围', 0, 'mg', '', '体重应在30-200kg之间');\n    return;\n}\n\n// 基础剂量计算\nvar baseDose = weight * 25; // 25mg/kg/日\n\n// 严重程度调整\nif (severity === '重度') {\n    baseDose *= 1.5;\n} else if (severity === '轻度') {\n    baseDose *= 0.8;\n}\n\n// 计算单次剂量\nvar singleDose = round(baseDose / 3, 1);\n\n// 输出结果\naddNormalResult('推荐剂量', singleDose, 'mg', '每日3次', '7-10天', '餐后服用');"
                       }
                       """);
 
         sb.AppendLine();
         sb.AppendLine("请根据药物的具体特性和临床使用情况，生成合适的参数和计算逻辑。");
         sb.AppendLine("确保代码符合临床实际，包含必要的安全检查。");
-        sb.AppendLine("只输出JSON格式的配置，不要包含其他说明文字。");
 
         return sb.ToString();
     }
 
-    // Add a static readonly field to cache the JsonSerializerOptions instance
     private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    // Update the ParseAiResponse method to use the cached instance
     private DosageCalculatorGenerationResult ParseAiResponse(string aiResponse, BaseDrugInfo drugInfo)
     {
         try
         {
-            // Use the cached JsonSerializerOptions instance
             var config = JsonSerializer.Deserialize<CalculatorConfig>(aiResponse, CachedJsonSerializerOptions)
                          ?? throw new Exception("无法解析AI响应");
 
-            // 创建计算器对象
             var calculator = new DosageCalculator
             {
                 DrugIdentifier = DosageCalculator.GenerateDrugIdentifier(drugInfo.DataSource, drugInfo.Id),
@@ -432,8 +449,8 @@ public class DosageCalculatorAiService
                 CalculationCode = config.CalculationCode,
                 ParameterDefinitions = JsonSerializer.Serialize(config.Parameters),
                 CreatedBy = "taigongzhaihua",
-                CreatedAt = DateTime.Now, // 使用本地时间
-                UpdatedAt = DateTime.Now, // 使用本地时间
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
                 IsActive = true
             };
 
@@ -458,6 +475,15 @@ public class DosageCalculatorAiService
 }
 
 /// <summary>
+/// Deepseek流式响应块
+/// </summary>
+public class DeepseekStreamChunk
+{
+    public string? Content { get; set; }
+    public string? ReasoningContent { get; set; }
+}
+
+/// <summary>
 /// 计算器生成进度
 /// </summary>
 public class DosageCalculatorGenerationProgress
@@ -467,6 +493,7 @@ public class DosageCalculatorGenerationProgress
     public int Progress { get; set; }
     public string? PartialContent { get; set; }
     public string? StreamChunk { get; set; }
+    public string? ReasoningContent { get; set; }
     public TimeSpan? ElapsedTime { get; set; }
     public DosageCalculatorGenerationResult? Result { get; set; }
 }
@@ -485,39 +512,33 @@ public enum GenerationStatus
 }
 
 /// <summary>
-/// Deepseek 流式响应模型
+/// Deepseek 流式响应模型（支持推理内容）
 /// </summary>
 public class DeepseekStreamingResponse
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
-
     [JsonPropertyName("object")] public string? Object { get; set; }
-
     [JsonPropertyName("created")] public long Created { get; set; }
-
     [JsonPropertyName("model")] public string? Model { get; set; }
-
     [JsonPropertyName("choices")] public List<StreamingChoice>? Choices { get; set; }
 }
 
 public class StreamingChoice
 {
     [JsonPropertyName("index")] public int Index { get; set; }
-
     [JsonPropertyName("delta")] public StreamingDelta? Delta { get; set; }
-
     [JsonPropertyName("finish_reason")] public string? FinishReason { get; set; }
 }
 
 public class StreamingDelta
 {
     [JsonPropertyName("role")] public string? Role { get; set; }
-
     [JsonPropertyName("content")] public string? Content { get; set; }
+    [JsonPropertyName("reasoning_content")] public string? ReasoningContent { get; set; }
 }
 
 /// <summary>
-/// 计算器配置（移除category）
+/// 计算器配置
 /// </summary>
 public class CalculatorConfig
 {
@@ -525,24 +546,6 @@ public class CalculatorConfig
     public string Description { get; set; } = string.Empty;
     public List<DosageParameter> Parameters { get; set; } = [];
     public string CalculationCode { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Deepseek API响应
-/// </summary>
-public class DeepseekResponse
-{
-    public List<DeepseekChoice>? Choices { get; set; }
-}
-
-public class DeepseekChoice
-{
-    public DeepseekMessage? Message { get; set; }
-}
-
-public class DeepseekMessage
-{
-    public string? Content { get; set; }
 }
 
 /// <summary>

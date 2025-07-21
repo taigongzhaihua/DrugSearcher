@@ -19,42 +19,36 @@ public partial class HomePageViewModel : ObservableObject
 {
     private readonly DrugSearchService _drugSearchService;
     private readonly JavaScriptDosageCalculatorService _calculatorService;
-    private CancellationTokenSource? _searchCancellationTokenSource;
     private readonly DosageCalculatorAiService _aiService;
+    private CancellationTokenSource? _searchCancellationTokenSource;
     private Dictionary<string, string> _cachedMarkdownContents = [];
-    private List<(string Key, string Header, bool IsSpecial)> _tabDefinitions;
-    public HomePageViewModel(DrugSearchService drugSearchService,
+    private List<(string Key, string Header, bool IsSpecial)>? _tabDefinitions;
+
+    public HomePageViewModel(
+        DrugSearchService drugSearchService,
         JavaScriptDosageCalculatorService calculatorService,
         DosageCalculatorAiService aiService)
     {
         _drugSearchService = drugSearchService;
         _calculatorService = calculatorService;
-        SearchResults = [];
-        SearchSuggestions = [];
-        TabItems = [];
+        _aiService = aiService;
 
-        // 初始化计算器相关集合
-        AvailableCalculators = [];
-        CalculatorParameters = [];
-        CalculationResults = [];
+        InitializeDefaultValues();
+        InitializeTabItems();
+    }
 
-        // 设置默认值
+    #region 初始化方法
+
+    private void InitializeDefaultValues()
+    {
         IsLocalDbEnabled = true;
         IsOnlineEnabled = true;
         ResultCount = "搜索结果: 0 条";
         CalculatorStatusMessage = "请选择药物以查看可用的计算器";
-        _aiService = aiService;
-
-        // 初始化标签页
-        InitializeTabItems();
     }
-
-
-    #region 初始化方法
 
     private void InitializeTabItems()
     {
-        // 定义所有可能的标签页
         _tabDefinitions =
         [
             ("FullDetails", "全部详情", false),
@@ -62,7 +56,7 @@ public partial class HomePageViewModel : ObservableObject
             ("Appearance", "性状", false),
             ("DrugDescription", "药物说明", false),
             ("Indications", "适应症", false),
-            ("Dosage", "用法用量", true), // 特殊标签页
+            ("Dosage", "用法用量", true),
             ("SideEffects", "不良反应", false),
             ("Precautions", "注意事项", false),
             ("Contraindications", "禁忌", false),
@@ -78,129 +72,72 @@ public partial class HomePageViewModel : ObservableObject
     }
 
     #endregion
-    #region 原有属性 (搜索相关) - 保持不变
 
-    [ObservableProperty]
-    private string _searchTerm = string.Empty;
+    #region 属性
 
-    [ObservableProperty]
-    private bool _isLocalDbEnabled;
+    // 搜索相关
+    [ObservableProperty] private string _searchTerm = string.Empty;
+    [ObservableProperty] private bool _isLocalDbEnabled;
+    [ObservableProperty] private bool _isOnlineEnabled;
+    [ObservableProperty] private bool _isLoading;
+    [ObservableProperty] private string _resultCount = string.Empty;
+    [ObservableProperty] private string _searchStatus = string.Empty;
+    [ObservableProperty] private bool _isDetailPanelVisible;
+    [ObservableProperty] private UnifiedDrugSearchResult? _selectedDrug;
+    [ObservableProperty] private bool _showSearchSuggestions;
 
-    [ObservableProperty]
-    private bool _isOnlineEnabled;
+    // 基本信息
+    [ObservableProperty] private string _drugName = string.Empty;
+    [ObservableProperty] private string _genericName = string.Empty;
+    [ObservableProperty] private string _tradeName = string.Empty;
+    [ObservableProperty] private string _manufacturerInfo = string.Empty;
+    [ObservableProperty] private string _approvalNumber = string.Empty;
+    [ObservableProperty] private string _specification = string.Empty;
+    [ObservableProperty] private string _dataSourceInfo = string.Empty;
+    [ObservableProperty] private string _matchInfo = string.Empty;
 
-    [ObservableProperty]
-    private bool _isLoading;
+    // 中医信息
+    [ObservableProperty] private string _tcmDisease = string.Empty;
+    [ObservableProperty] private string _tcmSyndrome = string.Empty;
 
-    [ObservableProperty]
-    private string _resultCount = string.Empty;
+    // 计算器相关
+    [ObservableProperty] private DosageCalculator? _selectedCalculator;
+    [ObservableProperty] private bool _isCalculatorLoading;
+    [ObservableProperty] private bool _isCalculating;
+    [ObservableProperty] private bool _hasCalculationResults;
+    [ObservableProperty] private bool _hasCalculators;
+    [ObservableProperty] private string _calculatorStatusMessage = "请选择药物以查看可用的计算器";
 
-    [ObservableProperty]
-    private string _searchStatus = string.Empty;
+    // AI生成相关
+    [ObservableProperty] private bool _isGeneratingCalculator;
+    [ObservableProperty] private string _generationStatus = string.Empty;
+    [ObservableProperty] private int _generationProgress;
+    [ObservableProperty] private string _generationStreamContent = string.Empty;
+    [ObservableProperty] private string _generationReasoningContent = string.Empty;
 
-    [ObservableProperty]
-    private bool _isDetailPanelVisible;
+    // Tab相关
+    [ObservableProperty] private TabItemViewModel? _selectedTab;
 
-    [ObservableProperty]
-    private UnifiedDrugSearchResult? _selectedDrug;
-
-    [ObservableProperty]
-    private bool _showSearchSuggestions;
-
-    // 基本信息属性
-    [ObservableProperty]
-    private string _drugName = string.Empty;
-
-    [ObservableProperty]
-    private string _genericName = string.Empty;
-
-    [ObservableProperty]
-    private string _tradeName = string.Empty;
-
-    [ObservableProperty]
-    private string _manufacturerInfo = string.Empty;
-
-    [ObservableProperty]
-    private string _approvalNumber = string.Empty;
-
-    [ObservableProperty]
-    private string _specification = string.Empty;
-
-    [ObservableProperty]
-    private string _dataSourceInfo = string.Empty;
-
-    [ObservableProperty]
-    private string _matchInfo = string.Empty;
-
-    // 中医信息属性
-    [ObservableProperty]
-    private string _tcmDisease = string.Empty;
-
-    [ObservableProperty]
-    private string _tcmSyndrome = string.Empty;
-
-    // 添加AI生成相关属性
-    [ObservableProperty]
-    private bool _isGeneratingCalculator;
-
-    [ObservableProperty]
-    private string _generationStatus = string.Empty;
-
-    // 新增：Tab相关属性
-    [ObservableProperty]
-    private TabItemViewModel? _selectedTab;
-
-    public ObservableCollection<UnifiedDrugSearchResult?> SearchResults { get; }
-    public ObservableCollection<string> SearchSuggestions { get; }
-    public ObservableCollection<TabItemViewModel> TabItems { get; }
-
-    // 计算器相关属性
+    public ObservableCollection<UnifiedDrugSearchResult?> SearchResults { get; } = [];
+    public ObservableCollection<string> SearchSuggestions { get; } = [];
+    public ObservableCollection<TabItemViewModel> TabItems { get; } = [];
+    public ObservableCollection<DosageCalculator> AvailableCalculators { get; } = [];
+    public ObservableCollection<DosageParameter> CalculatorParameters { get; } = [];
+    public ObservableCollection<DosageCalculationResult> CalculationResults { get; } = [];
     public BaseDrugInfo? SelectedDrugInfo => SelectedDrug?.DrugInfo;
 
     #endregion
 
-    #region 新增属性 (计算器相关)
-
-    [ObservableProperty]
-    private DosageCalculator? _selectedCalculator;
-
-    [ObservableProperty]
-    private bool _isCalculatorLoading;
-
-    [ObservableProperty]
-    private bool _isCalculating;
-
-    [ObservableProperty]
-    private bool _hasCalculationResults;
-
-    [ObservableProperty]
-    private bool _hasCalculators;
-
-    [ObservableProperty]
-    private string _calculatorStatusMessage = "请选择药物以查看可用的计算器";
-
-    [ObservableProperty]
-    private int _generationProgress;
-
-    [ObservableProperty]
-    private string _generationStreamContent = string.Empty;
-    public ObservableCollection<DosageCalculator> AvailableCalculators { get; }
-    public ObservableCollection<DosageParameter> CalculatorParameters { get; }
-    public ObservableCollection<DosageCalculationResult> CalculationResults { get; }
-
-    #endregion
-
-    #region 原有命令 (搜索相关)
+    #region 命令
 
     [RelayCommand]
     private async Task Search()
     {
-        if (string.IsNullOrEmpty(SearchTerm.Trim()))
+        if (string.IsNullOrWhiteSpace(SearchTerm))
         {
             MessageBox.Show("请输入搜索关键词", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-
         await PerformSearch();
     }
 
@@ -234,60 +171,46 @@ public partial class HomePageViewModel : ObservableObject
         ShowSearchSuggestions = false;
         HideDetailPanel();
         ResultCount = "搜索结果: 0 条";
-
-        // 清空计算器状态
         ResetCalculatorState();
     }
 
     [RelayCommand]
     private void HideSuggestions() => ShowSearchSuggestions = false;
 
-    #endregion
-
-    #region 新增命令 (计算器相关)
-
     [RelayCommand]
     private async Task LoadCalculatorsForDrug(BaseDrugInfo drugInfo)
     {
-        try
-        {
-            IsCalculatorLoading = true;
-            CalculatorStatusMessage = "正在加载计算器...";
-
-            var calculators = await _calculatorService.GetCalculatorsForDrugAsync(drugInfo);
-
-            AvailableCalculators.Clear();
-            foreach (var calculator in calculators)
+        await ExecuteWithLoadingState(
+            async () =>
             {
-                AvailableCalculators.Add(calculator);
-            }
+                var calculators = await _calculatorService.GetCalculatorsForDrugAsync(drugInfo);
 
-            HasCalculators = AvailableCalculators.Count > 0;
+                AvailableCalculators.Clear();
+                foreach (var calculator in calculators)
+                {
+                    AvailableCalculators.Add(calculator);
+                }
 
-            if (HasCalculators)
-            {
-                // 自动选择第一个计算器
-                SelectedCalculator = AvailableCalculators[0];
-                await LoadCalculatorParameters();
-                CalculatorStatusMessage = $"找到 {AvailableCalculators.Count} 个计算器";
-            }
-            else
-            {
-                CalculatorStatusMessage = "该药物暂无可用的计算器";
-                ClearCalculatorData();
-            }
-        }
-        catch (Exception ex)
-        {
-            CalculatorStatusMessage = $"加载计算器失败: {ex.Message}";
-            HasCalculators = false;
-            ClearCalculatorData();
-        }
-        finally
-        {
-            IsCalculatorLoading = false;
-        }
+                HasCalculators = AvailableCalculators.Count > 0;
+
+                if (HasCalculators)
+                {
+                    SelectedCalculator = AvailableCalculators[0];
+                    await LoadCalculatorParameters();
+                    CalculatorStatusMessage = $"找到 {AvailableCalculators.Count} 个计算器";
+                }
+                else
+                {
+                    CalculatorStatusMessage = "该药物暂无可用的计算器";
+                    ClearCalculatorData();
+                }
+            },
+            loading => IsCalculatorLoading = loading,
+            "正在加载计算器...",
+            "加载计算器失败"
+        );
     }
+
     [RelayCommand]
     private async Task LoadCalculatorParameters()
     {
@@ -300,11 +223,9 @@ public partial class HomePageViewModel : ObservableObject
             CalculatorParameters.Clear();
             foreach (var param in parameters)
             {
-                // 参数的Value已经在服务层设置好了
                 CalculatorParameters.Add(param);
             }
 
-            // 清空之前的计算结果
             CalculationResults.Clear();
             HasCalculationResults = false;
 
@@ -323,128 +244,28 @@ public partial class HomePageViewModel : ObservableObject
     {
         if (SelectedCalculator == null) return;
 
-        // 验证必填参数
-        var missingParams = CalculatorParameters.Where(p => p.IsRequired &&
-            (string.IsNullOrWhiteSpace(p.Value.ToString()))).ToList();
-
+        var missingParams = ValidateRequiredParameters();
         if (missingParams.Count != 0)
         {
-            var missingNames = string.Join(", ", missingParams.Select(p => p.DisplayName));
-            MessageBox.Show($"请填写必填参数: {missingNames}", "参数验证",
-                MessageBoxButton.OK, MessageBoxImage.Warning);
+            ShowValidationError(missingParams);
             return;
         }
 
-        IsCalculating = true;
-        CalculationResults.Clear();
-        HasCalculationResults = false;
-        CalculatorStatusMessage = "正在计算...";
-
-        try
-        {
-            // 构建参数字典
-            var paramDict = new Dictionary<string, object>();
-            foreach (var param in CalculatorParameters)
-            {
-                // 根据参数类型转换值
-                object value = param.DataType switch
-                {
-                    ParameterTypes.Number => Convert.ToDouble(param.Value),
-                    ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
-                    _ => param.Value.ToString() ?? string.Empty
-                };
-                if (param.Name != null) paramDict[param.Name] = value;
-            }
-
-            var request = new DosageCalculationRequest
-            {
-                CalculatorId = SelectedCalculator.Id,
-                Parameters = paramDict
-            };
-
-            var results = await _calculatorService.CalculateDosageAsync(request);
-
-            foreach (var result in results)
-            {
-                CalculationResults.Add(result);
-            }
-
-            HasCalculationResults = CalculationResults.Count > 0;
-            CalculatorStatusMessage = HasCalculationResults ?
-                $"计算完成，共 {CalculationResults.Count} 个结果" : "计算完成，无结果";
-        }
-        catch (Exception ex)
-        {
-            CalculationResults.Add(new DosageCalculationResult
-            {
-                Description = "计算错误",
-                IsWarning = true,
-                WarningMessage = ex.Message
-            });
-            HasCalculationResults = true;
-            CalculatorStatusMessage = "计算失败";
-        }
-        finally
-        {
-            IsCalculating = false;
-        }
+        await ExecuteCalculation();
     }
 
     [RelayCommand]
     private async Task CreateCalculator()
     {
         if (SelectedDrugInfo == null) return;
-
-        try
-        {
-            var calculatorService = ContainerAccessor.Resolve<JavaScriptDosageCalculatorService>();
-            var logger = ContainerAccessor.Resolve<ILogger<CalculatorEditorViewModel>>();
-
-            var viewModel = new CalculatorEditorViewModel(calculatorService, logger, SelectedDrugInfo);
-            var window = new CalculatorEditorWindow();
-            window.SetViewModel(viewModel);
-            window.Owner = Application.Current.MainWindow;
-
-            if (window.ShowDialog() == true)
-            {
-                // 重新加载计算器列表
-                await LoadCalculatorsForDrug(SelectedDrugInfo);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"创建计算器时发生错误: {ex.Message}", "错误",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        await ShowCalculatorEditor();
     }
 
-    // 更新编辑计算器命令
     [RelayCommand]
     private async Task EditCalculator()
     {
         if (SelectedCalculator == null || SelectedDrugInfo == null) return;
-
-        try
-        {
-            var calculatorService = ContainerAccessor.Resolve<JavaScriptDosageCalculatorService>();
-            var logger = ContainerAccessor.Resolve<ILogger<CalculatorEditorViewModel>>();
-
-            var viewModel = new CalculatorEditorViewModel(calculatorService, logger, SelectedDrugInfo, SelectedCalculator);
-            var window = new CalculatorEditorWindow();
-            window.SetViewModel(viewModel);
-            window.Owner = Application.Current.MainWindow;
-
-            if (window.ShowDialog() == true)
-            {
-                // 重新加载计算器列表
-                await LoadCalculatorsForDrug(SelectedDrugInfo);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"编辑计算器时发生错误: {ex.Message}", "错误",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        await ShowCalculatorEditor(SelectedCalculator);
     }
 
     [RelayCommand]
@@ -455,7 +276,6 @@ public partial class HomePageViewModel : ObservableObject
         CalculatorStatusMessage = "结果已清空";
     }
 
-    // 添加AI生成命令
     [RelayCommand]
     private async Task GenerateCalculatorWithAi()
     {
@@ -465,72 +285,138 @@ public partial class HomePageViewModel : ObservableObject
             return;
         }
 
-        var result = ShowCalculatorGenerationDialog();
-        if (result == null) return;
+        var request = ShowCalculatorGenerationDialog();
+        if (request == null) return;
 
+        await GenerateCalculatorWithAiStream(request);
+    }
+
+    #endregion
+
+    #region 私有方法
+
+    [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
+    private async Task PerformSearch()
+    {
+        _searchCancellationTokenSource?.Cancel();
+        _searchCancellationTokenSource = new CancellationTokenSource();
+
+        await ExecuteWithLoadingState(
+            async () =>
+            {
+                SearchResults.Clear();
+                HideDetailPanel();
+                ShowSearchSuggestions = false;
+
+                var searchCriteria = new DrugSearchCriteria
+                {
+                    SearchTerm = SearchTerm.Trim(),
+                    SearchLocalDb = IsLocalDbEnabled,
+                    SearchOnline = IsOnlineEnabled,
+                    MaxResults = 100,
+                    MinMatchScore = 0.1
+                };
+
+                var results = await _drugSearchService.SearchDrugsAsync(searchCriteria);
+
+                if (_searchCancellationTokenSource.Token.IsCancellationRequested)
+                    return;
+
+                foreach (var drugResult in results)
+                {
+                    SearchResults.Add(drugResult);
+                }
+
+                UpdateResultCount(results.Count);
+
+                if (results.Count > 0)
+                {
+                    await SelectDrug(results[0]);
+                }
+            },
+            loading => IsLoading = loading,
+            "搜索中...",
+            "搜索时发生错误"
+        );
+    }
+
+    private async Task DisplayDrugDetails(UnifiedDrugSearchResult? drugResult)
+    {
+        try
+        {
+            ShowBasicInfo(drugResult);
+            ShowDetailPanel();
+
+            if (drugResult != null)
+            {
+                var detailInfo = await _drugSearchService.GetDrugDetailsAsync(
+                    drugResult.DrugInfo.Id,
+                    drugResult.DrugInfo.DataSource);
+
+                if (detailInfo != null)
+                {
+                    await UpdateDetailInfo(detailInfo);
+                }
+            }
+
+            if (SelectedDrugInfo != null)
+            {
+                await LoadCalculatorsForDrug(SelectedDrugInfo);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"获取药物详情时发生错误: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async Task GenerateCalculatorWithAiStream(CalculatorGenerationRequest request)
+    {
         IsGeneratingCalculator = true;
         GenerationStatus = "正在准备生成计算器...";
         GenerationProgress = 0;
         GenerationStreamContent = string.Empty;
+        GenerationReasoningContent = string.Empty;
 
         try
         {
             DosageCalculatorGenerationResult? finalResult = null;
 
-            // 在后台线程运行流式生成
             await Task.Run(async () =>
             {
-                await foreach (var progress in _aiService.GenerateCalculatorStreamAsync(
-                    SelectedDrugInfo,
-                    result.CalculatorType,
-                    result.AdditionalRequirements))
-                {
-                    // 在UI线程更新进度
-                    await Application.Current.Dispatcher.InvokeAsync(() =>
+                if (SelectedDrugInfo != null)
+                    await foreach (var progress in _aiService.GenerateCalculatorStreamAsync(
+                                       SelectedDrugInfo,
+                                       request.CalculatorType,
+                                       request.AdditionalRequirements))
                     {
-                        GenerationStatus = progress.Message;
-                        GenerationProgress = progress.Progress;
-
-                        // 显示部分内容（可选）
-                        if (!string.IsNullOrEmpty(progress.StreamChunk))
+                        await Application.Current.Dispatcher.InvokeAsync(() =>
                         {
-                            GenerationStreamContent += progress.StreamChunk;
-                        }
+                            GenerationStatus = progress.Message;
+                            GenerationProgress = progress.Progress;
 
-                        // 保存最终结果
-                        if (progress.Result != null)
-                        {
-                            finalResult = progress.Result;
-                        }
-                    }, System.Windows.Threading.DispatcherPriority.Background);
-                }
+                            if (!string.IsNullOrEmpty(progress.StreamChunk))
+                            {
+                                GenerationStreamContent += progress.StreamChunk;
+                            }
+
+                            // 收集思维链内容
+                            if (!string.IsNullOrEmpty(progress.ReasoningContent))
+                            {
+                                GenerationReasoningContent = progress.ReasoningContent;
+                            }
+
+                            if (progress.Result != null)
+                            {
+                                finalResult = progress.Result;
+                            }
+                        }, System.Windows.Threading.DispatcherPriority.Background);
+                    }
             }).ConfigureAwait(false);
 
             if (finalResult is { Success: true, Calculator: not null })
             {
-                GenerationStatus = "正在保存计算器...";
-
-                // 在后台线程保存计算器
-                var savedCalculator = await _calculatorService.SaveCalculatorAsync(finalResult.Calculator).ConfigureAwait(false);
-
-                // 在UI线程更新界面
-                await Application.Current.Dispatcher.InvokeAsync(async () =>
-                {
-                    // 重新加载计算器列表
-                    await LoadCalculatorsForDrug(SelectedDrugInfo);
-
-                    // 选择新生成的计算器
-                    var newCalculator = AvailableCalculators.FirstOrDefault(c => c.Id == savedCalculator.Id);
-                    if (newCalculator != null)
-                    {
-                        SelectedCalculator = newCalculator;
-                        await LoadCalculatorParameters();
-                    }
-
-                    GenerationStatus = "计算器生成成功！";
-                    MessageBox.Show($"计算器 '{savedCalculator.CalculatorName}' 已生成并保存", "成功",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
-                });
+                await SaveGeneratedCalculator(finalResult.Calculator, GenerationReasoningContent);
             }
             else
             {
@@ -558,108 +444,287 @@ public partial class HomePageViewModel : ObservableObject
                 IsGeneratingCalculator = false;
                 GenerationProgress = 0;
                 GenerationStreamContent = string.Empty;
+                GenerationReasoningContent = string.Empty;
             });
         }
     }
 
-    #endregion
-
-    #region 私有方法 (搜索相关)
-
-    [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
-    private async Task PerformSearch()
+    private async Task SaveGeneratedCalculator(DosageCalculator calculator, string reasoning)
     {
-        // 取消之前的搜索
-        _searchCancellationTokenSource?.Cancel();
-        _searchCancellationTokenSource = new CancellationTokenSource();
+        GenerationStatus = "正在保存计算器...";
 
-        SetLoadingState(true);
-        SearchResults.Clear();
-        HideDetailPanel();
-        ShowSearchSuggestions = false;
+        // 将思维链内容作为注释添加到代码开头
+        if (!string.IsNullOrWhiteSpace(reasoning))
+        {
+            // 在代码前方添加AI生成声明
+            var info = $"// 计算器名称: {calculator.CalculatorName}\n" +
+                       $"// 生成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n" +
+                       "// 注意：以下所有代码均由Deepseek R1 AI模型生成，不保证准确性。代码后方附有思考链内容。\n";
+            calculator.CalculationCode = info + calculator.CalculationCode;
+            var reasoningComment = $"/*\n * AI生成思维链:\n * {reasoning.Replace("\n", "\n * ")}\n */\n\n";
+            calculator.CalculationCode += reasoningComment;
+        }
+
+        var savedCalculator = await _calculatorService.SaveCalculatorAsync(calculator).ConfigureAwait(false);
+
+        await Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            if (SelectedDrugInfo != null) await LoadCalculatorsForDrug(SelectedDrugInfo);
+
+            var newCalculator = AvailableCalculators.FirstOrDefault(c => c.Id == savedCalculator.Id);
+            if (newCalculator != null)
+            {
+                SelectedCalculator = newCalculator;
+                await LoadCalculatorParameters();
+            }
+
+            GenerationStatus = "计算器生成成功！";
+            MessageBox.Show($"计算器 '{savedCalculator.CalculatorName}' 已生成并保存", "成功",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        });
+    }
+
+    private async Task ExecuteWithLoadingState(
+        Func<Task> action,
+        Action<bool> setLoadingState,
+        string loadingMessage,
+        string errorMessage)
+    {
+        setLoadingState(true);
+        CalculatorStatusMessage = loadingMessage;
 
         try
         {
-            var searchCriteria = new DrugSearchCriteria
-            {
-                SearchTerm = SearchTerm.Trim(),
-                SearchLocalDb = IsLocalDbEnabled,
-                SearchOnline = IsOnlineEnabled,
-                MaxResults = 100,
-                MinMatchScore = 0.1
-            };
-
-            var results = await _drugSearchService.SearchDrugsAsync(searchCriteria);
-
-            // 检查是否被取消
-            if (_searchCancellationTokenSource.Token.IsCancellationRequested)
-                return;
-
-            foreach (var drugResult in results)
-            {
-                SearchResults.Add(drugResult);
-            }
-
-            UpdateResultCount(results.Count);
-
-            // 如果有结果，自动选择第一个
-            if (results.Count > 0)
-            {
-                await SelectDrug(results[0]);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // 搜索被取消，不需要处理
+            await action();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"搜索时发生错误: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            CalculatorStatusMessage = $"{errorMessage}: {ex.Message}";
+            if (errorMessage == "加载计算器失败")
+            {
+                HasCalculators = false;
+                ClearCalculatorData();
+            }
         }
         finally
         {
-            SetLoadingState(false);
+            setLoadingState(false);
         }
     }
-    private async Task DisplayDrugDetails(UnifiedDrugSearchResult? drugResult)
+
+    private List<DosageParameter> ValidateRequiredParameters()
     {
+        return [.. CalculatorParameters.Where(p => p.IsRequired && string.IsNullOrWhiteSpace(p.Value.ToString()))];
+    }
+
+    private static void ShowValidationError(List<DosageParameter> missingParams)
+    {
+        var missingNames = string.Join(", ", missingParams.Select(p => p.DisplayName));
+        MessageBox.Show($"请填写必填参数: {missingNames}", "参数验证",
+            MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    private async Task ExecuteCalculation()
+    {
+        IsCalculating = true;
+        CalculationResults.Clear();
+        HasCalculationResults = false;
+        CalculatorStatusMessage = "正在计算...";
+
         try
         {
-            // 显示基本信息
-            ShowBasicInfo(drugResult);
-            ShowDetailPanel();
-
-            // 异步获取详细信息（如果需要）
-            if (drugResult != null)
+            var paramDict = BuildParameterDictionary();
+            if (SelectedCalculator != null)
             {
-                var detailInfo = await _drugSearchService.GetDrugDetailsAsync(
-                    drugResult.DrugInfo.Id,
-                    drugResult.DrugInfo.DataSource);
-
-                if (detailInfo != null)
+                var request = new DosageCalculationRequest
                 {
-                    // 更新详细信息
-                    await UpdateDetailInfo(detailInfo);
+                    CalculatorId = SelectedCalculator.Id,
+                    Parameters = paramDict
+                };
+
+                var results = await _calculatorService.CalculateDosageAsync(request);
+
+                foreach (var result in results)
+                {
+                    CalculationResults.Add(result);
                 }
             }
 
-            // 加载计算器
+            HasCalculationResults = CalculationResults.Count > 0;
+            CalculatorStatusMessage = HasCalculationResults
+                ? $"计算完成，共 {CalculationResults.Count} 个结果"
+                : "计算完成，无结果";
+        }
+        catch (Exception ex)
+        {
+            HandleCalculationError(ex);
+        }
+        finally
+        {
+            IsCalculating = false;
+        }
+    }
+
+    private Dictionary<string, object> BuildParameterDictionary()
+    {
+        var paramDict = new Dictionary<string, object>();
+        foreach (var param in CalculatorParameters)
+        {
+            object value = param.DataType switch
+            {
+                ParameterTypes.Number => Convert.ToDouble(param.Value),
+                ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
+                _ => param.Value.ToString() ?? string.Empty
+            };
+            if (param.Name != null) paramDict[param.Name] = value;
+        }
+        return paramDict;
+    }
+
+    private void HandleCalculationError(Exception ex)
+    {
+        CalculationResults.Add(new DosageCalculationResult
+        {
+            Description = "计算错误",
+            IsWarning = true,
+            WarningMessage = ex.Message
+        });
+        HasCalculationResults = true;
+        CalculatorStatusMessage = "计算失败";
+    }
+
+    private async Task ShowCalculatorEditor(DosageCalculator? calculator = null)
+    {
+        try
+        {
+            var calculatorService = ContainerAccessor.Resolve<JavaScriptDosageCalculatorService>();
+            var logger = ContainerAccessor.Resolve<ILogger<CalculatorEditorViewModel>>();
+
             if (SelectedDrugInfo != null)
             {
-                await LoadCalculatorsForDrug(SelectedDrugInfo);
+                var viewModel = new CalculatorEditorViewModel(
+                    calculatorService,
+                    logger,
+                    SelectedDrugInfo,
+                    calculator);
+
+                var window = new CalculatorEditorWindow();
+                window.SetViewModel(viewModel);
+                window.Owner = Application.Current.MainWindow;
+
+                if (window.ShowDialog() == true)
+                {
+                    await LoadCalculatorsForDrug(SelectedDrugInfo);
+                }
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"获取药物详情时发生错误: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            var action = calculator == null ? "创建" : "编辑";
+            MessageBox.Show($"{action}计算器时发生错误: {ex.Message}", "错误",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    /// <summary>
-    /// 搜索词变化时获取建议
-    /// </summary>
+    private void ShowBasicInfo(UnifiedDrugSearchResult? drugResult)
+    {
+        var drugInfo = drugResult?.DrugInfo;
+        if (drugInfo == null) return;
+
+        UpdateBasicInfo(drugInfo);
+        if (drugResult != null) UpdateMatchInfo(drugResult);
+        UpdateSpecificInfo(drugInfo);
+    }
+
+    private void UpdateBasicInfo(BaseDrugInfo drugInfo)
+    {
+        DrugName = drugInfo.DrugName;
+        ManufacturerInfo = drugInfo.Manufacturer ?? string.Empty;
+        ApprovalNumber = drugInfo.ApprovalNumber ?? string.Empty;
+        Specification = drugInfo.Specification ?? string.Empty;
+        DataSourceInfo = drugInfo.GetDataSourceText();
+    }
+
+    private void UpdateMatchInfo(UnifiedDrugSearchResult drugResult)
+    {
+        var matchScore = (drugResult.MatchScore * 100).ToString("F1");
+        var matchedFields = string.Join(", ", drugResult.MatchedFields);
+        MatchInfo = $"匹配度: {matchScore}% | 匹配字段: {matchedFields}";
+    }
+
+    private void UpdateSpecificInfo(BaseDrugInfo drugInfo)
+    {
+        switch (drugInfo)
+        {
+            case LocalDrugInfo localDrug:
+                GenericName = localDrug.GenericName ?? string.Empty;
+                TradeName = string.Empty;
+                TcmDisease = localDrug.TcmDisease ?? string.Empty;
+                TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
+                break;
+            case OnlineDrugInfo onlineDrug:
+                GenericName = string.Empty;
+                TradeName = onlineDrug.TradeName ?? string.Empty;
+                TcmDisease = string.Empty;
+                TcmSyndrome = string.Empty;
+                break;
+            default:
+                ClearSpecificInfo();
+                break;
+        }
+    }
+
+    private void ClearSpecificInfo()
+    {
+        GenericName = string.Empty;
+        TradeName = string.Empty;
+        TcmDisease = string.Empty;
+        TcmSyndrome = string.Empty;
+    }
+
+    private static CalculatorGenerationRequest? ShowCalculatorGenerationDialog()
+    {
+        var dialog = new CalculatorGenerationDialog();
+        if (dialog.ShowDialog() == true)
+        {
+            return new CalculatorGenerationRequest
+            {
+                CalculatorType = dialog.CalculatorType,
+                AdditionalRequirements = dialog.AdditionalRequirements
+            };
+        }
+        return null;
+    }
+
+    private async Task UpdateDetailInfo(BaseDrugInfo drugInfo)
+    {
+        _cachedMarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(drugInfo);
+
+        await Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            TabItems.Clear();
+            foreach (var content in _cachedMarkdownContents.Where(content => !string.IsNullOrWhiteSpace(content.Value)))
+            {
+                var (key, header, isSpecial) = (_tabDefinitions ?? []).FirstOrDefault(t => t.Key == content.Key);
+
+                var tabItem = new TabItemViewModel(header, key, isSpecial)
+                {
+                    Content = content.Value,
+                    IsVisible = true,
+                    IsLoaded = true
+                };
+                TabItems.Add(tabItem);
+            }
+
+            var firstVisibleTab = TabItems.FirstOrDefault(t => t.IsVisible);
+            if (firstVisibleTab != null)
+            {
+                SelectedTab = firstVisibleTab;
+            }
+        });
+    }
+
     partial void OnSearchTermChanged(string value) =>
-        // 延迟获取建议，避免频繁请求
         Task.Delay(300).ContinueWith(async _ =>
         {
             if (SearchTerm == value && !string.IsNullOrWhiteSpace(value) && value.Length >= 2)
@@ -668,16 +733,12 @@ public partial class HomePageViewModel : ObservableObject
             }
         });
 
-    /// <summary>
-    /// 获取搜索建议
-    /// </summary>
     private async Task GetSearchSuggestions(string keyword)
     {
         try
         {
             var suggestions = await _drugSearchService.GetSearchSuggestionsAsync(keyword);
 
-            // 在UI线程中更新建议
             Application.Current.Dispatcher.Invoke(() =>
             {
                 SearchSuggestions.Clear();
@@ -694,119 +755,7 @@ public partial class HomePageViewModel : ObservableObject
         }
     }
 
-    private void ShowBasicInfo(UnifiedDrugSearchResult? drugResult)
-    {
-        var drugInfo = drugResult?.DrugInfo;
-
-        if (drugInfo == null) return;
-        DrugName = drugInfo.DrugName;
-        ManufacturerInfo = drugInfo.Manufacturer ?? string.Empty;
-        ApprovalNumber = drugInfo.ApprovalNumber ?? string.Empty;
-        Specification = drugInfo.Specification ?? string.Empty;
-        DataSourceInfo = drugInfo.GetDataSourceText();
-
-        // 显示匹配信息
-        if (drugResult != null)
-        {
-            var matchScore = (drugResult.MatchScore * 100).ToString("F1");
-            var matchedFields = string.Join(", ", drugResult.MatchedFields);
-            MatchInfo = $"匹配度: {matchScore}% | 匹配字段: {matchedFields}";
-        }
-
-        switch (drugInfo)
-        {
-            // 根据不同的数据源显示不同的信息
-            case LocalDrugInfo localDrug:
-                GenericName = localDrug.GenericName ?? string.Empty;
-                TradeName = string.Empty;
-
-                // 设置中医信息
-                TcmDisease = localDrug.TcmDisease ?? string.Empty;
-                TcmSyndrome = localDrug.TcmSyndrome ?? string.Empty;
-                break;
-            case OnlineDrugInfo onlineDrug:
-                GenericName = string.Empty;
-                TradeName = onlineDrug.TradeName ?? string.Empty;
-
-                // 清空中医信息
-                TcmDisease = string.Empty;
-                TcmSyndrome = string.Empty;
-                break;
-            default:
-                GenericName = string.Empty;
-                TradeName = string.Empty;
-                TcmDisease = string.Empty;
-                TcmSyndrome = string.Empty;
-                break;
-        }
-    }
-
-    /// <summary>
-    /// 显示计算器生成对话框
-    /// </summary>
-    private static CalculatorGenerationRequest? ShowCalculatorGenerationDialog()
-    {
-        var dialog = new CalculatorGenerationDialog();
-        if (dialog.ShowDialog() == true)
-        {
-            return new CalculatorGenerationRequest
-            {
-                CalculatorType = dialog.CalculatorType,
-                AdditionalRequirements = dialog.AdditionalRequirements
-            };
-        }
-        return null;
-    }
-
-    /// <summary>
-    /// 计算器生成请求
-    /// </summary>
-    public class CalculatorGenerationRequest
-    {
-        public string CalculatorType { get; set; } = "通用剂量计算器";
-        public string AdditionalRequirements { get; set; } = string.Empty;
-    }
-
-    private async Task UpdateDetailInfo(BaseDrugInfo drugInfo)
-    {
-        // 使用 Helper 类生成 Markdown 内容
-        _cachedMarkdownContents = DrugInfoMarkdownHelper.ConvertToMarkdownDictionary(drugInfo);
-
-        // 更新标签页可见性和内容
-        await Application.Current.Dispatcher.InvokeAsync(() =>
-        {
-            TabItems.Clear();
-            foreach (var content in _cachedMarkdownContents.Where(content => !string.IsNullOrWhiteSpace(content.Value)))
-            {
-                var (key, header, isSpecial) = _tabDefinitions.FirstOrDefault(t => t.Key == content.Key);
-
-                var tabItem = new TabItemViewModel(header, key, isSpecial)
-                {
-                    Content = content.Value,
-                    IsVisible = true,
-                    IsLoaded = true
-                };
-                TabItems.Add(tabItem);
-            }
-
-
-            // 选择第一个可见的标签页
-            var firstVisibleTab = TabItems.FirstOrDefault(t => t.IsVisible);
-            if (firstVisibleTab != null)
-            {
-                SelectedTab = firstVisibleTab;
-            }
-        });
-    }
-
-    private void SetLoadingState(bool isLoading)
-    {
-        IsLoading = isLoading;
-        SearchStatus = isLoading ? "搜索中..." : string.Empty;
-    }
-
     private void UpdateResultCount(int count) => ResultCount = $"搜索结果: {count} 条";
-
     private void ShowDetailPanel() => IsDetailPanelVisible = true;
 
     private void HideDetailPanel()
@@ -814,7 +763,6 @@ public partial class HomePageViewModel : ObservableObject
         IsDetailPanelVisible = false;
         _cachedMarkdownContents.Clear();
 
-        // 重置所有标签页
         foreach (var tabItem in TabItems)
         {
             tabItem.IsVisible = false;
@@ -822,13 +770,8 @@ public partial class HomePageViewModel : ObservableObject
             tabItem.Content = string.Empty;
         }
 
-        // 隐藏详情面板时也重置计算器状态
         ResetCalculatorState();
     }
-
-    #endregion
-
-    #region 私有方法 (计算器相关)
 
     private void ClearCalculatorData()
     {
@@ -847,4 +790,10 @@ public partial class HomePageViewModel : ObservableObject
     }
 
     #endregion
+
+    public class CalculatorGenerationRequest
+    {
+        public string CalculatorType { get; set; } = "通用剂量计算器";
+        public string AdditionalRequirements { get; set; } = string.Empty;
+    }
 }

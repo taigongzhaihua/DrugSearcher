@@ -63,14 +63,11 @@
                             Margin="0,0,15,10"
                             Background="{DynamicResource BackgroundBrush}">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" MinWidth="100" />
                                 <ColumnDefinition Width="*" MinWidth="150" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
                             <!-- 参数名称 -->
@@ -102,13 +99,24 @@
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <!-- 说明文本 -->
-                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                                       Text="{Binding Description}"
-                                       FontSize="12" Margin="0,5,0,0"
+                            <TextBlock Grid.Column="3"
+                                       Text="&#xe63f;"
+                                       FontSize="14" Margin="5,0,0,0"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                       Foreground="{DynamicResource PrimaryBrush}"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       ToolTip="{Binding Description}"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -124,14 +132,11 @@
                             Margin="0,0,15,10"
                             Background="{DynamicResource BackgroundBrush}">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" MinWidth="40" />
                                 <ColumnDefinition Width="*" MinWidth="40" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
                             <!-- 参数名称 -->
@@ -167,13 +172,24 @@
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <!-- 说明文本 -->
-                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                                       Text="{Binding Description}"
-                                       FontSize="12" Margin="0,5,0,0"
+                            <TextBlock Grid.Column="3"
+                                       Text="&#xe63f;"
+                                       FontSize="14" Margin="5,0,0,0"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                       Foreground="{DynamicResource PrimaryBrush}"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       ToolTip="{Binding Description}"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -189,14 +205,11 @@
                             Margin="0,0,15,10"
                             Background="{DynamicResource BackgroundBrush}">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" MinWidth="40" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
                             <!-- 参数名称 -->
@@ -239,13 +252,24 @@
                                 </TextBlock.Style>
                             </TextBlock>
                             <!-- 说明文本 -->
-                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                                       Text="{Binding Description}"
-                                       FontSize="12" Margin="0,5,0,0"
+                            <TextBlock Grid.Column="3"
+                                       Text="&#xe63f;"
+                                       FontSize="14" Margin="5,0,0,0"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                       Foreground="{DynamicResource PrimaryBrush}"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       ToolTip="{Binding Description}"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -261,14 +285,11 @@
                             Margin="0,0,15,10"
                             Background="{DynamicResource BackgroundBrush}">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" MinWidth="40" />
                                 <ColumnDefinition Width="*" MinWidth="40" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
                             </Grid.ColumnDefinitions>
 
                             <!-- 参数名称 -->
@@ -301,13 +322,24 @@
                                        Foreground="{DynamicResource SecondaryTextBrush}"
                                        Visibility="{Binding Unit, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <!-- 说明文本 -->
-                            <TextBlock Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
-                                       Text="{Binding Description}"
-                                       FontSize="12" Margin="0,5,0,0"
+                            <TextBlock Grid.Column="3"
+                                       Text="&#xe63f;"
+                                       FontSize="14" Margin="5,0,0,0"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
-                                       TextWrapping="Wrap"
-                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                       Foreground="{DynamicResource PrimaryBrush}"
+                                       FontFamily="{DynamicResource IconFont}"
+                                       ToolTip="{Binding Description}"
+                                       Visibility="{Binding Description, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -436,6 +468,7 @@
                                 </StackPanel>
 
                                 <!-- 添加生成进度面板 -->
+                                <!-- 在AI生成进度面板中添加思维链显示 -->
                                 <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                         Background="{DynamicResource SurfaceBrush}"
                                         BorderBrush="{DynamicResource BorderBrush}"
@@ -446,6 +479,8 @@
                                         Visibility="{Binding IsGeneratingCalculator, Converter={StaticResource BooleanToVisibilityConverter}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
@@ -473,6 +508,26 @@
                                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                                    HorizontalAlignment="Right"
                                                    Margin="0,5,0,0" />
+                                        <StackPanel Grid.Row="3"
+                                                    Visibility="{Binding GenerationReasoningContent, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            
+                                            <!-- 思维链标题 -->
+                                            <TextBlock Text="AI思考过程:"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       Margin="0,10,0,5" />
+
+                                            <!-- 思维链内容 -->
+                                            <markdig:MarkdownViewer
+                                                Markdown="{Binding GenerationReasoningContent,Mode=OneWay}"
+                                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                                BorderThickness="0"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SecondaryTextBrush}"
+                                                FontFamily="Consolas, Microsoft YaHei"
+                                                Padding="10" />
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </Grid>

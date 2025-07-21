@@ -120,14 +120,25 @@ public partial class MainWindow
             CaptionHeight = 60,
             CornerRadius = new CornerRadius(8),
             GlassFrameThickness = new Thickness(-1),
-            NonClientFrameEdges = NonClientFrameEdges.Bottom |
-                                  NonClientFrameEdges.Left |
-                                  NonClientFrameEdges.Right,
             UseAeroCaptionButtons = false
         };
 
+        // 检查是否为 Windows 11
+        if (IsWindows11())
+        {
+            // Windows 11：隐藏顶部边框
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
+                                               NonClientFrameEdges.Left |
+                                               NonClientFrameEdges.Right;
+        }
+        else
+        {
+            // Windows 10 及更早版本：保留四条边框
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.None;
+        }
+
         WindowChrome.SetWindowChrome(this, windowChrome);
-        Debug.WriteLine("窗口Chrome配置完成");
+        Debug.WriteLine($"窗口Chrome配置完成 - 系统版本: {(IsWindows11() ? "Windows 11" : "Windows 10 或更早")}");
     }
 
     /// <summary>
@@ -788,6 +799,25 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>
+    /// 判断是否为 Windows 11
+    /// </summary>
+    private static bool IsWindows11()
+    {
+        try
+        {
+            var osVersion = Environment.OSVersion.Version;
+
+            // Windows 11 的版本号为 10.0.22000 或更高
+            // Build 22000 是 Windows 11 的第一个正式版本
+            return osVersion is { Major: 10, Build: >= 22000 };
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"检测系统版本失败: {ex.Message}");
+            return false; // 默认按 Windows 10 处理
+        }
+    }
     #endregion
 
     #region 窗口生命周期
