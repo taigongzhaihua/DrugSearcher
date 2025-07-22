@@ -7,7 +7,7 @@ namespace DrugSearcher.Repositories;
 /// <summary>
 /// 本地药物仓储适配器 - 保持向后兼容
 /// </summary>
-public class DrugRepositoryAdapter(IDrugDbContextFactory contextFactory) : IDrugRepository
+public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugRepository
 {
     public async Task<LocalDrugInfo?> GetByIdAsync(int id)
     {

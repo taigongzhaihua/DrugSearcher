@@ -8,7 +8,7 @@ namespace DrugSearcher.Repositories;
 /// <summary>
 /// 在线药物仓储适配器 - 保持向后兼容
 /// </summary>
-public class OnlineDrugRepositoryAdapter(IDrugDbContextFactory contextFactory) : IOnlineDrugRepository
+public class OnlineDrugRepository(IDrugDbContextFactory contextFactory) : IOnlineDrugRepository
 {
     public async Task<OnlineDrugInfo?> GetByIdAsync(int id)
     {

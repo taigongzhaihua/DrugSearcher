@@ -141,14 +141,14 @@ public static class ContainerConfig
     private static void RegisterRepositories(ContainerBuilder builder)
     {
         // 注册适配器保持向后兼容
-        builder.RegisterType<DrugRepositoryAdapter>()
+        builder.RegisterType<DrugRepository>()
             .As<IDrugRepository>()
             .InstancePerLifetimeScope();
 
-        builder.RegisterType<OnlineDrugRepositoryAdapter>()
+        builder.RegisterType<OnlineDrugRepository>()
             .As<IOnlineDrugRepository>()
             .InstancePerLifetimeScope();
-        builder.RegisterType<DosageCalculatorRepositoryAdapter>()
+        builder.RegisterType<DosageCalculatorRepository>()
             .As<IDosageCalculatorRepository>()
             .InstancePerLifetimeScope();
     }

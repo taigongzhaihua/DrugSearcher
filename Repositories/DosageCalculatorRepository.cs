@@ -7,7 +7,7 @@ namespace DrugSearcher.Repositories;
 /// <summary>
 /// 剂量计算器仓储适配器
 /// </summary>
-public class DosageCalculatorRepositoryAdapter(IDrugDbContextFactory contextFactory) : IDosageCalculatorRepository
+public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : IDosageCalculatorRepository
 {
     public async Task<DosageCalculator?> GetByIdAsync(int id)
     {
@@ -78,7 +78,7 @@ public class DosageCalculatorRepositoryAdapter(IDrugDbContextFactory contextFact
             .Where(c => c.IsActive &&
                        (EF.Functions.Like(c.DrugName.ToLower(), $"%{keywordLower}%") ||
                         EF.Functions.Like(c.CalculatorName.ToLower(), $"%{keywordLower}%") ||
-                        (c.Description != null && EF.Functions.Like(c.Description.ToLower(), $"%{keywordLower}%"))))
+                        EF.Functions.Like(c.Description.ToLower(), $"%{keywordLower}%")))
             .OrderBy(c => c.DrugName)
             .ThenBy(c => c.CalculatorName)
             .ToListAsync();
