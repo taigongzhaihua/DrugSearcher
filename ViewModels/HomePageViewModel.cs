@@ -24,6 +24,11 @@ public partial class HomePageViewModel : ObservableObject
     private Dictionary<string, string> _cachedMarkdownContents = [];
     private List<(string Key, string Header, bool IsSpecial)>? _tabDefinitions;
 
+    // 分页相关
+    private const int PageSize = 30;
+    private string _lastSearchTerm = string.Empty;
+    private PaginatedResult<OnlineDrugInfo>? _currentOnlineResult;
+
     public HomePageViewModel(
         DrugSearchService drugSearchService,
         JavaScriptDosageCalculatorService calculatorService,
@@ -128,6 +133,17 @@ public partial class HomePageViewModel : ObservableObject
 
     #endregion
 
+    #region 分页相关属性
+
+    [ObservableProperty] private int _currentPage = 1;
+    [ObservableProperty] private int _totalPages = 1;
+    [ObservableProperty] private bool _hasPreviousPage;
+    [ObservableProperty] private bool _hasNextPage;
+    [ObservableProperty] private bool _isLoadingMore;
+    [ObservableProperty] private string _pageInfo = string.Empty;
+
+    #endregion
+
     #region 命令
 
     [RelayCommand]
@@ -138,7 +154,35 @@ public partial class HomePageViewModel : ObservableObject
             MessageBox.Show("请输入搜索关键词", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        await PerformSearch();
+
+        // 新搜索时重置页码
+        CurrentPage = 1;
+        _lastSearchTerm = SearchTerm.Trim();
+        await PerformSearch(true);
+    }
+
+    [RelayCommand]
+    private async Task LoadNextPage()
+    {
+        if (!HasNextPage || IsLoadingMore) return;
+        CurrentPage++;
+        await PerformSearch(false);
+    }
+
+    [RelayCommand]
+    private async Task LoadPreviousPage()
+    {
+        if (!HasPreviousPage || IsLoadingMore) return;
+        CurrentPage--;
+        await PerformSearch(false);
+    }
+
+    [RelayCommand]
+    private async Task GoToPage(int pageNumber)
+    {
+        if (pageNumber < 1 || pageNumber > TotalPages || IsLoadingMore) return;
+        CurrentPage = pageNumber;
+        await PerformSearch(false);
     }
 
     [RelayCommand]
@@ -338,6 +382,87 @@ public partial class HomePageViewModel : ObservableObject
             "搜索中...",
             "搜索时发生错误"
         );
+    }
+
+    private async Task PerformSearch(bool isNewSearch)
+    {
+        _searchCancellationTokenSource?.Cancel();
+        _searchCancellationTokenSource = new CancellationTokenSource();
+        var cancellationToken = _searchCancellationTokenSource.Token;
+
+        await ExecuteWithLoadingState(
+            async () =>
+            {
+                if (isNewSearch)
+                {
+                    SearchResults.Clear();
+                    HideDetailPanel();
+                    ShowSearchSuggestions = false;
+                }
+
+                IsLoadingMore = !isNewSearch;
+
+                // 创建搜索条件
+                var searchCriteria = new PaginatedDrugSearchCriteria
+                {
+                    SearchTerm = _lastSearchTerm,
+                    SearchLocalDb = IsLocalDbEnabled,
+                    SearchOnline = IsOnlineEnabled,
+                    PageIndex = CurrentPage - 1, // 转换为0基索引
+                    PageSize = PageSize
+                };
+
+                var results = await _drugSearchService.SearchDrugsWithPaginationAsync(searchCriteria);
+
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                SearchResults.Clear();
+
+                foreach (var drugResult in results.Items)
+                {
+                    SearchResults.Add(drugResult);
+                }
+
+                // 更新分页信息
+                UpdatePaginationInfo(results);
+
+                // 如果是新搜索且有结果，选中第一个
+                if (isNewSearch && results.Items.Count > 0)
+                {
+                    await SelectDrug(results.Items[0]);
+                }
+            },
+            loading =>
+            {
+                if (isNewSearch)
+                {
+                    IsLoading = loading;
+                }
+                else
+                {
+                    IsLoadingMore = loading;
+                }
+            },
+            isNewSearch ? "搜索中..." : "加载中...",
+            "搜索时发生错误"
+        );
+    }
+
+    private void UpdatePaginationInfo(PaginatedSearchResult results)
+    {
+        TotalPages = results.TotalPages;
+        HasPreviousPage = results.HasPreviousPage;
+        HasNextPage = results.HasNextPage;
+
+        // 更新结果计数
+        var startItem = results.TotalCount > 0 ? (CurrentPage - 1) * PageSize + 1 : 0;
+        var endItem = Math.Min(CurrentPage * PageSize, results.TotalCount);
+
+        ResultCount = $"搜索结果: {results.TotalCount} 条";
+        PageInfo = results.TotalCount > 0
+            ? $"显示 {startItem}-{endItem} 条，共 {results.TotalCount} 条"
+            : string.Empty;
     }
 
     private async Task DisplayDrugDetails(UnifiedDrugSearchResult? drugResult)
@@ -578,6 +703,7 @@ public partial class HomePageViewModel : ObservableObject
             };
             if (param.Name != null) paramDict[param.Name] = value;
         }
+
         return paramDict;
     }
 
@@ -693,6 +819,7 @@ public partial class HomePageViewModel : ObservableObject
                 AdditionalRequirements = dialog.AdditionalRequirements
             };
         }
+
         return null;
     }
 
@@ -746,6 +873,7 @@ public partial class HomePageViewModel : ObservableObject
                 {
                     SearchSuggestions.Add(suggestion);
                 }
+
                 ShowSearchSuggestions = suggestions.Count > 0;
             });
         }

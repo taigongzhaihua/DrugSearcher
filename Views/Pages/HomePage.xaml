@@ -111,7 +111,9 @@
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource PrimaryHoverBrush}">
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -184,7 +186,9 @@
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource PrimaryHoverBrush}">
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -264,7 +268,9 @@
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource PrimaryHoverBrush}">
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -334,7 +340,9 @@
                                     <Style TargetType="TextBlock">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground"  Value="{DynamicResource PrimaryHoverBrush}"></Setter>
+                                                <Setter Property="Foreground"
+                                                        Value="{DynamicResource PrimaryHoverBrush}">
+                                                </Setter>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -510,7 +518,7 @@
                                                    Margin="0,5,0,0" />
                                         <StackPanel Grid.Row="3"
                                                     Visibility="{Binding GenerationReasoningContent, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                            
+
                                             <!-- 思维链标题 -->
                                             <TextBlock Text="AI思考过程:"
                                                        FontSize="12"
@@ -839,7 +847,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- 搜索结果列表 -->
+            <!-- 修改结果列表部分 -->
             <Border Grid.Column="0"
                     behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
@@ -852,6 +860,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <!-- 结果统计 -->
@@ -859,24 +868,34 @@
                             Background="{DynamicResource SecondaryBackgroundBrush}"
                             Padding="15,10"
                             CornerRadius="9,9,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding ResultCount}"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
-                                       FontWeight="SemiBold" />
-                            <TextBlock Text="{Binding SearchStatus}"
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <TextBlock Text="{Binding ResultCount}"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding SearchStatus}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="20,0,0,0" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding PageInfo}"
                                        Foreground="{DynamicResource SecondaryTextBrush}"
-                                       Margin="20,0,0,0" />
-                        </StackPanel>
+                                       FontSize="12" />
+                        </Grid>
                     </Border>
 
                     <!-- 结果列表 -->
-                    <ListBox Grid.Row="1"
-                             ItemsSource="{Binding SearchResults}"
+                    <ListBox Grid.Row="1" ItemsSource="{Binding SearchResults}"
                              SelectedItem="{Binding SelectedDrug}"
                              Background="Transparent"
                              BorderThickness="0"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                             Width="350">
+                             Width="380">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction Command="{Binding SelectDrugCommand}"
@@ -963,11 +982,86 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
 
+
+                    <!-- 分页控件 -->
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource SecondaryBackgroundBrush}"
+                            Padding="10"
+                            Visibility="{Binding TotalPages, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 上一页按钮 -->
+                            <Button Grid.Column="0"
+                                    Content="上一页"
+                                    Command="{Binding LoadPreviousPageCommand}"
+                                    IsEnabled="{Binding HasPreviousPage}"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    Padding="10,5" />
+
+                            <!-- 页码信息 -->
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="第 "
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding CurrentPage}"
+                                         TextAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{DynamicResource SecondaryTextBrush}" >
+                                </TextBlock>
+                                <TextBlock Text=" / "
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding TotalPages}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text=" 页"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                            </StackPanel>
+
+                            <!-- 下一页按钮 -->
+                            <Button Grid.Column="2"
+                                    Content="下一页"
+                                    Command="{Binding LoadNextPageCommand}"
+                                    IsEnabled="{Binding HasNextPage}"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    Padding="10,5" />
+                        </Grid>
+                    </Border>
+
                     <!-- 加载指示器 -->
-                    <ProgressBar Grid.Row="2"
+                    <ProgressBar Grid.Row="3"
                                  IsIndeterminate="True"
                                  Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
                                  Height="4" />
+
+                    <!-- 加载更多指示器 -->
+                    <Border Grid.Row="1"
+                            Background="{DynamicResource SurfaceBrush}"
+                            Opacity="0.8"
+                            Visibility="{Binding IsLoadingMore, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            VerticalAlignment="Bottom"
+                            Height="50">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                            <ProgressBar Width="20"
+                                         Height="20"
+                                         IsIndeterminate="True"
+                                         Margin="0,0,10,0" />
+                            <TextBlock Text="正在加载更多..."
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource PrimaryTextBrush}" />
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 

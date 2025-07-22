@@ -37,112 +37,115 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
         ConfigureDosageCalculator(modelBuilder);
     }
 
-    private static void ConfigureLocalDrugInfo(ModelBuilder modelBuilder) => modelBuilder.Entity<LocalDrugInfo>(entity =>
-                                                                                  {
-                                                                                      // 设置表名
-                                                                                      entity.ToTable("LocalDrugInfos");
+    private static void ConfigureLocalDrugInfo(ModelBuilder modelBuilder) => modelBuilder.Entity<LocalDrugInfo>(
+        entity =>
+        {
+            // 设置表名
+            entity.ToTable("LocalDrugInfos");
 
-                                                                                      // 配置索引
-                                                                                      entity.HasIndex(e => e.DrugName)
-                                                                                          .HasDatabaseName("IX_LocalDrugInfos_DrugName");
+            // 配置索引
+            entity.HasIndex(e => e.DrugName)
+                .HasDatabaseName("IX_LocalDrugInfos_DrugName");
 
-                                                                                      entity.HasIndex(e => e.Manufacturer)
-                                                                                          .HasDatabaseName("IX_LocalDrugInfos_Manufacturer");
+            entity.HasIndex(e => e.Manufacturer)
+                .HasDatabaseName("IX_LocalDrugInfos_Manufacturer");
 
-                                                                                      entity.HasIndex(e => e.ApprovalNumber)
-                                                                                          .HasDatabaseName("IX_LocalDrugInfos_ApprovalNumber");
+            entity.HasIndex(e => e.ApprovalNumber)
+                .HasDatabaseName("IX_LocalDrugInfos_ApprovalNumber");
 
-                                                                                      // 配置复合索引用于去重
-                                                                                      entity.HasIndex(e => new { e.DrugName, e.Specification, e.Manufacturer })
-                                                                                          .HasDatabaseName("IX_LocalDrugInfos_Unique")
-                                                                                          .IsUnique();
+            // 配置复合索引用于去重
+            entity.HasIndex(e => new { e.DrugName, e.Specification, e.Manufacturer })
+                .HasDatabaseName("IX_LocalDrugInfos_Unique")
+                .IsUnique();
 
-                                                                                      // 配置自动更新时间
-                                                                                      entity.Property(e => e.CreatedAt)
-                                                                                          .HasDefaultValueSql("datetime('now', 'localtime')");
+            // 配置自动更新时间
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
 
-                                                                                      entity.Property(e => e.UpdatedAt)
-                                                                                          .HasDefaultValueSql("datetime('now', 'localtime')");
-                                                                                  });
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
+        });
 
-    private static void ConfigureOnlineDrugInfo(ModelBuilder modelBuilder) => modelBuilder.Entity<OnlineDrugInfo>(entity =>
-                                                                                   {
-                                                                                       // 设置表名
-                                                                                       entity.ToTable("OnlineDrugInfos");
+    private static void ConfigureOnlineDrugInfo(ModelBuilder modelBuilder) => modelBuilder.Entity<OnlineDrugInfo>(
+        entity =>
+        {
+            // 设置表名
+            entity.ToTable("OnlineDrugInfos");
 
-                                                                                       // 配置索引
-                                                                                       entity.HasIndex(e => e.DrugName)
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_DrugName");
+            // 配置索引
+            entity.HasIndex(e => e.DrugName)
+                .HasDatabaseName("IX_OnlineDrugInfos_DrugName");
 
-                                                                                       entity.HasIndex(e => e.Manufacturer)
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_Manufacturer");
+            entity.HasIndex(e => e.Manufacturer)
+                .HasDatabaseName("IX_OnlineDrugInfos_Manufacturer");
 
-                                                                                       entity.HasIndex(e => e.ApprovalNumber)
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_ApprovalNumber");
+            entity.HasIndex(e => e.ApprovalNumber)
+                .HasDatabaseName("IX_OnlineDrugInfos_ApprovalNumber");
 
-                                                                                       entity.HasIndex(e => e.CrawlStatus)
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_CrawlStatus");
+            entity.HasIndex(e => e.CrawlStatus)
+                .HasDatabaseName("IX_OnlineDrugInfos_CrawlStatus");
 
-                                                                                       entity.HasIndex(e => e.CrawledAt)
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_CrawledAt");
+            entity.HasIndex(e => e.CrawledAt)
+                .HasDatabaseName("IX_OnlineDrugInfos_CrawledAt");
 
-                                                                                       // 配置复合索引用于去重
-                                                                                       entity.HasIndex(e => new { e.DrugName, e.Specification, e.Manufacturer })
-                                                                                           .HasDatabaseName("IX_OnlineDrugInfos_Unique");
+            // 配置复合索引用于去重
+            entity.HasIndex(e => new { e.DrugName, e.Specification, e.Manufacturer })
+                .HasDatabaseName("IX_OnlineDrugInfos_Unique");
 
-                                                                                       // 配置自动更新时间
-                                                                                       entity.Property(e => e.CreatedAt)
-                                                                                           .HasDefaultValueSql("datetime('now', 'localtime')");
+            // 配置自动更新时间
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
 
-                                                                                       entity.Property(e => e.UpdatedAt)
-                                                                                           .HasDefaultValueSql("datetime('now', 'localtime')");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
 
-                                                                                       entity.Property(e => e.CrawledAt)
-                                                                                           .HasDefaultValueSql("datetime('now', 'localtime')");
-                                                                                   });
+            entity.Property(e => e.CrawledAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
+        });
 
-    private static void ConfigureDosageCalculator(ModelBuilder modelBuilder) => modelBuilder.Entity<DosageCalculator>(entity =>
-                                                                                     {
-                                                                                         // 设置表名
-                                                                                         entity.ToTable("DosageCalculators");
+    private static void ConfigureDosageCalculator(ModelBuilder modelBuilder) => modelBuilder.Entity<DosageCalculator>(
+        entity =>
+        {
+            // 设置表名
+            entity.ToTable("DosageCalculators");
 
-                                                                                         // 配置索引
-                                                                                         entity.HasIndex(e => e.DrugIdentifier)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_DrugIdentifier");
+            // 配置索引
+            entity.HasIndex(e => e.DrugIdentifier)
+                .HasDatabaseName("IX_DosageCalculators_DrugIdentifier");
 
-                                                                                         entity.HasIndex(e => e.DataSource)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_DataSource");
+            entity.HasIndex(e => e.DataSource)
+                .HasDatabaseName("IX_DosageCalculators_DataSource");
 
-                                                                                         entity.HasIndex(e => e.OriginalDrugId)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_OriginalDrugId");
+            entity.HasIndex(e => e.OriginalDrugId)
+                .HasDatabaseName("IX_DosageCalculators_OriginalDrugId");
 
-                                                                                         entity.HasIndex(e => e.DrugName)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_DrugName");
+            entity.HasIndex(e => e.DrugName)
+                .HasDatabaseName("IX_DosageCalculators_DrugName");
 
-                                                                                         entity.HasIndex(e => e.IsActive)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_IsActive");
+            entity.HasIndex(e => e.IsActive)
+                .HasDatabaseName("IX_DosageCalculators_IsActive");
 
-                                                                                         entity.HasIndex(e => e.CreatedAt)
-                                                                                             .HasDatabaseName("IX_DosageCalculators_CreatedAt");
+            entity.HasIndex(e => e.CreatedAt)
+                .HasDatabaseName("IX_DosageCalculators_CreatedAt");
 
-                                                                                         // 配置复合索引
-                                                                                         entity.HasIndex(e => new { e.DataSource, e.OriginalDrugId })
-                                                                                             .HasDatabaseName("IX_DosageCalculators_DataSource_OriginalDrugId");
+            // 配置复合索引
+            entity.HasIndex(e => new { e.DataSource, e.OriginalDrugId })
+                .HasDatabaseName("IX_DosageCalculators_DataSource_OriginalDrugId");
 
-                                                                                         entity.HasIndex(e => new { e.DrugIdentifier, e.IsActive })
-                                                                                             .HasDatabaseName("IX_DosageCalculators_DrugIdentifier_IsActive");
+            entity.HasIndex(e => new { e.DrugIdentifier, e.IsActive })
+                .HasDatabaseName("IX_DosageCalculators_DrugIdentifier_IsActive");
 
-                                                                                         // 配置自动更新时间
-                                                                                         entity.Property(e => e.CreatedAt)
-                                                                                             .HasDefaultValueSql("datetime('now', 'localtime')");
+            // 配置自动更新时间
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
 
-                                                                                         entity.Property(e => e.UpdatedAt)
-                                                                                             .HasDefaultValueSql("datetime('now', 'localtime')");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("datetime('now', 'localtime')");
 
-                                                                                         // 配置枚举到字符串的转换
-                                                                                         entity.Property(e => e.DataSource)
-                                                                                             .HasConversion<string>();
-                                                                                     });
+            // 配置枚举到字符串的转换
+            entity.Property(e => e.DataSource)
+                .HasConversion<string>();
+        });
 
     /// <summary>
     /// 保存更改时自动更新UpdatedAt字段
@@ -169,7 +172,7 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
     {
         var entities = ChangeTracker.Entries()
             .Where(x => x.Entity is LocalDrugInfo or OnlineDrugInfo or DosageCalculator &&
-                       x.State is EntityState.Added or EntityState.Modified);
+                        x.State is EntityState.Added or EntityState.Modified);
 
         foreach (var entity in entities)
         {

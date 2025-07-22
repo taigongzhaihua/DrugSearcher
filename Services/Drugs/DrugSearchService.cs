@@ -1,4 +1,5 @@
 using DrugSearcher.Models;
+using DrugSearcher.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace DrugSearcher.Services;
@@ -10,7 +11,7 @@ public class DrugSearchService(
     ILocalDrugService localDrugService,
     ILogger<DrugSearchService> logger,
     IOnlineDrugService? onlineDrugService,
-    ICachedDrugService? cachedDrugService)
+    IOnlineDrugRepository onlineDrugRepository)
 {
     /// <summary>
     /// 统一搜索药物
@@ -72,7 +73,6 @@ public class DrugSearchService(
             {
                 DataSource.LocalDatabase => await localDrugService.GetDrugDetailAsync(id),
                 DataSource.OnlineSearch => await onlineDrugService?.GetDrugDetailByIdAsync(id),
-                DataSource.CachedDocuments => await cachedDrugService?.GetCachedDrugDetailAsync(id),
                 _ => null
             };
 #pragma warning restore CS8602 // 解引用可能出现空引用。
@@ -83,7 +83,75 @@ public class DrugSearchService(
             return null;
         }
     }
+    /// <summary>
+    /// 分页搜索药物
+    /// </summary>
+    public async Task<PaginatedSearchResult> SearchDrugsWithPaginationAsync(PaginatedDrugSearchCriteria criteria)
+    {
+        var result = new PaginatedSearchResult
+        {
+            PageIndex = criteria.PageIndex,
+            PageSize = criteria.PageSize
+        };
 
+        try
+        {
+            var allResults = new List<UnifiedDrugSearchResult>();
+            var localCount = 0;
+            var onlineCount = 0;
+
+            // 第一页时加载本地数据
+            if (criteria is { SearchLocalDb: true, PageIndex: 0 })
+            {
+                var localResults = await SearchLocalDrugsAsync(criteria.SearchTerm ?? string.Empty);
+                allResults.AddRange(localResults);
+                localCount = localResults.Count;
+            }
+
+            // 搜索在线数据（使用分页）
+            if (criteria.SearchOnline)
+            {
+                // 计算在线数据的偏移量
+                var onlinePageSize = criteria.PageSize;
+                var onlinePageIndex = criteria.PageIndex;
+
+                var onlineResult = await onlineDrugRepository.SearchWithPaginationOptimizedAsync(
+                    criteria.SearchTerm ?? string.Empty,
+                    onlinePageIndex,
+                    onlinePageSize,
+                    true // 总是包含计数以显示正确的分页信息
+                );
+
+                // 转换在线结果为统一格式
+                var onlineUnifiedResults = onlineResult.Items.Select(drug => new UnifiedDrugSearchResult
+                {
+                    DrugInfo = drug,
+                    MatchScore = CalculateMatchScore(drug, criteria.SearchTerm ?? string.Empty),
+                    MatchedFields = GetMatchedFields(drug, criteria.SearchTerm ?? string.Empty),
+                    IsExactMatch = IsExactMatch(drug, criteria.SearchTerm ?? string.Empty)
+                }).ToList();
+
+                allResults.AddRange(onlineUnifiedResults);
+                onlineCount = onlineResult.TotalCount;
+            }
+
+            // 计算总数
+            result.TotalCount = localCount + onlineCount;
+
+            // 去重和排序
+            var deduplicatedResults = DeduplicateResults(allResults);
+            var sortedResults = SortResults(deduplicatedResults);
+
+            result.Items = sortedResults;
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "分页搜索药物时发生错误");
+            throw;
+        }
+    }
     /// <summary>
     /// 获取搜索建议
     /// </summary>
@@ -103,22 +171,21 @@ public class DrugSearchService(
             suggestions.AddRange(localSuggestions);
 
             // 从在线数据获取建议
-            if (onlineDrugService != null)
-            {
-                var onlineResults = await onlineDrugService.SearchOnlineDrugsAsync(keyword);
-                var onlineSuggestions = onlineResults
-                    .Select(d => d.DrugName)
-                    .Where(name => !string.IsNullOrEmpty(name))
-                    .Distinct();
-                suggestions.AddRange(onlineSuggestions);
-            }
-            //
-            // // 从缓存获取建议
-            // if (cachedDrugService != null)
-            // {
-            //     var cachedSuggestions = await cachedDrugService.GetCachedDrugNameSuggestionsAsync(keyword);
-            //     suggestions.AddRange(cachedSuggestions);
-            // }
+            if (onlineDrugService == null)
+                return
+                [
+                    .. suggestions
+                        .Distinct()
+                        .Where(s => s.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                        .OrderBy(s => s)
+                        .Take(10)
+                ];
+            var onlineResults = await onlineDrugService.SearchOnlineDrugsAsync(keyword);
+            var onlineSuggestions = onlineResults
+                .Select(d => d.DrugName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Distinct();
+            suggestions.AddRange(onlineSuggestions);
 
             // 去重、排序并限制数量
             return
@@ -192,34 +259,6 @@ public class DrugSearchService(
         }
     }
 
-    /// <summary>
-    /// 搜索缓存药物
-    /// </summary>
-    private async Task<List<UnifiedDrugSearchResult>> SearchCachedDrugsAsync(string searchTerm)
-    {
-        try
-        {
-            if (cachedDrugService == null)
-                return [];
-
-            var cachedDrugs = await cachedDrugService.SearchCachedDrugsAsync(searchTerm);
-            return
-            [
-                .. cachedDrugs.Select(drug => new UnifiedDrugSearchResult
-                {
-                    DrugInfo = drug,
-                    MatchScore = CalculateMatchScore(drug, searchTerm),
-                    MatchedFields = GetMatchedFields(drug, searchTerm),
-                    IsExactMatch = IsExactMatch(drug, searchTerm)
-                })
-            ];
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "搜索缓存药物失败，搜索词: {searchTerm}", searchTerm);
-            return [];
-        }
-    }
 
     /// <summary>
     /// 计算匹配度

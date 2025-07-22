@@ -46,16 +46,16 @@ namespace DrugSearcher.Behaviors
             // 传播到父级
             e.Handled = true;
             var parentScrollViewer = FindParentScrollViewer(AssociatedObject);
-            
+
             if (parentScrollViewer != null)
             {
                 // 计算滚动量
                 var scrollAmount = e.Delta * SystemParameters.WheelScrollLines * 0.5;
                 var newOffset = parentScrollViewer.VerticalOffset - scrollAmount;
-                
+
                 // 确保在有效范围内
                 newOffset = Math.Max(0, Math.Min(parentScrollViewer.ScrollableHeight, newOffset));
-                
+
                 parentScrollViewer.ScrollToVerticalOffset(newOffset);
             }
         }
@@ -82,32 +82,32 @@ namespace DrugSearcher.Behaviors
         private static ScrollViewer? FindParentScrollViewer(DependencyObject child)
         {
             var parent = VisualTreeHelper.GetParent(child);
-            
+
             while (parent != null)
             {
                 if (parent is ScrollViewer scrollViewer)
                     return scrollViewer;
-                    
+
                 parent = VisualTreeHelper.GetParent(parent);
             }
-            
+
             return null;
         }
 
         private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
         {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
                 var child = VisualTreeHelper.GetChild(parent, i);
-                
+
                 if (child is T typedChild)
                     return typedChild;
-                    
+
                 var result = FindVisualChild<T>(child);
                 if (result != null)
                     return result;
             }
-            
+
             return null;
         }
     }

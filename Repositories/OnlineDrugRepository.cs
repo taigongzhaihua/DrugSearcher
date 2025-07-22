@@ -2,13 +2,18 @@ using DrugSearcher.Data;
 using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace DrugSearcher.Repositories;
 
 /// <summary>
 /// 在线药物仓储适配器 - 保持向后兼容
 /// </summary>
-public class OnlineDrugRepository(IDrugDbContextFactory contextFactory) : IOnlineDrugRepository
+public class OnlineDrugRepository(
+    IDrugDbContextFactory contextFactory,
+    IMemoryCache cache,
+    ILogger<OnlineDrugRepository> logger) : IOnlineDrugRepository
 {
     public async Task<OnlineDrugInfo?> GetByIdAsync(int id)
     {
@@ -60,8 +65,77 @@ public class OnlineDrugRepository(IDrugDbContextFactory contextFactory) : IOnlin
                         (d.ApprovalNumber != null && EF.Functions.Like(d.ApprovalNumber.ToLower(), $"%{keywordLower}%")) ||
                         (d.Specification != null && EF.Functions.Like(d.Specification.ToLower(), $"%{keywordLower}%"))))
             .OrderBy(d => d.DrugName)
-            .Take(50)
             .ToListAsync();
+    }
+
+    public async Task<PaginatedResult<OnlineDrugInfo>> SearchWithPaginationOptimizedAsync(
+    string keyword,
+    int pageIndex = 0,
+    int pageSize = 20,
+    bool includeCount = true)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            return new PaginatedResult<OnlineDrugInfo>
+            {
+                Items = [],
+                TotalCount = 0,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+
+        // 1. 先尝试缓存
+        var cacheKey = $"search_{keyword.ToLower()}_{pageIndex}_{pageSize}";
+        if (cache.TryGetValue<PaginatedResult<OnlineDrugInfo>>(cacheKey, out var cached))
+        {
+            return cached!;
+        }
+
+        await using var context = contextFactory.CreateDbContext();
+
+        // 2. 使用优化的查询
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+
+        // 移除ToLower，使用数据库的不区分大小写比较
+        var query = context.OnlineDrugInfos
+            .AsNoTracking() // 重要：提高只读查询性能
+            .Where(d => d.CrawlStatus == CrawlStatus.Success)
+            .Where(d =>
+                EF.Functions.Like(d.DrugName, $"%{keyword}%") ||
+                EF.Functions.Like(d.TradeName ?? "", $"%{keyword}%") ||
+                EF.Functions.Like(d.Manufacturer ?? "", $"%{keyword}%") ||
+                EF.Functions.Like(d.ApprovalNumber ?? "", $"%{keyword}%") ||
+                EF.Functions.Like(d.Specification ?? "", $"%{keyword}%"));
+
+        // 3. 并行执行计数和数据查询
+        var countTask = includeCount || pageIndex == 0
+            ? query.CountAsync()
+            : Task.FromResult(0);
+
+        var itemsTask = query
+            .OrderBy(d => d.DrugName)
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        await Task.WhenAll(countTask, itemsTask);
+
+        sw.Stop();
+        logger.LogDebug($"搜索 '{keyword}' 耗时: {sw.ElapsedMilliseconds}ms");
+
+        var result = new PaginatedResult<OnlineDrugInfo>
+        {
+            Items = await itemsTask,
+            TotalCount = await countTask,
+            PageIndex = pageIndex,
+            PageSize = pageSize
+        };
+
+        // 4. 缓存结果
+        cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
+
+        return result;
     }
 
     public async Task<List<string>> GetDrugNameSuggestionsAsync(string keyword)

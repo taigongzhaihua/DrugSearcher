@@ -6,7 +6,9 @@ using DrugSearcher.Services;
 using DrugSearcher.ViewModels;
 using DrugSearcher.Views;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.IO;
 using System.Net.Http;
 
@@ -31,6 +33,7 @@ public static class ContainerConfig
             RegisterLoggingServices(builder);
             RegisterDatabaseServices(builder);
             RegisterRepositories(builder);
+            RegisterCacheServices(builder);
             RegisterBusinessServices(builder);
             RegisterSettingsServices(builder); // 新增：注册设置服务
             RegisterViewModels(builder);
@@ -152,7 +155,22 @@ public static class ContainerConfig
             .As<IDosageCalculatorRepository>()
             .InstancePerLifetimeScope();
     }
+    private static void RegisterCacheServices(ContainerBuilder builder)
+    {
+        // 注册 MemoryCache 配置
+        builder.Register(c => Options.Create(new MemoryCacheOptions
+        {
+            CompactionPercentage = 0.05, // 缓存压缩百分比
+            ExpirationScanFrequency = TimeSpan.FromMinutes(5) // 过期扫描频率
+        }))
+            .As<IOptions<MemoryCacheOptions>>()
+            .SingleInstance();
 
+        // 注册 MemoryCache
+        builder.RegisterType<MemoryCache>()
+            .As<IMemoryCache>()
+            .SingleInstance();
+    }
     /// <summary>
     /// 注册业务服务层
     /// </summary>
@@ -185,10 +203,6 @@ public static class ContainerConfig
         builder.RegisterType<YaozsOnlineDrugService>()
             .As<IOnlineDrugService>()
             .InstancePerLifetimeScope(); // 在线药物服务使用作用域
-
-        builder.RegisterType<CachedDrugService>()
-            .As<ICachedDrugService>()
-            .InstancePerLifetimeScope(); // 缓存服务使用作用域
 
         // 药物搜索服务 - 聚合服务
         builder.RegisterType<DrugSearchService>()

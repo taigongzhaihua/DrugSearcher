@@ -21,12 +21,16 @@ public interface IOnlineDrugRepository
     /// <summary>
     /// 分页获取在线药物信息
     /// </summary>
-    Task<(List<OnlineDrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize, CrawlStatus? status = null);
+    Task<(List<OnlineDrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize,
+        CrawlStatus? status = null);
 
     /// <summary>
     /// 根据关键词搜索在线药物
     /// </summary>
     Task<List<OnlineDrugInfo>> SearchAsync(string keyword);
+
+    Task<PaginatedResult<OnlineDrugInfo>> SearchWithPaginationOptimizedAsync(string keyword, int pageIndex = 0,
+        int pageSize = 20, bool includeCount = true);
 
     /// <summary>
     /// 获取在线药物名称建议
