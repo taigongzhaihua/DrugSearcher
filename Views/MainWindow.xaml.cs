@@ -23,6 +23,8 @@ public partial class MainWindow
     private readonly IUserSettingsService? _settingsService;
     private readonly MainWindowViewModel _viewModel;
     private IHotKeyService? _hotKeyService;
+    private readonly ThemeManager _themeManager;
+
     #endregion
 
     #region 构造函数
@@ -32,8 +34,12 @@ public partial class MainWindow
     /// </summary>
     /// <param name="viewModel">主窗口视图模型</param>
     /// <param name="settingsService">用户设置服务</param>
-    public MainWindow(MainWindowViewModel viewModel, IUserSettingsService settingsService)
+    public MainWindow(
+        MainWindowViewModel viewModel,
+        IUserSettingsService settingsService,
+        ThemeManager themeManager)
     {
+
         try
         {
             // 初始化组件
@@ -42,6 +48,7 @@ public partial class MainWindow
             // 保存依赖引用
             _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+            _themeManager = themeManager;
 
             // 设置数据上下文
             DataContext = _viewModel;
@@ -50,6 +57,8 @@ public partial class MainWindow
             InitializeWindow();
             // 延迟初始化快捷键服务
             Loaded += OnWindowLoaded;
+            // 注册窗口关闭事件
+            Closed += OnWindowClosed;
 
             Debug.WriteLine("主窗口初始化完成");
         }
@@ -60,10 +69,10 @@ public partial class MainWindow
         }
     }
 
+
     #endregion
 
     #region 初始化方法
-
 
     // 窗口加载完成后初始化快捷键
     private void OnWindowLoaded(object sender, RoutedEventArgs e)
@@ -71,18 +80,21 @@ public partial class MainWindow
         try
         {
             // 从容器解析快捷键服务
-            if (ContainerAccessor.IsInitialized)
-            {
-                var hotKeyService = ContainerAccessor.Resolve<IHotKeyService>();
-                InitializeHotKeys(hotKeyService);
-            }
+            if (!ContainerAccessor.IsInitialized) return;
+            var hotKeyService = ContainerAccessor.Resolve<IHotKeyService>();
+            InitializeHotKeys(hotKeyService);
+            _themeManager.RegisterWindow(this);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"初始化快捷键服务失败: {ex.Message}");
         }
     }
-
+    private void OnWindowClosed(object? sender, EventArgs e)
+    {
+        // 注销窗口
+        _themeManager.UnregisterWindow(this);
+    }
 
     /// <summary>
     /// 初始化窗口设置
@@ -134,7 +146,10 @@ public partial class MainWindow
         else
         {
             // Windows 10 及更早版本：保留四条边框
-            windowChrome.NonClientFrameEdges = NonClientFrameEdges.None;
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
+                                               NonClientFrameEdges.Left |
+                                               NonClientFrameEdges.Top |
+                                               NonClientFrameEdges.Right;
         }
 
         WindowChrome.SetWindowChrome(this, windowChrome);
@@ -193,6 +208,7 @@ public partial class MainWindow
             Debug.WriteLine($"托盘管理器初始化失败: {ex.Message}");
         }
     }
+
     /// <summary>
     /// 初始化快捷键
     /// </summary>
@@ -356,7 +372,7 @@ public partial class MainWindow
     {
         List<FrameworkElement> pages =
         [
-            HomeButton,SettingsMenuItem,CrawlMenuItem,LoacalDataMenuItem,AboutMenuItem
+            HomeButton, SettingsMenuItem, CrawlMenuItem, LoacalDataMenuItem, AboutMenuItem
         ];
         foreach (var element in pages)
         {
@@ -609,6 +625,7 @@ public partial class MainWindow
             Debug.WriteLine($"数据管理菜单项点击处理失败: {ex.Message}");
         }
     }
+
     private void MenuItem_OnClick(object sender, RoutedEventArgs e)
     {
         try
@@ -750,8 +767,6 @@ public partial class MainWindow
 
     private void OnExitRequested() => Close();
 
-
-
     #endregion
 
     #region 辅助方法
@@ -818,6 +833,7 @@ public partial class MainWindow
             return false; // 默认按 Windows 10 处理
         }
     }
+
     #endregion
 
     #region 窗口生命周期
@@ -833,7 +849,7 @@ public partial class MainWindow
             // 清理托盘管理器
             CleanupTrayManager();
 
-            CleanupHotKeys();  // 添加这一行
+            CleanupHotKeys(); // 添加这一行
             // 清理单实例管理器
             SingleInstanceManager.Cleanup();
 
@@ -905,6 +921,4 @@ public partial class MainWindow
     public void ShowNotification(string title, string message) => _ = ShowNotificationAsync(title, message);
 
     #endregion
-
-
 }

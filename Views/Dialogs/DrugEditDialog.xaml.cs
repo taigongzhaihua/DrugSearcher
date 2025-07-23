@@ -1,3 +1,5 @@
+using DrugSearcher.Configuration;
+using DrugSearcher.Managers;
 using DrugSearcher.Models;
 using DrugSearcher.ViewModels;
 using System.Windows;
@@ -11,15 +13,23 @@ namespace DrugSearcher.Views;
 public partial class DrugEditDialog
 {
     private DrugEditDialogViewModel? _viewModel;
+    private readonly ThemeManager _themeManager;
 
     public DrugEditDialog(LocalDrugInfo? drugInfo = null)
     {
+
         InitializeComponent();
+        _themeManager = ContainerAccessor.Resolve<ThemeManager>();
 
         try
         {
             _viewModel = new DrugEditDialogViewModel(drugInfo);
             DataContext = _viewModel;
+
+
+            // 窗口加载完成后注册到主题管理器
+            Loaded += OnWindowLoaded;
+            Closed += OnWindowClosed;
         }
         catch (Exception ex)
         {
@@ -28,6 +38,17 @@ public partial class DrugEditDialog
             _viewModel = new DrugEditDialogViewModel();
             DataContext = _viewModel;
         }
+    }
+    private void OnWindowLoaded(object sender, RoutedEventArgs e)
+    {
+        // 注册窗口以启用边框颜色跟随主题
+        _themeManager.RegisterWindow(this);
+    }
+
+    private void OnWindowClosed(object? sender, EventArgs e)
+    {
+        // 注销窗口
+        _themeManager.UnregisterWindow(this);
     }
 
     /// <summary>

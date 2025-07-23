@@ -37,6 +37,7 @@ public partial class CalculatorEditorWindow
 
         // 使用 Loaded 事件确保所有控件都已初始化
         Loaded += OnWindowLoaded;
+        Closed += OnWindowClosed;
 
         // 订阅主题变化事件
         _themeManager.ThemeChanged += OnThemeChanged;
@@ -50,6 +51,8 @@ public partial class CalculatorEditorWindow
         // 确保所有控件都已初始化
         SetupCodeEditor();
         ConfigureWindowChrome();
+        // 注册窗口以启用边框颜色跟随主题
+        _themeManager.RegisterWindow(this);
 
         // 延迟初始化需要编辑器完全准备好的功能
         Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, new Action(() =>
@@ -59,6 +62,11 @@ public partial class CalculatorEditorWindow
             SetupSyntaxChecking();
             UpdateCodeCompletionParameters();
         }));
+    }
+    private void OnWindowClosed(object? _, EventArgs _1)
+    {
+        // 注销窗口
+        _themeManager.UnregisterWindow(this);
     }
 
     private void SetupCodeEditor()

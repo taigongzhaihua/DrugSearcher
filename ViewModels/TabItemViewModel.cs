@@ -8,25 +8,25 @@ namespace DrugSearcher.ViewModels;
 public partial class TabItemViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string _header = string.Empty;
+    public partial string Header { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _key = string.Empty;
+    public partial string Key { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _content = string.Empty;
+    public partial string Content { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isVisible = true;
+    public partial bool IsVisible { get; set; } = true;
 
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    private bool _isLoaded;
+    public partial bool IsLoaded { get; set; }
 
     [ObservableProperty]
-    private bool _isSpecialTab;
+    public partial bool IsSpecialTab { get; set; }
 
     public TabItemViewModel(string header, string key, bool isSpecialTab = false)
     {

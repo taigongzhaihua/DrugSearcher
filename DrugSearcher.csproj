@@ -11,6 +11,7 @@
 		<UserSecretsId>10832840-53ad-409b-80da-6aea6444d6fd</UserSecretsId>
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Resources\app.ico</ApplicationIcon>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

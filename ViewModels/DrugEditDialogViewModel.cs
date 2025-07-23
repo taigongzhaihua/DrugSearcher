@@ -47,84 +47,84 @@ public partial class DrugEditDialogViewModel : ObservableValidator
     [Required(ErrorMessage = "药物名称不能为空")]
     [StringLength(200, ErrorMessage = "药物名称长度不能超过200个字符")]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    private string _drugName = string.Empty;
+    public partial string DrugName { get; set; } = string.Empty;
 
     /// <summary>
     /// 通用名称
     /// </summary>
     [ObservableProperty]
     [StringLength(200, ErrorMessage = "通用名称长度不能超过200个字符")]
-    private string _genericName = string.Empty;
+    public partial string GenericName { get; set; } = string.Empty;
 
     /// <summary>
     /// 药物规格
     /// </summary>
     [ObservableProperty]
     [StringLength(100, ErrorMessage = "规格长度不能超过100个字符")]
-    private string _specification = string.Empty;
+    public partial string Specification { get; set; } = string.Empty;
 
     /// <summary>
     /// 生产厂家
     /// </summary>
     [ObservableProperty]
     [StringLength(200, ErrorMessage = "生产厂家长度不能超过200个字符")]
-    private string _manufacturer = string.Empty;
+    public partial string Manufacturer { get; set; } = string.Empty;
 
     /// <summary>
     /// 批准文号
     /// </summary>
     [ObservableProperty]
     [StringLength(100, ErrorMessage = "批准文号长度不能超过100个字符")]
-    private string _approvalNumber = string.Empty;
+    public partial string ApprovalNumber { get; set; } = string.Empty;
 
     /// <summary>
     /// 适应症
     /// </summary>
     [ObservableProperty]
-    private string _indications = string.Empty;
+    public partial string Indications { get; set; } = string.Empty;
 
     /// <summary>
     /// 用法用量
     /// </summary>
     [ObservableProperty]
-    private string _dosage = string.Empty;
+    public partial string Dosage { get; set; } = string.Empty;
 
     /// <summary>
     /// 中医病名
     /// </summary>
     [ObservableProperty]
     [StringLength(500, ErrorMessage = "中医病名长度不能超过500个字符")]
-    private string _tcmDisease = string.Empty;
+    public partial string TcmDisease { get; set; } = string.Empty;
 
     /// <summary>
     /// 中医辨病辨证
     /// </summary>
     [ObservableProperty]
-    private string _tcmSyndrome = string.Empty;
+    public partial string TcmSyndrome { get; set; } = string.Empty;
 
     /// <summary>
     /// 备注
     /// </summary>
     [ObservableProperty]
-    private string _remarks = string.Empty;
+    public partial string Remarks { get; set; } = string.Empty;
 
     /// <summary>
     /// 药物说明
     /// </summary>
     [ObservableProperty]
-    private string _description = string.Empty;
+    public partial string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// 不良反应
     /// </summary>
     [ObservableProperty]
-    private string _sideEffects = string.Empty;
+    public partial string SideEffects { get; set; } = string.Empty;
 
     /// <summary>
     /// 注意事项
     /// </summary>
     [ObservableProperty]
-    private string _precautions = string.Empty;
+    public partial string Precautions { get; set; } = string.Empty;
 
     #endregion
 

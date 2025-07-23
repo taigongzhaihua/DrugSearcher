@@ -45,69 +45,69 @@ public partial class LocalDataManagementViewModel : ObservableObject
     /// 搜索关键词
     /// </summary>
     [ObservableProperty]
-    private string _searchKeyword = string.Empty;
+    public partial string SearchKeyword { get; set; } = string.Empty;
 
     /// <summary>
     /// 当前页码
     /// </summary>
     [ObservableProperty]
-    private int _currentPage = 1;
+    public partial int CurrentPage { get; set; } = 1;
 
     /// <summary>
     /// 每页大小
     /// </summary>
     [ObservableProperty]
-    private int _pageSize = 50;
+    public partial int PageSize { get; set; } = 50;
 
     /// <summary>
     /// 总页数
     /// </summary>
     [ObservableProperty]
-    private int _totalPages = 1;
+    public partial int TotalPages { get; set; } = 1;
 
     /// <summary>
     /// 总记录数
     /// </summary>
     [ObservableProperty]
-    private int _totalRecords;
+    public partial int TotalRecords { get; set; }
 
     /// <summary>
     /// 是否正在加载
     /// </summary>
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     /// <summary>
     /// 状态消息
     /// </summary>
     [ObservableProperty]
-    private string _statusMessage = "就绪";
+    public partial string StatusMessage { get; set; } = "就绪";
 
     /// <summary>
     /// 药物统计信息
     /// </summary>
     [ObservableProperty]
-    private DrugStatistics? _statistics;
+    public partial DrugStatistics? Statistics { get; set; }
 
     /// <summary>
     /// 选中的药物
     /// </summary>
     [ObservableProperty]
-    private LocalDrugInfo? _selectedDrug;
+    public partial LocalDrugInfo? SelectedDrug { get; set; }
 
     /// <summary>
     /// 是否可以上一页
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(PreviousPageCommand))]
-    private bool _canGoPrevious;
+    public partial bool CanGoPrevious { get; set; }
 
     /// <summary>
     /// 是否可以下一页
     /// </summary>
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(NextPageCommand))]
-    private bool _canGoNext;
+    public partial bool CanGoNext { get; set; }
 
     #endregion
 

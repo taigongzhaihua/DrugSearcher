@@ -52,25 +52,25 @@ public partial class SettingsPageViewModel : ObservableObject
     /// 过滤后的分组集合
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<DynamicSettingGroup> _filteredGroups;
+    public partial ObservableCollection<DynamicSettingGroup> FilteredGroups { get; set; }
 
     /// <summary>
     /// 是否正在加载
     /// </summary>
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     /// <summary>
     /// 状态消息
     /// </summary>
     [ObservableProperty]
-    private string _statusMessage = string.Empty;
+    public partial string StatusMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// 搜索文本
     /// </summary>
     [ObservableProperty]
-    private string _searchText = string.Empty;
+    public partial string SearchText { get; set; } = string.Empty;
 
     #endregion
 

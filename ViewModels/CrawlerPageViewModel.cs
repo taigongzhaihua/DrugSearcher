@@ -37,78 +37,77 @@ public partial class CrawlerPageViewModel : ObservableObject
     #region 属性
 
     [ObservableProperty]
-    private int _startId;
+    public partial int StartId { get; set; }
 
     [ObservableProperty]
-    private int _endId;
+    public partial int EndId { get; set; }
 
     [ObservableProperty]
-    private int _batchSize;
+    public partial int BatchSize { get; set; }
 
     [ObservableProperty]
-    private int _delayMs;
+    public partial int DelayMs { get; set; }
 
     [ObservableProperty]
-    private bool _isCrawling;
+    public partial bool IsCrawling { get; set; }
 
     [ObservableProperty]
-    private bool _canStartCrawl = true;
+    public partial bool CanStartCrawl { get; set; } = true;
 
     [ObservableProperty]
-    private string _crawlButtonText = "开始爬取";
+    public partial string CrawlButtonText { get; set; } = "开始爬取";
 
     [ObservableProperty]
-    private double _progressPercentage;
+    public partial double ProgressPercentage { get; set; }
 
     [ObservableProperty]
-    private string _progressText = "准备就绪";
+    public partial string ProgressText { get; set; } = "准备就绪";
 
     [ObservableProperty]
-    private int _totalProcessed;
+    public partial int TotalProcessed { get; set; }
 
     [ObservableProperty]
-    private int _successCount;
+    public partial int SuccessCount { get; set; }
 
     [ObservableProperty]
-    private int _failedCount;
+    public partial int FailedCount { get; set; }
 
     [ObservableProperty]
-    private int _currentId;
+    public partial int CurrentId { get; set; }
 
     [ObservableProperty]
-    private string _estimatedTimeRemaining = "--";
+    public partial string EstimatedTimeRemaining { get; set; } = "--";
 
     [ObservableProperty]
-    private string _crawlSpeed = "0 条/分钟";
+    public partial string CrawlSpeed { get; set; } = "0 条/分钟";
 
     [ObservableProperty]
-    private DateTime _startTime;
+    public partial DateTime StartTime { get; set; }
 
     [ObservableProperty]
-    private DateTime _endTime;
+    public partial DateTime EndTime { get; set; }
 
     [ObservableProperty]
-    private string _elapsedTime = "00:00:00";
+    public partial string ElapsedTime { get; set; } = "00:00:00";
 
     // 统计信息
     [ObservableProperty]
-    private int _totalDrugsInDatabase;
+    public partial int TotalDrugsInDatabase { get; set; }
 
     [ObservableProperty]
-    private int _successfulDrugs;
+    public partial int SuccessfulDrugs { get; set; }
 
     [ObservableProperty]
-    private int _failedDrugs;
+    public partial int FailedDrugs { get; set; }
 
     [ObservableProperty]
-    private int _notFoundDrugs;
+    public partial int NotFoundDrugs { get; set; }
 
     [ObservableProperty]
-    private int _parseErrorDrugs;
+    public partial int ParseErrorDrugs { get; set; }
 
     [ObservableProperty]
-    private string _completionRate = "0%";
-
+    public partial string CompletionRate { get; set; } = "0%";
     public ObservableCollection<CrawlLogEntry> CrawlLogs { get; }
 
     #endregion

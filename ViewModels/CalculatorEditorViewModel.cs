@@ -44,29 +44,28 @@ public partial class CalculatorEditorViewModel : ObservableObject
     #region Properties
 
     [ObservableProperty]
-    private string _calculatorName = string.Empty;
+    public partial string CalculatorName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _description = string.Empty;
+    public partial string Description { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _calculationCode = string.Empty;
+    public partial string CalculationCode { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private TextDocument _codeDocument;
+    public partial TextDocument CodeDocument { get; set; }
 
     [ObservableProperty]
-    private bool _isSaving;
+    public partial bool IsSaving { get; set; }
 
     [ObservableProperty]
-    private bool _isTesting;
+    public partial bool IsTesting { get; set; }
 
     [ObservableProperty]
-    private string _statusMessage = string.Empty;
+    public partial string StatusMessage { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private DosageParameterViewModel? _selectedParameter;
-
+    public partial DosageParameterViewModel? SelectedParameter { get; set; }
     public ObservableCollection<DosageParameterViewModel> Parameters { get; }
 
     public string WindowTitle => IsEditing ? $"编辑计算器 - {_drugInfo.DrugName}" : $"创建计算器 - {_drugInfo.DrugName}";

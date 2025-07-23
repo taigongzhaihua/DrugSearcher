@@ -27,7 +27,6 @@ public partial class HomePageViewModel : ObservableObject
     // 分页相关
     private const int PageSize = 30;
     private string _lastSearchTerm = string.Empty;
-    private PaginatedResult<OnlineDrugInfo>? _currentOnlineResult;
 
     public HomePageViewModel(
         DrugSearchService drugSearchService,
@@ -81,48 +80,103 @@ public partial class HomePageViewModel : ObservableObject
     #region 属性
 
     // 搜索相关
-    [ObservableProperty] private string _searchTerm = string.Empty;
-    [ObservableProperty] private bool _isLocalDbEnabled;
-    [ObservableProperty] private bool _isOnlineEnabled;
-    [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private string _resultCount = string.Empty;
-    [ObservableProperty] private string _searchStatus = string.Empty;
-    [ObservableProperty] private bool _isDetailPanelVisible;
-    [ObservableProperty] private UnifiedDrugSearchResult? _selectedDrug;
-    [ObservableProperty] private bool _showSearchSuggestions;
+    [ObservableProperty]
+    public partial string SearchTerm { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsLocalDbEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsOnlineEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsLoading { get; set; }
+
+    [ObservableProperty]
+    public partial string ResultCount { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string SearchStatus { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool IsDetailPanelVisible { get; set; }
+
+    [ObservableProperty]
+    public partial UnifiedDrugSearchResult? SelectedDrug { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowSearchSuggestions { get; set; }
 
     // 基本信息
-    [ObservableProperty] private string _drugName = string.Empty;
-    [ObservableProperty] private string _genericName = string.Empty;
-    [ObservableProperty] private string _tradeName = string.Empty;
-    [ObservableProperty] private string _manufacturerInfo = string.Empty;
-    [ObservableProperty] private string _approvalNumber = string.Empty;
-    [ObservableProperty] private string _specification = string.Empty;
-    [ObservableProperty] private string _dataSourceInfo = string.Empty;
-    [ObservableProperty] private string _matchInfo = string.Empty;
+    [ObservableProperty]
+    public partial string DrugName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string GenericName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string TradeName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ManufacturerInfo { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ApprovalNumber { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string Specification { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string DataSourceInfo { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string MatchInfo { get; set; } = string.Empty;
 
     // 中医信息
-    [ObservableProperty] private string _tcmDisease = string.Empty;
-    [ObservableProperty] private string _tcmSyndrome = string.Empty;
+    [ObservableProperty]
+    public partial string TcmDisease { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string TcmSyndrome { get; set; } = string.Empty;
 
     // 计算器相关
-    [ObservableProperty] private DosageCalculator? _selectedCalculator;
-    [ObservableProperty] private bool _isCalculatorLoading;
-    [ObservableProperty] private bool _isCalculating;
-    [ObservableProperty] private bool _hasCalculationResults;
-    [ObservableProperty] private bool _hasCalculators;
-    [ObservableProperty] private string _calculatorStatusMessage = "请选择药物以查看可用的计算器";
+    [ObservableProperty]
+    public partial DosageCalculator? SelectedCalculator { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCalculatorLoading { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCalculating { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasCalculationResults { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasCalculators { get; set; }
+
+    [ObservableProperty]
+    public partial string CalculatorStatusMessage { get; set; } = "请选择药物以查看可用的计算器";
 
     // AI生成相关
-    [ObservableProperty] private bool _isGeneratingCalculator;
-    [ObservableProperty] private string _generationStatus = string.Empty;
-    [ObservableProperty] private int _generationProgress;
-    [ObservableProperty] private string _generationStreamContent = string.Empty;
-    [ObservableProperty] private string _generationReasoningContent = string.Empty;
+    [ObservableProperty]
+    public partial bool IsGeneratingCalculator { get; set; }
+
+    [ObservableProperty]
+    public partial string GenerationStatus { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial int GenerationProgress { get; set; }
+
+    [ObservableProperty]
+    public partial string GenerationStreamContent { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string GenerationReasoningContent { get; set; } = string.Empty;
 
     // Tab相关
-    [ObservableProperty] private TabItemViewModel? _selectedTab;
-
+    [ObservableProperty]
+    public partial TabItemViewModel? SelectedTab { get; set; }
     public ObservableCollection<UnifiedDrugSearchResult?> SearchResults { get; } = [];
     public ObservableCollection<string> SearchSuggestions { get; } = [];
     public ObservableCollection<TabItemViewModel> TabItems { get; } = [];
@@ -135,12 +189,23 @@ public partial class HomePageViewModel : ObservableObject
 
     #region 分页相关属性
 
-    [ObservableProperty] private int _currentPage = 1;
-    [ObservableProperty] private int _totalPages = 1;
-    [ObservableProperty] private bool _hasPreviousPage;
-    [ObservableProperty] private bool _hasNextPage;
-    [ObservableProperty] private bool _isLoadingMore;
-    [ObservableProperty] private string _pageInfo = string.Empty;
+    [ObservableProperty]
+    public partial int CurrentPage { get; set; } = 1;
+
+    [ObservableProperty]
+    public partial int TotalPages { get; set; } = 1;
+
+    [ObservableProperty]
+    public partial bool HasPreviousPage { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasNextPage { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsLoadingMore { get; set; }
+
+    [ObservableProperty]
+    public partial string PageInfo { get; set; } = string.Empty;
 
     #endregion
 

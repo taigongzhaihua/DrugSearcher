@@ -30,25 +30,25 @@ public partial class AboutPageViewModel : ObservableObject
     /// 当前版本信息
     /// </summary>
     [ObservableProperty]
-    private VersionInfo? _currentVersion;
+    public partial VersionInfo? CurrentVersion { get; set; }
 
     /// <summary>
     /// 更新检查结果
     /// </summary>
     [ObservableProperty]
-    private UpdateCheckResult? _updateCheckResult;
+    public partial UpdateCheckResult? UpdateCheckResult { get; set; }
 
     /// <summary>
     /// 是否正在检查更新
     /// </summary>
     [ObservableProperty]
-    private bool _isCheckingUpdate;
+    public partial bool IsCheckingUpdate { get; set; }
 
     /// <summary>
     /// 状态消息
     /// </summary>
     [ObservableProperty]
-    private string _statusMessage = string.Empty;
+    public partial string StatusMessage { get; set; } = string.Empty;
 
     #endregion
 

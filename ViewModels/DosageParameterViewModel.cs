@@ -46,37 +46,37 @@ public partial class DosageParameterViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private string? _name = string.Empty;
+    public partial string? Name { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _displayName = string.Empty;
+    public partial string DisplayName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _dataType = ParameterTypes.Number;
+    public partial string DataType { get; set; } = ParameterTypes.Number;
 
     [ObservableProperty]
-    private string _unit = string.Empty;
+    public partial string Unit { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isRequired;
+    public partial bool IsRequired { get; set; }
 
     [ObservableProperty]
-    private object? _defaultValue;
+    public partial object? DefaultValue { get; set; }
 
     [ObservableProperty]
-    private double? _minValue;
+    public partial double? MinValue { get; set; }
 
     [ObservableProperty]
-    private double? _maxValue;
+    public partial double? MaxValue { get; set; }
 
     [ObservableProperty]
-    private string[] _options;
+    public partial string[] Options { get; set; }
 
     [ObservableProperty]
-    private string _description = string.Empty;
+    public partial string Description { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _optionsText = string.Empty;
+    public partial string OptionsText { get; set; } = string.Empty;
 
     // 用于DataGrid显示的属性
     public string DataTypeName

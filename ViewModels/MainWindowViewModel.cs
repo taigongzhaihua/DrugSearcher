@@ -45,7 +45,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// 应用程序标题
     /// </summary>
     [ObservableProperty]
-    private string _title = "药物查询器";
+    public partial string Title { get; set; } = "药物查询器";
 
     #endregion
 
@@ -55,19 +55,19 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// 主题切换按钮图标
     /// </summary>
     [ObservableProperty]
-    private string _themeButtonText = "\ue611";
+    public partial string ThemeButtonText { get; set; } = "\ue611";
 
     /// <summary>
     /// 首页按钮图标
     /// </summary>
     [ObservableProperty]
-    private string _homeButtonText = "\ue61a";
+    public partial string HomeButtonText { get; set; } = "\ue61a";
 
     /// <summary>
     /// 设置按钮图标
     /// </summary>
     [ObservableProperty]
-    private string _settingsButtonText = "\ue61c";
+    public partial string SettingsButtonText { get; set; } = "\ue61c";
 
     #endregion
 
@@ -77,7 +77,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// 主题按钮工具提示
     /// </summary>
     [ObservableProperty]
-    private string _themeTooltip = "当前主题：浅色";
+    public partial string ThemeTooltip { get; set; } = "当前主题：浅色";
 
     #endregion
 
@@ -87,19 +87,19 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     /// 各颜色主题的选择状态
     /// </summary>
     [ObservableProperty]
-    private Dictionary<ThemeColor, bool> _colorSelectionStates = [];
+    public partial Dictionary<ThemeColor, bool> ColorSelectionStates { get; set; } = [];
 
     /// <summary>
     /// 当前主题模式的显示名称
     /// </summary>
     [ObservableProperty]
-    private string _currentThemeModeName = "浅色";
+    public partial string CurrentThemeModeName { get; set; } = "浅色";
 
     /// <summary>
     /// 当前主题颜色的显示名称
     /// </summary>
     [ObservableProperty]
-    private string _currentThemeColorName = "蓝色";
+    public partial string CurrentThemeColorName { get; set; } = "蓝色";
 
     #endregion
 

@@ -17,26 +17,25 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
     #region 属性
 
     [ObservableProperty]
-    private BaseDrugInfo? _currentDrugInfo;
+    public partial BaseDrugInfo? CurrentDrugInfo { get; set; }
 
     [ObservableProperty]
-    private DosageCalculator? _selectedCalculator;
+    public partial DosageCalculator? SelectedCalculator { get; set; }
 
     [ObservableProperty]
-    private bool _isLoading;
+    public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    private bool _isCalculating;
+    public partial bool IsCalculating { get; set; }
 
     [ObservableProperty]
-    private bool _hasResults;
+    public partial bool HasResults { get; set; }
 
     [ObservableProperty]
-    private bool _hasCalculators;
+    public partial bool HasCalculators { get; set; }
 
     [ObservableProperty]
-    private string _statusMessage = "请选择药物以查看可用的计算器";
-
+    public partial string StatusMessage { get; set; } = "请选择药物以查看可用的计算器";
     public ObservableCollection<DosageCalculator> AvailableCalculators { get; } = [];
     public ObservableCollection<DosageParameter> Parameters { get; } = [];
     public ObservableCollection<DosageCalculationResult> CalculationResults { get; } = [];

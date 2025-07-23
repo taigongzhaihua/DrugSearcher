@@ -7,7 +7,10 @@ using DrugSearcher.Services;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
+using System.Windows.Media;
 using Application = System.Windows.Application;
+using Brush = System.Windows.Media.Brush;
+using Color = System.Windows.Media.Color;
 using ThemeMode = DrugSearcher.Enums.ThemeMode;
 
 namespace DrugSearcher.Managers;
@@ -25,7 +28,7 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// 当前主题配置
     /// </summary>
     [ObservableProperty]
-    private ThemeConfig _currentTheme = new(ThemeMode.Light, ThemeColor.Blue);
+    public partial ThemeConfig CurrentTheme { get; set; } = new(ThemeMode.Light, ThemeColor.Blue);
 
     /// <summary>
     /// 缓存所有颜色资源字典，避免重复加载
@@ -41,6 +44,14 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// 是否已释放资源
     /// </summary>
     private bool _disposed;
+
+    private readonly HashSet<WeakReference> _registeredWindows = [];
+    private readonly Lock _windowsLock = new();
+
+    /// <summary>
+    /// 是否启用Windows 11边框控制
+    /// </summary>
+    public bool IsWindowBorderControlEnabled { get; private set; } = true;
 
     #endregion
 
@@ -74,11 +85,13 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// <summary>
     /// 初始化主题管理器
     /// </summary>
+    // 在Initialize()方法中添加
     public void Initialize()
     {
         try
         {
             InitializeResourceCache();
+
             _ = LoadAndApplyThemeFromSettingsAsync();
         }
         catch (Exception ex)
@@ -134,6 +147,166 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     {
         var defaultTheme = new ThemeConfig(ThemeMode.Light, ThemeColor.Blue);
         ApplyTheme(defaultTheme);
+    }
+
+    #endregion
+
+    #region 窗口注册方法
+
+    /// <summary>
+    /// 注册窗口以进行边框颜色管理
+    /// </summary>
+    /// <param name="window"> 要注册的窗口</param>
+    /// <summary>
+    /// 注册窗口以进行边框和标题栏颜色管理
+    /// </summary>
+    public void RegisterWindow(Window? window)
+    {
+        if (window == null || !IsWindowBorderControlEnabled)
+            return;
+
+        lock (_windowsLock)
+        {
+            _registeredWindows.Add(new WeakReference(window));
+
+            // 立即应用当前主题的窗口颜色
+            ApplyWindowColorsToWindow(window);
+        }
+
+        Debug.WriteLine($"已注册窗口进行边框和标题栏管理: {window.GetType().Name}");
+    }
+
+    /// <summary>
+    /// 注销窗口的颜色管理
+    /// </summary>
+    /// <param name="window">要注销的窗口</param>
+    public void UnregisterWindow(Window? window)
+    {
+        if (window == null)
+            return;
+
+        lock (_windowsLock)
+        {
+            var toRemove = _registeredWindows
+                .Where(wr => wr.Target == window)
+                .ToList();
+
+            foreach (var wr in toRemove)
+            {
+                _registeredWindows.Remove(wr);
+            }
+        }
+
+        // 重置为系统默认颜色
+        var result = WindowColorManager.ResetWindowColors(window);
+
+        Debug.WriteLine($"窗口 {window.GetType().Name} 已注销颜色管理，重置结果: {result.Message}");
+    }
+
+    #endregion
+
+    #region 主题颜色提取和应用方法
+
+    // 添加颜色提取方法
+    /// <summary>
+    /// 从当前主题资源中获取PrimaryBrush颜色
+    /// </summary>
+    /// <returns>主题色彩，如果无法获取则返回默认蓝色</returns>
+    private static Color GetThemeColor(string resourceKey)
+    {
+        try
+        {
+            var appResources = Application.Current.Resources;
+
+            if (!appResources.Contains(resourceKey) ||
+                appResources[resourceKey] is not Brush brush ||
+                brush.GetValue(SolidColorBrush.ColorProperty) is not Color color) return Colors.DodgerBlue;
+            Debug.WriteLine($"已提取主题色彩: {color}");
+            return color;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"获取主题色彩失败: {ex.Message}");
+            return Colors.DodgerBlue;
+        }
+    }
+
+    /// <summary>
+    /// 应用边框和标题栏颜色到指定窗口
+    /// </summary>
+    /// <param name="window">目标窗口</param>
+    private void ApplyWindowColorsToWindow(Window? window)
+    {
+        if (window == null || !IsWindowBorderControlEnabled)
+            return;
+
+        try
+        {
+            var themeColor = GetThemeColor("BackgroundBrush");
+
+
+            var result = WindowColorManager.SetWindowColors(window, themeColor, themeColor);
+
+            if (result.IsFullySuccessful)
+            {
+                Debug.WriteLine($"已为窗口 {window.GetType().Name} 设置边框和标题栏颜色: 边框={themeColor}, 标题栏={themeColor}");
+            }
+            else if (result.IsPartiallySuccessful)
+            {
+                Debug.WriteLine($"为窗口 {window.GetType().Name} 部分设置颜色成功: {result.Message}");
+            }
+            else
+            {
+                Debug.WriteLine($"为窗口 {window.GetType().Name} 设置颜色失败: {result.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"应用窗口颜色失败: {ex.Message}");
+        }
+    }
+
+
+    /// <summary>
+    /// 更新所有已注册窗口的边框颜色
+    /// </summary>
+    private void UpdateAllWindowColors()
+    {
+        if (!IsWindowBorderControlEnabled)
+            return;
+
+        lock (_windowsLock)
+        {
+            var aliveWindows = new List<Window?>();
+            var deadReferences = new List<WeakReference>();
+
+            // 收集存活的窗口和死亡的引用
+            foreach (var windowRef in _registeredWindows)
+            {
+                if (windowRef.Target is Window { IsLoaded: true } window)
+                {
+                    aliveWindows.Add(window);
+                }
+                else
+                {
+                    deadReferences.Add(windowRef);
+                }
+            }
+
+            // 清理死亡的引用
+            foreach (var deadRef in deadReferences)
+            {
+                _registeredWindows.Remove(deadRef);
+            }
+
+            // 更新存活窗口的颜色
+            foreach (var window in aliveWindows)
+            {
+                ApplyWindowColorsToWindow(window);
+            }
+
+            Debug.WriteLine($"已更新 {aliveWindows.Count} 个窗口的边框和标题栏颜色");
+        }
     }
 
     #endregion
@@ -230,7 +403,8 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// <summary>
     /// 检查设置值是否未发生变化
     /// </summary>
-    private static bool IsSettingValueUnchanged(SettingChangedEventArgs e) => e.NewValue?.ToString() == e.OldValue?.ToString();
+    private static bool IsSettingValueUnchanged(SettingChangedEventArgs e) =>
+        e.NewValue?.ToString() == e.OldValue?.ToString();
 
     #endregion
 
@@ -291,6 +465,56 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     {
         var newConfig = CurrentTheme with { Color = color };
         ApplyTheme(newConfig);
+    }
+
+    #endregion
+
+    #region 手动控制边框颜色
+
+    /// <summary>
+    /// 立即更新所有窗口边框和标题栏为当前主题色
+    /// </summary>
+    public void RefreshAllWindowColors()
+    {
+        UpdateAllWindowColors();
+    }
+
+    /// <summary>
+    /// 手动设置指定窗口的边框和标题栏颜色
+    /// </summary>
+    /// <param name="window">目标窗口</param>
+    /// <param name="borderColor">边框颜色</param>
+    /// <param name="captionColor">标题栏颜色，如果为null则使用边框颜色</param>
+    /// <returns>设置结果</returns>
+    public WindowColorResult SetWindowColors(Window? window, Color borderColor, Color? captionColor = null)
+    {
+        return !IsWindowBorderControlEnabled
+            ? new WindowColorResult(false, false, "None", "不支持的系统版本")
+            : WindowColorManager.SetWindowColors(window, borderColor, captionColor);
+    }
+
+    /// <summary>
+    /// 手动设置指定窗口使用当前主题颜色
+    /// </summary>
+    /// <param name="window">目标窗口</param>
+    /// <returns>设置结果</returns>
+    public WindowColorResult ApplyCurrentThemeToWindow(Window? window)
+    {
+        if (!IsWindowBorderControlEnabled)
+            return new WindowColorResult(false, false, "None", "不支持的系统版本");
+
+        try
+        {
+            var color = GetThemeColor("BackgroundBrush");
+
+
+            return WindowColorManager.SetWindowColors(window, color, color);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"应用当前主题到窗口失败: {ex.Message}");
+            return new WindowColorResult(false, false, "None", ex.Message);
+        }
     }
 
     #endregion
@@ -444,8 +668,8 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// <param name="mode">原始主题模式</param>
     /// <returns>实际主题模式</returns>
     private static ThemeMode GetActualThemeMode(ThemeMode mode) => mode == ThemeMode.System
-            ? (SystemThemeHelper.IsSystemDarkTheme() ? ThemeMode.Dark : ThemeMode.Light)
-            : mode;
+        ? (SystemThemeHelper.IsSystemDarkTheme() ? ThemeMode.Dark : ThemeMode.Light)
+        : mode;
 
     /// <summary>
     /// 更新应用程序资源
@@ -495,7 +719,8 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// </summary>
     /// <param name="appResources">应用程序资源</param>
     /// <param name="newThemeDictionaries">新主题资源字典列表</param>
-    private static void AddNewThemeResources(ResourceDictionary appResources, List<ResourceDictionary> newThemeDictionaries)
+    private static void AddNewThemeResources(ResourceDictionary appResources,
+        List<ResourceDictionary> newThemeDictionaries)
     {
         foreach (var newDict in newThemeDictionaries)
         {
@@ -591,11 +816,15 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// 触发主题变更事件
     /// </summary>
     /// <param name="themeConfig">新的主题配置</param>
+    // 修改OnThemeChanged方法
     private void OnThemeChanged(ThemeConfig themeConfig)
     {
         try
         {
             ThemeChanged?.Invoke(this, themeConfig);
+
+            // 更新所有窗口的边框和标题栏颜色
+            UpdateAllWindowColors();
         }
         catch (Exception ex)
         {
@@ -679,7 +908,21 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
         {
             try
             {
-                // 释放托管资源
+                // 清理窗口注册并重置颜色
+                lock (_windowsLock)
+                {
+                    foreach (var windowRef in _registeredWindows)
+                    {
+                        if (windowRef.Target is Window window)
+                        {
+                            WindowColorManager.ResetWindowColors(window);
+                        }
+                    }
+
+                    _registeredWindows.Clear();
+                }
+
+                // 其他现有的清理代码...
                 UnsubscribeFromSystemThemeChanges();
                 UnsubscribeFromSettingsChanges();
                 ClearCache();
@@ -691,9 +934,6 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
                 Debug.WriteLine($"释放 ThemeManager 资源失败: {ex.Message}");
             }
         }
-
-        // 释放非托管资源（如果有的话）
-        // ...
 
         _disposed = true;
     }
