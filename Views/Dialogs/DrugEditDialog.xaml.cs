@@ -2,7 +2,9 @@ using DrugSearcher.Configuration;
 using DrugSearcher.Managers;
 using DrugSearcher.Models;
 using DrugSearcher.ViewModels;
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Shell;
 using MessageBox = System.Windows.MessageBox;
 
 namespace DrugSearcher.Views;
@@ -25,7 +27,7 @@ public partial class DrugEditDialog
         {
             _viewModel = new DrugEditDialogViewModel(drugInfo);
             DataContext = _viewModel;
-
+            ConfigureWindowChrome();
 
             // 窗口加载完成后注册到主题管理器
             Loaded += OnWindowLoaded;
@@ -50,7 +52,56 @@ public partial class DrugEditDialog
         // 注销窗口
         _themeManager.UnregisterWindow(this);
     }
+    private void ConfigureWindowChrome()
+    {
+        var windowChrome = new WindowChrome
+        {
+            ResizeBorderThickness = new Thickness(5),
+            CaptionHeight = 60,
+            CornerRadius = new CornerRadius(8),
+            GlassFrameThickness = new Thickness(-1),
+            UseAeroCaptionButtons = false
+        };
 
+        // 检查是否为 Windows 11
+        if (IsWindows11())
+        {
+            // Windows 11：隐藏顶部边框
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
+                                               NonClientFrameEdges.Left |
+                                               NonClientFrameEdges.Right;
+        }
+        else
+        {
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
+                                               NonClientFrameEdges.Left |
+                                               NonClientFrameEdges.Right;
+            // Windows 10 及更早版本：保留四条边框
+            WindowStyle = WindowStyle.ThreeDBorderWindow;
+        }
+
+        WindowChrome.SetWindowChrome(this, windowChrome);
+        Debug.WriteLine($"窗口Chrome配置完成 - 系统版本: {(IsWindows11() ? "Windows 11" : "Windows 10 或更早")}");
+    }
+    /// <summary>
+    /// 判断是否为 Windows 11
+    /// </summary>
+    private static bool IsWindows11()
+    {
+        try
+        {
+            var osVersion = Environment.OSVersion.Version;
+
+            // Windows 11 的版本号为 10.0.22000 或更高
+            // Build 22000 是 Windows 11 的第一个正式版本
+            return osVersion is { Major: 10, Build: >= 22000 };
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"检测系统版本失败: {ex.Message}");
+            return false; // 默认按 Windows 10 处理
+        }
+    }
     /// <summary>
     /// 获取编辑后的药物信息
     /// </summary>

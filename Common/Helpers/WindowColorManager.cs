@@ -36,6 +36,24 @@ namespace DrugSearcher.Helpers
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool InvalidateRect(IntPtr hWnd, IntPtr lpRect, [MarshalAs(UnmanagedType.Bool)] bool bErase);
 
+        [LibraryImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
+
+        [LibraryImport("user32.dll")]
+        private static partial int GetWindowLong(IntPtr hwnd, int index);
+
+        [LibraryImport("user32.dll")]
+        private static partial int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+        [LibraryImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool SetWindowPos(IntPtr hwnd, IntPtr hwndInsertAfter,
+            int x, int y, int cx, int cy, uint flags);
+
+
+        [LibraryImport("user32.dll")]
+        private static partial IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
         #endregion
 
         #region 常量定义
@@ -121,10 +139,19 @@ namespace DrugSearcher.Helpers
                 return SetWindows11Colors(hwnd, borderColor, actualTitleBarColor);
             }
 
+
             // Windows 10: 使用组合方法
             if (IsWindows10())
             {
-                return SetWindows10Colors(hwnd, borderColor, actualTitleBarColor);
+                var result = SetWindows10Colors(hwnd, borderColor, actualTitleBarColor);
+                if (result != null)
+                {
+                    window.UpdateLayout();
+                    window.Width += 1;
+                    window.Width -= 1;
+                    return result;
+                }
+                    
             }
 
             return new WindowColorResult(false, false, "Unsupported", "不支持的系统版本");
@@ -151,7 +178,14 @@ namespace DrugSearcher.Helpers
 
             if (IsWindows10())
             {
-                return ResetWindows10Colors(hwnd);
+                var result = ResetWindows10Colors(hwnd);
+                if (result != null)
+                {
+                    window.UpdateLayout();
+                    window.Width += 1;
+                    window.Width -= 1;
+                    return result;
+                }
             }
 
             return new WindowColorResult(false, false, "Unsupported", "不支持的系统版本");
@@ -214,11 +248,13 @@ namespace DrugSearcher.Helpers
         {
             try
             {
-                // 方法1: 尝试使用组合属性设置边框颜色
-                var borderSuccess = SetWindows10BorderColor(hwnd, borderColor);
 
                 // 方法2: 尝试设置标题栏主题
                 var titleSuccess = SetWindows10TitleBarTheme(hwnd, titleBarColor);
+
+                // 方法1: 尝试使用组合属性设置边框颜色
+                var borderSuccess = SetWindows10BorderColor(hwnd, borderColor);
+
 
                 if (!borderSuccess)
                 {
@@ -226,6 +262,23 @@ namespace DrugSearcher.Helpers
                     borderSuccess = SetWindows10AcrylicColor(hwnd, borderColor);
                 }
 
+                if (hwnd != IntPtr.Zero)
+                {
+                    // 发送 WM_NCPAINT 消息
+                    const int WM_NCPAINT = 0x0085;
+                    SendMessage(hwnd, WM_NCPAINT, new IntPtr(1), IntPtr.Zero);
+
+                    // 发送 WM_NCACTIVATE 消息
+                    const int WM_NCACTIVATE = 0x0086;
+                    SendMessage(hwnd, WM_NCACTIVATE, new IntPtr(1), IntPtr.Zero);
+
+                    // 使用 RedrawWindow 指定只重绘边框
+                    const uint RDW_FRAME = 0x0400;
+                    const uint RDW_INVALIDATE = 0x0001;
+                    const uint RDW_UPDATENOW = 0x0100;
+
+                    RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW);
+                }
                 var method = borderSuccess ? "Windows10_Composition" : "Windows10_Fallback";
                 var message = $"Windows 10 设置结果: 边框={borderSuccess}, 标题栏={titleSuccess}";
 
@@ -244,8 +297,8 @@ namespace DrugSearcher.Helpers
             {
                 var accent = new AccentPolicy
                 {
-                    AccentState = AccentState.AccentEnableGradient,
-                    AccentFlags = AccentFlags.DrawAllBorders,
+                    AccentState = AccentState.AccentDisabled,
+                    AccentFlags = AccentFlags.None,
                     GradientColor = ColorToAbgr(color),
                     AnimationId = 0
                 };
