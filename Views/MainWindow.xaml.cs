@@ -77,39 +77,6 @@ public partial class MainWindow
 
     #region 初始化方法
 
-    // 窗口加载完成后初始化快捷键
-    private void OnWindowLoaded(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            // 从容器解析快捷键服务
-            if (!ContainerAccessor.IsInitialized) return;
-            var hotKeyService = ContainerAccessor.Resolve<IHotKeyService>();
-            InitializeHotKeys(hotKeyService);
-            _themeManager.RegisterWindow(this);
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"初始化快捷键服务失败: {ex.Message}");
-        }
-    }
-    private void OnWindowClosed(object? sender, EventArgs e)
-    {
-        // 注销窗口
-        _themeManager.UnregisterWindow(this);
-    }
-
-    private void OnWindowActivated(object? sender, EventArgs e)
-    {
-        // 窗口获得焦点时刷新
-        WindowColorManager.RefreshWindow(this);
-    }
-
-    private void OnWindowDeactivated(object? sender, EventArgs e)
-    {
-        // 窗口失去焦点时刷新
-        WindowColorManager.RefreshWindow(this);
-    }
 
     /// <summary>
     /// 初始化窗口设置
@@ -160,9 +127,7 @@ public partial class MainWindow
         }
         else
         {
-            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
-                                               NonClientFrameEdges.Left |
-                                               NonClientFrameEdges.Right;
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom;
             // Windows 10 及更早版本：保留四条边框
             WindowStyle = WindowStyle.ThreeDBorderWindow;
         }
@@ -508,6 +473,45 @@ public partial class MainWindow
 
     #endregion
 
+    #region 事件处理器 - 窗口事件
+
+    // 窗口加载完成后初始化快捷键
+    private void OnWindowLoaded(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // 从容器解析快捷键服务
+            if (!ContainerAccessor.IsInitialized) return;
+            var hotKeyService = ContainerAccessor.Resolve<IHotKeyService>();
+            InitializeHotKeys(hotKeyService);
+            _themeManager.RegisterWindow(this);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"初始化快捷键服务失败: {ex.Message}");
+        }
+    }
+    private void OnWindowClosed(object? sender, EventArgs e)
+    {
+        // 注销窗口
+        _themeManager.UnregisterWindow(this);
+    }
+
+    private void OnWindowActivated(object? sender, EventArgs e)
+    {
+        // 窗口获得焦点时刷新
+        WindowColorManager.RefreshWindow(this);
+    }
+
+    private void OnWindowDeactivated(object? sender, EventArgs e)
+    {
+        // 窗口失去焦点时刷新
+        WindowColorManager.RefreshWindow(this);
+    }
+
+
+    #endregion
+
     #region 事件处理器 - 托盘
 
     /// <summary>
@@ -807,27 +811,6 @@ public partial class MainWindow
     }
 
 
-    private void CleanupHotKeys()
-    {
-        if (_hotKeyService == null) return;
-
-        try
-        {
-            _hotKeyService.ShowMainWindowRequested -= OnShowMainWindowRequested;
-            _hotKeyService.QuickSearchRequested -= OnQuickSearchRequested;
-            _hotKeyService.SearchRequested -= OnSearchRequested;
-            _hotKeyService.RefreshRequested -= OnRefreshRequested;
-            _hotKeyService.SettingsRequested -= OnSettingsRequested;
-            _hotKeyService.ExitRequested -= OnExitRequested;
-
-            _hotKeyService.Dispose();
-            Debug.WriteLine("快捷键已清理");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"清理快捷键失败: {ex.Message}");
-        }
-    }
 
     /// <summary>
     /// 判断是否为 Windows 11
@@ -909,6 +892,27 @@ public partial class MainWindow
         }
     }
 
+    private void CleanupHotKeys()
+    {
+        if (_hotKeyService == null) return;
+
+        try
+        {
+            _hotKeyService.ShowMainWindowRequested -= OnShowMainWindowRequested;
+            _hotKeyService.QuickSearchRequested -= OnQuickSearchRequested;
+            _hotKeyService.SearchRequested -= OnSearchRequested;
+            _hotKeyService.RefreshRequested -= OnRefreshRequested;
+            _hotKeyService.SettingsRequested -= OnSettingsRequested;
+            _hotKeyService.ExitRequested -= OnExitRequested;
+
+            _hotKeyService.Dispose();
+            Debug.WriteLine("快捷键已清理");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"清理快捷键失败: {ex.Message}");
+        }
+    }
     #endregion
 
     #region 向后兼容方法

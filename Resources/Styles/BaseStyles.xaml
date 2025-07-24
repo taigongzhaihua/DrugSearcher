@@ -441,14 +441,15 @@
                             CornerRadius="6">
                         <Grid>
                             <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="Center" />
+                                          VerticalAlignment="Stretch"
+                                          Margin="{TemplateBinding Padding}"/>
                             <TextBlock x:Name="PlaceholderText"
                                        Text="{TemplateBinding Tag}"
                                        Foreground="{DynamicResource SecondaryTextBrush}"
-                                       Margin="{TemplateBinding Padding}"
-                                       Padding="4,0"
-                                       VerticalAlignment="Center"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Margin="{Binding ElementName=PART_ContentHost,Path=Margin,Mode=OneWay}"
+                                       Padding="{Binding ElementName=PART_ContentHost,Path=Padding,Mode=OneWay}"
+                                       VerticalAlignment="Stretch"
                                        IsHitTestVisible="False"
                                        Visibility="Collapsed" />
                         </Grid>

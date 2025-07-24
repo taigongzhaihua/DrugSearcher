@@ -141,6 +141,8 @@ public static partial class WindowColorManager
         var result = SetWindows10Colors(hwnd, borderColor, actualTitleBarColor);
         if (result == null) return unsupportedResult;
         _ = RefreshWindow(window);
+        ++ window.Width ;
+        -- window.Width ;
         return result;
 
     }
@@ -168,6 +170,7 @@ public static partial class WindowColorManager
         var result = ResetWindows10Colors(hwnd);
         if (result == null) return unsupportedResult;
         _ = RefreshWindow(window);
+        window.Width = window.Width;
         return result;
 
     }

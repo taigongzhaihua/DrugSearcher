@@ -52,6 +52,7 @@ public partial class DrugEditDialog
         // 注销窗口
         _themeManager.UnregisterWindow(this);
     }
+
     private void ConfigureWindowChrome()
     {
         var windowChrome = new WindowChrome
@@ -73,11 +74,7 @@ public partial class DrugEditDialog
         }
         else
         {
-            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom |
-                                               NonClientFrameEdges.Left |
-                                               NonClientFrameEdges.Right;
-            // Windows 10 及更早版本：保留四条边框
-            WindowStyle = WindowStyle.ThreeDBorderWindow;
+            windowChrome.NonClientFrameEdges = NonClientFrameEdges.Bottom;
         }
 
         WindowChrome.SetWindowChrome(this, windowChrome);

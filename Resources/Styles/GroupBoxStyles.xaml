@@ -24,7 +24,7 @@
                         <Border Grid.Row="0" 
                                 Background="{TemplateBinding Background}"
                                 Padding="6,2"
-                                Margin="30,0,0,-15"
+                                Margin="20,0,0,-15"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
@@ -42,7 +42,8 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Padding="{TemplateBinding Padding}"
-                                CornerRadius="4">
+                                CornerRadius="4"
+                                ClipToBounds="True">
                             <ContentPresenter Margin="0,15,0,0"/>
                         </Border>
                     </Grid>
