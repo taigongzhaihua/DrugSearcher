@@ -35,7 +35,7 @@ public partial class DrugEditDialog
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"初始化DrugEditDialog失败: {ex.Message}");
+            Debug.WriteLine($"初始化DrugEditDialog失败: {ex.Message}");
             // 设置一个默认的ViewModel以防止崩溃
             _viewModel = new DrugEditDialogViewModel();
             DataContext = _viewModel;
@@ -120,7 +120,7 @@ public partial class DrugEditDialog
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"保存按钮点击处理失败: {ex.Message}");
+            Debug.WriteLine($"保存按钮点击处理失败: {ex.Message}");
             MessageBox.Show($"保存时发生错误：{ex.Message}", "错误",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
@@ -138,7 +138,7 @@ public partial class DrugEditDialog
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"取消按钮点击处理失败: {ex.Message}");
+            Debug.WriteLine($"取消按钮点击处理失败: {ex.Message}");
             // 强制关闭窗口
             Close();
         }
@@ -160,7 +160,7 @@ public partial class DrugEditDialog
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"窗口初始化失败: {ex.Message}");
+            Debug.WriteLine($"窗口初始化失败: {ex.Message}");
         }
     }
 }

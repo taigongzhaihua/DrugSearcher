@@ -7,7 +7,6 @@ using DrugSearcher.ViewModels;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using System.Windows.Shell;
 using Button = System.Windows.Controls.Button;
 
@@ -62,8 +61,8 @@ public partial class MainWindow
             // 注册窗口关闭事件
             Closed += OnWindowClosed;
             // 监听激活状态变化
-            this.Activated += OnWindowActivated;
-            this.Deactivated += OnWindowDeactivated;
+            Activated += OnWindowActivated;
+            Deactivated += OnWindowDeactivated;
             Debug.WriteLine("主窗口初始化完成");
         }
         catch (Exception ex)
@@ -100,33 +99,18 @@ public partial class MainWindow
         _themeManager.UnregisterWindow(this);
     }
 
-    private void OnWindowActivated(object sender, EventArgs e)
+    private void OnWindowActivated(object? sender, EventArgs e)
     {
         // 窗口获得焦点时刷新
-        RefreshWindowBorders();
+        WindowColorManager.RefreshWindow(this);
     }
 
-    private void OnWindowDeactivated(object sender, EventArgs e)
+    private void OnWindowDeactivated(object? sender, EventArgs e)
     {
         // 窗口失去焦点时刷新
-        RefreshWindowBorders();
+        WindowColorManager.RefreshWindow(this);
     }
 
-    private void RefreshWindowBorders()
-    {
-        // 强制重绘窗口
-        var hwnd = new WindowInteropHelper(this).Handle;
-        if (hwnd != IntPtr.Zero)
-        {
-            const uint RDW_FRAME = 0x0400;
-            const uint RDW_INVALIDATE = 0x0001;
-            const uint RDW_UPDATENOW = 0x0100;
-            const uint RDW_ALLCHILDREN = 0x0080;
-
-            WindowColorManager.RedrawWindow(hwnd, IntPtr.Zero, IntPtr.Zero,
-                RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
-        }
-    }
     /// <summary>
     /// 初始化窗口设置
     /// </summary>
