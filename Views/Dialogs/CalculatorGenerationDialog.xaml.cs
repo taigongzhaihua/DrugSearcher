@@ -21,7 +21,7 @@ public partial class CalculatorGenerationDialog
         InitializeComponent();
 
         _themeManager = ContainerAccessor.Resolve<ThemeManager>();
-
+        Owner = ContainerAccessor.Resolve<MainWindow>();
         ConfigureWindowChrome();
         // 窗口加载完成后注册到主题管理器
         Loaded += OnWindowLoaded;

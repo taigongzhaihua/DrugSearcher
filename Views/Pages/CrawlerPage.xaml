@@ -1,13 +1,13 @@
 <Page x:Class="DrugSearcher.Views.CrawlerPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
       xmlns:converters="clr-namespace:DrugSearcher.Converters"
       xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
-      mc:Ignorable="d" 
-      d:DesignHeight="800" d:DesignWidth="1200" 
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="1200"
       d:DataContext="{d:DesignInstance viewModels:CrawlerPageViewModel}"
       Title="数据爬取">
 
@@ -15,403 +15,415 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
     </Page.Resources>
-    <Grid  Margin="20">
+    <Grid Margin="20">
         <!-- 页面标题 -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
                    Text="药物数据爬取"
                    Style="{StaticResource PageTitleStyle}"
-                   Margin="0,0,0,20"/>
+                   Foreground="{DynamicResource Heading2Brush}"
+                   Margin="0,0,0,20" />
         <ScrollViewer Grid.Row="1">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-
-
-        <!-- 左侧主要区域 -->
-        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,20,0">
-            
-            <!-- 爬取控制区域 -->
-                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
-                            BorderBrush="{DynamicResource BorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="20"
-                            Margin="0,0,0,20">
-                <StackPanel>
-                    <TextBlock Text="爬取控制"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               Margin="0,0,0,15"/>
-
-                    <!-- 参数设置 -->
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- 起始ID -->
-                        <TextBlock Grid.Row="0" Grid.Column="0"
-                                   Text="起始ID:"
-                                   Style="{StaticResource FormLabelStyle}"
-                                   Margin="0,0,10,0"/>
-                        <TextBox Grid.Row="0" Grid.Column="1"
-                                 Text="{Binding StartId}"
-                                 Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="10,10,20,10"/>
-
-                        <!-- 结束ID -->
-                        <TextBlock Grid.Row="0" Grid.Column="2"
-                                   Text="结束ID:"
-                                   Style="{StaticResource FormLabelStyle}"
-                                   Margin="0,0,10,0"/>
-                        <TextBox Grid.Row="0" Grid.Column="3"
-                                 Text="{Binding EndId}"
-                                 Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="10,10,20,10"/>
-
-                        <!-- 批次大小 -->
-                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                   Text="批次大小:"
-                                   Style="{StaticResource FormLabelStyle}"
-                                   Margin="0,0,10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1"
-                                 Text="{Binding BatchSize}"
-                                 Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="10,10,20,10"/>
-
-                        <!-- 请求间隔 -->
-                        <TextBlock Grid.Row="1" Grid.Column="2"
-                                   Text="间隔(ms):"
-                                   Style="{StaticResource FormLabelStyle}"
-                                   Margin="0,0,10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="3"
-                                 Text="{Binding DelayMs}"
-                                 Style="{StaticResource FormTextBoxStyle}"
-                                 IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                 Margin="10,10,20,10"/>
-                    </Grid>
-
-                    <!-- 快速设置按钮 -->
-                    <TextBlock Text="快速设置:"
-                               Style="{StaticResource FormLabelStyle}"
-                               Margin="0,10,0,5"/>
-                    <WrapPanel Margin="0,0,0,15">
-                        <Button Content="测试(1-100)"
-                                Command="{Binding SetQuickRangeCommand}"
-                                CommandParameter="Test"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="前1000条"
-                                Command="{Binding SetQuickRangeCommand}"
-                                CommandParameter="First1000"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="前10000条"
-                                Command="{Binding SetQuickRangeCommand}"
-                                CommandParameter="First10000"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="全部数据"
-                                Command="{Binding SetQuickRangeCommand}"
-                                CommandParameter="All"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                    </WrapPanel>
-
-                    <!-- 控制按钮 -->
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="{Binding CrawlButtonText}"
-                                Command="{Binding StartCrawlCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}"
-                                MinWidth="120"/>
-                        <Button Content="重试失败"
-                                Command="{Binding RetryFailedDrugsCommand}"
-                                Style="{StaticResource WarningButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="清理旧记录"
-                                Command="{Binding CleanupOldRecordsCommand}"
-                                Style="{StaticResource DangerButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="最近爬取"
-                                Command="{Binding ViewRecentCrawledCommand}"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                        <Button Content="刷新统计"
-                                Command="{Binding RefreshStatisticsCommand}"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- 进度显示区域 -->
-                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
-                            BorderBrush="{DynamicResource BorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="20"
-                            Margin="0,0,0,20">
-                <StackPanel>
-                    <TextBlock Text="爬取进度"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               Margin="0,0,0,15"/>
-
-                    <!-- 进度条 -->
-                    <TextBlock Text="{Binding ProgressText}"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               Margin="0,0,0,5"/>
-                    <ProgressBar Value="{Binding ProgressPercentage}"
-                                 Maximum="100"
-                                 Height="8"
-                                 Margin="0,0,0,15"/>
-
-                    <!-- 进度信息 -->
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Row="0" Grid.Column="0">
-                            <TextBlock Text="已处理"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding TotalProcessed}"
-                                       FontSize="20"
-                                       FontWeight="Bold"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="0" Grid.Column="1">
-                            <TextBlock Text="成功"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding SuccessCount}"
-                                       FontSize="20"
-                                       FontWeight="Bold"
-                                       Foreground="#4CAF50"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="0" Grid.Column="2">
-                            <TextBlock Text="失败"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding FailedCount}"
-                                       FontSize="20"
-                                       FontWeight="Bold"
-                                       Foreground="#F44336"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,10,0,0">
-                            <TextBlock Text="爬取速度"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding CrawlSpeed}"
-                                       FontSize="14"
-                                       FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0">
-                            <TextBlock Text="已用时间"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding ElapsedTime}"
-                                       FontSize="14"
-                                       FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,10,0,0">
-                            <TextBlock Text="预计剩余"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding EstimatedTimeRemaining}"
-                                       FontSize="14"
-                                       FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"/>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-
-        <!-- 右侧统计区域 -->
-        <StackPanel Grid.Row="1" Grid.Column="1">
-            <!-- 数据统计 -->
-                    <Border behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
-                            BorderBrush="{DynamicResource BorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Padding="20"
-                            Margin="0,0,0,20">
-                <StackPanel>
-                    <TextBlock Text="数据统计"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               Margin="0,0,0,15"/>
-
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="数据库总量"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"/>
-                        <TextBlock Text="{Binding TotalDrugsInDatabase}"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   Foreground="{DynamicResource PrimaryBrush}"/>
-                    </StackPanel>
-
-                    <StackPanel Margin="0,0,0,10">
-                        <TextBlock Text="完成率"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"/>
-                        <TextBlock Text="{Binding CompletionRate}"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Foreground="#4CAF50"/>
-                    </StackPanel>
-
-                    <Separator Margin="0,10"/>
-
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,5,10">
-                            <TextBlock Text="成功记录"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding SuccessfulDrugs}"
-                                       FontSize="16"
-                                       FontWeight="SemiBold"
-                                       Foreground="#4CAF50"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,10">
-                            <TextBlock Text="失败记录"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"/>
-                            <TextBlock Text="{Binding FailedDrugs}"
-                                       FontSize="16"
-                                       FontWeight="SemiBold"
-                                       Foreground="#F44336"/>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-
-        <!-- 日志区域 -->
-        <Border Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0"
-                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="20"
-                MaxHeight="300">
-            <Grid>
+            <Grid Margin="20">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- 日志标题和控制 -->
-                <Grid Grid.Row="0" Margin="0,0,0,15">
-                    <TextBlock Text="爬取日志"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               HorizontalAlignment="Left"/>
-                    <Button Content="清空日志"
-                            Command="{Binding ClearLogsCommand}"
-                            Style="{StaticResource SecondaryButtonStyle}"
-                            HorizontalAlignment="Right"
-                            Padding="12,6"/>
-                </Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <!-- 日志列表 -->
-                <ListBox Grid.Row="1"
-                         ItemsSource="{Binding CrawlLogs}"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type viewModels:CrawlLogEntry}">
-                            <Grid Margin="0,2">
+                <!-- 左侧主要区域 -->
+                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,20,0">
+
+                    <!-- 爬取控制区域 -->
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20"
+                            Effect="{StaticResource CardShadowEffect}">
+                        <StackPanel>
+                            <TextBlock Text="爬取控制"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Heading4Brush}"
+                                       Margin="0,0,0,15" />
+
+                            <!-- 参数设置 -->
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding FormattedTimestamp}"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SecondaryTextBrush}"
-                                           Margin="0,0,10,0"/>
+                                <!-- 起始ID -->
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="起始ID:"
+                                           Style="{StaticResource FormLabelStyle}"
+                                           Margin="0,0,10,0" />
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                         Text="{Binding StartId}"
+                                         Style="{StaticResource FormTextBoxStyle}"
+                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                         Margin="10,10,20,10" />
 
-                                <Border Grid.Column="1"
-                                        Background="{Binding LevelColor}"
-                                        CornerRadius="2"
-                                        Padding="4,2"
-                                        Margin="0,0,10,0">
-                                    <TextBlock Text="{Binding LevelText}"
-                                               FontSize="10"
-                                               Foreground="White"/>
-                                </Border>
+                                <!-- 结束ID -->
+                                <TextBlock Grid.Row="0" Grid.Column="2"
+                                           Text="结束ID:"
+                                           Style="{StaticResource FormLabelStyle}"
+                                           Margin="0,0,10,0" />
+                                <TextBox Grid.Row="0" Grid.Column="3"
+                                         Text="{Binding EndId}"
+                                         Style="{StaticResource FormTextBoxStyle}"
+                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                         Margin="10,10,20,10" />
 
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding Message}"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                           TextWrapping="Wrap"/>
+                                <!-- 批次大小 -->
+                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                           Text="批次大小:"
+                                           Style="{StaticResource FormLabelStyle}"
+                                           Margin="0,0,10,0" />
+                                <TextBox Grid.Row="1" Grid.Column="1"
+                                         Text="{Binding BatchSize}"
+                                         Style="{StaticResource FormTextBoxStyle}"
+                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                         Margin="10,10,20,10" />
+
+                                <!-- 请求间隔 -->
+                                <TextBlock Grid.Row="1" Grid.Column="2"
+                                           Text="间隔(ms):"
+                                           Style="{StaticResource FormLabelStyle}"
+                                           Margin="0,0,10,0" />
+                                <TextBox Grid.Row="1" Grid.Column="3"
+                                         Text="{Binding DelayMs}"
+                                         Style="{StaticResource FormTextBoxStyle}"
+                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                         Margin="10,10,20,10" />
                             </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+
+                            <!-- 快速设置按钮 -->
+                            <TextBlock Text="快速设置:"
+                                       Style="{StaticResource FormLabelStyle}"
+                                       Margin="0,10,0,5" />
+                            <WrapPanel Margin="0,0,0,15">
+                                <Button Content="测试(1-100)"
+                                        Command="{Binding SetQuickRangeCommand}"
+                                        CommandParameter="Test"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="前1000条"
+                                        Command="{Binding SetQuickRangeCommand}"
+                                        CommandParameter="First1000"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="前10000条"
+                                        Command="{Binding SetQuickRangeCommand}"
+                                        CommandParameter="First10000"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="全部数据"
+                                        Command="{Binding SetQuickRangeCommand}"
+                                        CommandParameter="All"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                            </WrapPanel>
+
+                            <!-- 控制按钮 -->
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{Binding CrawlButtonText}"
+                                        Command="{Binding StartCrawlCommand}"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        MinWidth="120" />
+                                <Button Content="重试失败"
+                                        Command="{Binding RetryFailedDrugsCommand}"
+                                        Style="{StaticResource WarningButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="清理旧记录"
+                                        Command="{Binding CleanupOldRecordsCommand}"
+                                        Style="{StaticResource DangerButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="最近爬取"
+                                        Command="{Binding ViewRecentCrawledCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                <Button Content="刷新统计"
+                                        Command="{Binding RefreshStatisticsCommand}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 进度显示区域 -->
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20"
+                            Effect="{StaticResource CardShadowEffect}">
+                        <StackPanel>
+                            <TextBlock Text="爬取进度"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Heading4Brush}"
+                                       Margin="0,0,0,15" />
+
+                            <!-- 进度条 -->
+                            <TextBlock Text="{Binding ProgressText}"
+                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Margin="0,0,0,5" />
+                            <ProgressBar Value="{Binding ProgressPercentage}"
+                                         Maximum="100"
+                                         Height="8"
+                                         Margin="0,0,0,15"
+                                         Foreground="{DynamicResource PrimaryBrush}"
+                                         Background="{DynamicResource SecondaryBackgroundBrush}" />
+
+                            <!-- 进度信息 -->
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="已处理"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding TotalProcessed}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1">
+                                    <TextBlock Text="成功"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding SuccessCount}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource SuccessTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="2">
+                                    <TextBlock Text="失败"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding FailedCount}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource ErrorTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,10,0,0">
+                                    <TextBlock Text="爬取速度"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding CrawlSpeed}"
+                                               FontSize="14"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0">
+                                    <TextBlock Text="已用时间"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding ElapsedTime}"
+                                               FontSize="14"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,10,0,0">
+                                    <TextBlock Text="预计剩余"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding EstimatedTimeRemaining}"
+                                               FontSize="14"
+                                               FontWeight="Medium"
+                                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- 右侧统计区域 -->
+                <StackPanel Grid.Row="1" Grid.Column="1">
+                    <!-- 数据统计 -->
+                    <Border behaviors:ThemeBehavior.Background="{DynamicResource InfoCardBackgroundBrush}"
+                            BorderBrush="{DynamicResource InfoCardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="20"
+                            Margin="0,0,0,20"
+                            Effect="{StaticResource CardShadowEffect}">
+                        <StackPanel>
+                            <TextBlock Text="数据统计"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Heading4Brush}"
+                                       Margin="0,0,0,15" />
+
+                            <StackPanel Margin="0,0,0,10">
+                                <TextBlock Text="数据库总量"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding TotalDrugsInDatabase}"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource InfoTextBrush}" />
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,0,10">
+                                <TextBlock Text="完成率"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SecondaryTextBrush}" />
+                                <TextBlock Text="{Binding CompletionRate}"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource SuccessTextBrush}" />
+                            </StackPanel>
+
+                            <Separator Margin="0,10" Background="{DynamicResource DividerBrush}" />
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,5,10">
+                                    <TextBlock Text="成功记录"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding SuccessfulDrugs}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource SuccessTextBrush}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,0,10">
+                                    <TextBlock Text="失败记录"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                                    <TextBlock Text="{Binding FailedDrugs}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource ErrorTextBrush}" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- 日志区域 -->
+                <Border Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0"
+                        behaviors:ThemeBehavior.Background="{DynamicResource CardBackgroundBrush}"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="20"
+                        MaxHeight="300"
+                        Effect="{StaticResource CardShadowEffect}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- 日志标题和控制 -->
+                        <Grid Grid.Row="0" Margin="0,0,0,15">
+                            <TextBlock Text="爬取日志"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Heading4Brush}"
+                                       HorizontalAlignment="Left" />
+                            <Button Content="清空日志"
+                                    Command="{Binding ClearLogsCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    HorizontalAlignment="Right"
+                                    Padding="12,6" />
+                        </Grid>
+
+                        <!-- 日志列表 -->
+                        <Border Grid.Row="1" Background="{DynamicResource SecondaryBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="8">
+                            <ListBox ItemsSource="{Binding CrawlLogs}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type viewModels:CrawlLogEntry}">
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding FormattedTimestamp}"
+                                                       FontSize="12"
+                                                       Foreground="{DynamicResource TertiaryTextBrush}"
+                                                       FontFamily="Consolas"
+                                                       Margin="0,0,10,0" />
+
+                                            <Border Grid.Column="1"
+                                                    Background="{Binding LevelColor}"
+                                                    CornerRadius="2"
+                                                    Padding="4,2"
+                                                    Margin="0,0,10,0">
+                                                <TextBlock Text="{Binding LevelText}"
+                                                           FontSize="10"
+                                                           Foreground="White"
+                                                           FontWeight="Medium" />
+                                            </Border>
+
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Message}"
+                                                       FontSize="12"
+                                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                                       TextWrapping="Wrap" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </Grid>
+                </Border>
             </Grid>
-        </Border>
-    </Grid>
-</ScrollViewer>
+        </ScrollViewer>
     </Grid>
 </Page>

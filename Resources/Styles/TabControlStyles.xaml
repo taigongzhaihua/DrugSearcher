@@ -3,8 +3,8 @@
 
     <!-- Fluent Design TabControl 样式 -->
     <Style x:Key="FluentTabControlStyle" TargetType="TabControl">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -14,7 +14,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
                     <Grid KeyboardNavigation.TabNavigation="Local"
-                          Background="{DynamicResource SecondaryBackgroundBrush}">
+                          Background="{DynamicResource WindowBackgroundBrush}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -64,7 +64,7 @@
     <Style x:Key="FluentTabItemStyle" TargetType="TabItem">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="12,10"/>
         <Setter Property="Margin" Value="0,0,2,0"/>
@@ -97,8 +97,8 @@
                                 Margin="-1,2,-1,1"
                                 RenderTransformOrigin="0.5,0.5">
 
-                                <!-- 内容区域 -->
-                                <ContentPresenter x:Name="ContentSite"
+                            <!-- 内容区域 -->
+                            <ContentPresenter x:Name="ContentSite"
                                                   ContentSource="Header"
                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -110,7 +110,7 @@
                         <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
                                 x:Name="SelectedIndicator"
                                 Height="4" MinWidth="30" 
-                                Background="{DynamicResource PrimaryHoverBrush}"
+                                Background="{DynamicResource PrimaryControlBackgroundBrush}"
                                 VerticalAlignment="Bottom" HorizontalAlignment="Center"
                                 CornerRadius="2"
                                 Opacity="0"
@@ -128,10 +128,10 @@
                                 Margin="0,0,0,1"
                                 Panel.ZIndex="10"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                Background="{DynamicResource WindowBackgroundBrush}"
                                 Visibility="Collapsed"/>
                         <Border x:Name="BottomBackground" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                                Background="{DynamicResource SurfaceBrush}"
+                                Background="{DynamicResource CardBackgroundBrush}"
                                 Height="5"
                                 Margin="0,0,0,-1"
                                 BorderThickness="0"
@@ -145,7 +145,7 @@
                                 Margin="0,0,0,1"
                                 Panel.ZIndex="10"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                Background="{DynamicResource WindowBackgroundBrush}"
                                 Visibility="Collapsed"/>
                     </Grid>
 
@@ -191,9 +191,8 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
-                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-
                             <Setter TargetName="TabBorder" Property="BorderThickness" Value="1,1,1,0"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="Panel.ZIndex" Value="1"/>
@@ -206,6 +205,7 @@
                         <!-- 禁用状态 -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            <Setter Property="Opacity" Value="0.6"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -248,7 +248,7 @@
                                 <!-- 底部指示器 -->
                                 <Border x:Name="SelectedIndicator"
                                         Height="3"
-                                        Background="{DynamicResource PrimaryBrush}"
+                                        Background="{DynamicResource PrimaryControlBackgroundBrush}"
                                         VerticalAlignment="Bottom"
                                         CornerRadius="1.5,1.5,0,0"
                                         Opacity="0"
@@ -300,7 +300,7 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="Panel.ZIndex" Value="1"/>
@@ -309,6 +309,7 @@
                         <!-- 禁用状态 -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            <Setter Property="Opacity" Value="0.6"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -318,7 +319,7 @@
 
     <!-- 垂直 TabControl 样式 -->
     <Style x:Key="VerticalTabControlStyle" TargetType="TabControl">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="TabStripPlacement" Value="Left"/>
@@ -336,7 +337,7 @@
                         <!-- Tab Header 区域 -->
                         <Border x:Name="HeaderBorder"
                                 Grid.Column="0"
-                                Background="{DynamicResource SecondaryBackgroundBrush}"
+                                Background="{DynamicResource SurfaceBrush}"
                                 BorderBrush="{DynamicResource BorderBrush}"
                                 BorderThickness="0,0,1,0"
                                 Padding="0">
@@ -393,7 +394,7 @@
                             <!-- 左侧指示器 -->
                             <Border x:Name="SelectedIndicator"
                                     Width="3"
-                                    Background="{DynamicResource PrimaryBrush}"
+                                    Background="{DynamicResource PrimaryControlBackgroundBrush}"
                                     HorizontalAlignment="Left"
                                     CornerRadius="0,1.5,1.5,0"
                                     Opacity="0"
@@ -427,7 +428,7 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
-                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource ActivatedBrush}"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                         </Trigger>
@@ -435,6 +436,7 @@
                         <!-- 禁用状态 -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            <Setter Property="Opacity" Value="0.6"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -469,7 +471,7 @@
                             <!-- 底部指示器 -->
                             <Border x:Name="SelectedIndicator"
                                     Height="3"
-                                    Background="{DynamicResource PrimaryBrush}"
+                                    Background="{DynamicResource PrimaryControlBackgroundBrush}"
                                     VerticalAlignment="Bottom"
                                     CornerRadius="1.5,1.5,0,0"
                                     Visibility="Hidden"
@@ -493,7 +495,7 @@
 
                         <!-- 选中状态 -->
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
                             <Setter TargetName="SelectedIndicator" Property="Visibility" Value="Visible"/>
                             <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -503,6 +505,7 @@
                         <!-- 禁用状态 -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            <Setter Property="Opacity" Value="0.6"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

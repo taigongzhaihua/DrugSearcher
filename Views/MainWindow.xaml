@@ -19,7 +19,7 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8"/>
-            <Setter Property="Effect" Value="{StaticResource DropShadowEffect}"/>
+            <Setter Property="Effect" Value="{StaticResource PopupShadowEffect}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
@@ -91,7 +91,7 @@
                                             BorderThickness="1"
                                             CornerRadius="8"
                                             Padding="8"
-                                            Effect="{StaticResource DropShadowEffect}">
+                                            Effect="{StaticResource PopupShadowEffect}">
                                         <StackPanel IsItemsHost="True"/>
                                     </Border>
                                 </Popup>
@@ -162,7 +162,7 @@
                                             BorderThickness="1"
                                             CornerRadius="8"
                                             Padding="8"
-                                            Effect="{StaticResource DropShadowEffect}">
+                                            Effect="{StaticResource PopupShadowEffect}">
                                         <StackPanel IsItemsHost="True"/>
                                     </Border>
                                 </Popup>
@@ -194,7 +194,7 @@
 
         <!-- 分隔线样式 -->
         <Style x:Key="MenuSeparatorStyle" TargetType="Separator">
-            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource DividerBrush}"/>
             <Setter Property="Height" Value="1"/>
             <Setter Property="Margin" Value="8,4"/>
             <Setter Property="Template">
@@ -205,6 +205,13 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <Style x:Key="CaptionButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentThemeButtonStyle}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
         </Style>
 
     </Window.Resources>
@@ -222,7 +229,7 @@
                 <!-- 主页按钮 -->
                 <Button x:Name="HomeButton"
                         Content="{Binding HomeButtonText}"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
+                        Style="{DynamicResource CaptionButtonStyle}"
                         Click="HomeButton_OnClick"
                         Margin="0,0,5,0"
                         ToolTip="主页"
@@ -233,7 +240,7 @@
                     <!-- 后退按钮 -->
                     <Button x:Name="BackButton"
                             Content="&#xe617;"
-                            Style="{DynamicResource TransparentThemeButtonStyle}"
+                            Style="{DynamicResource CaptionButtonStyle}"
                             Click="BackButton_OnClick"
                             Margin="0,0,5,0"
                             ToolTip="后退"
@@ -243,7 +250,7 @@
                     <!-- 前进按钮 -->
                     <Button x:Name="ForwardButton"
                             Content="&#xe618;"
-                            Style="{DynamicResource TransparentThemeButtonStyle}"
+                            Style="{DynamicResource CaptionButtonStyle}"
                             Click="ForwardButton_OnClick"
                             Margin="0,0,5,0"
                             ToolTip="前进"
@@ -254,7 +261,7 @@
                 <!-- 功能菜单按钮 -->
                 <Button x:Name="MenuButton"
                         Content="&#xe626;"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
+                        Style="{DynamicResource CaptionButtonStyle}"
                         Click="MenuButton_OnClick"
                         Margin="0,0,10,0"
                         ToolTip="功能菜单"
@@ -269,7 +276,7 @@
                             <MenuItem Header="功能菜单" 
                                       IsEnabled="False"
                                       FontWeight="Bold"
-                                      Foreground="{DynamicResource PrimaryBrush}"/>
+                                      Foreground="{DynamicResource Heading4Brush}"/>
 
                             <Separator Style="{StaticResource MenuSeparatorStyle}"/>
 
@@ -304,11 +311,13 @@
                                 <!-- 主题子菜单 -->
                                 <MenuItem.Items>
                                     <!-- 明暗模式切换 -->
+
                                     <MenuItem Header="切换明暗模式"
                                               Tag="{Binding ThemeButtonText}"
                                               Style="{StaticResource FunctionMenuItemStyle}"
                                               Command="{Binding SwitchThemeCommand}"
                                               ToolTip="{Binding ThemeTooltip}"/>
+
 
                                     <Separator Style="{StaticResource MenuSeparatorStyle}"/>
 
@@ -398,7 +407,7 @@
                 <!-- 最小化按钮 -->
                 <Button x:Name="MinimizeButton"
                         Content="&#xe60e;"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
+                        Style="{DynamicResource CaptionButtonStyle}"
                         Click="MinimizeButton_Click"
                         Margin="0,0,5,0"
                         ToolTip="最小化窗口"
@@ -407,7 +416,7 @@
                 <!-- 最大化/还原按钮 -->
                 <Button x:Name="MaximizeButton"
                         Content="&#xe60d;"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
+                        Style="{DynamicResource CaptionButtonStyle}"
                         Click="MaximizeButton_OnClick"
                         Margin="0,0,5,0"
                         ToolTip="最大化窗口"
@@ -416,7 +425,7 @@
                 <!-- 关闭按钮 -->
                 <Button x:Name="CloseButton"
                         Content="&#xe60f;"
-                        Style="{DynamicResource TransparentThemeButtonStyle}"
+                        Style="{DynamicResource CaptionButtonStyle}"
                         Click="CloseButton_Click"
                         Margin="0,0,0,0"
                         ToolTip="关闭窗口"
@@ -431,7 +440,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" MinHeight="40"/>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -445,19 +454,22 @@
                         VerticalAlignment="Center"
                         Margin="0,0,10,0" 
                         Padding="4"
-                        CornerRadius="4">
+                        CornerRadius="4"
+                        Width="24" Height="24"
+                        Effect="{StaticResource CardShadowEffect}">
                     <TextBlock x:Name="ApplicationIcon"
-                                       Text="&#xe629;"
-                                       FontFamily="{DynamicResource IconFont}"
-                                       FontSize="14"
-                                       Foreground="White"/>
+                               Text="&#xe629;"
+                               FontFamily="{DynamicResource IconFont}"
+                               VerticalAlignment="Center" HorizontalAlignment="Center"
+                               FontSize="14"
+                               Foreground="{DynamicResource PrimaryControlForegroundBrush}"/>
                 </Border>
 
                 <!-- 应用标题 -->
                 <TextBlock Text="{Binding Title}"
                            FontSize="16"
                            FontWeight="Medium"
-                           Foreground="{DynamicResource PrimaryTextBrush}"
+                           Foreground="{DynamicResource Heading3Brush}"
                            VerticalAlignment="Center" />
             </StackPanel>
 

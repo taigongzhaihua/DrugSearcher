@@ -15,8 +15,8 @@
 
         <!-- 自定义样式 -->
         <Style x:Key="HotKeyBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="Background" Value="{DynamicResource BorderControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="8,4,6,4" />
             <Setter Property="MinWidth" Value="160" />
@@ -26,26 +26,50 @@
             <Style.Triggers>
                 <!-- 焦点状态 -->
                 <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                    <Setter Property="BorderThickness" Value="1.5" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource BorderControlHoverBorderBrush}" />
+                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
                 </Trigger>
                 <!-- 录制状态 - 使用DataTrigger绑定到UserControl的属性 -->
                 <DataTrigger Binding="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
-                    <Setter Property="BorderThickness" Value="1.5" />
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <SolidColorBrush Color="{DynamicResource SurfaceColor}" Opacity="0.1"/>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="BorderBrush" Value="{DynamicResource BorderControlPressedBorderBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource BorderControlPressedBackgroundBrush}"/>
+                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
                 </DataTrigger>
                 <!-- 悬停状态 -->
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource BorderControlHoverBorderBrush}" />
+                    <Setter Property="Background" Value="{DynamicResource BorderControlHoverBackgroundBrush}" />
+                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
+                </Trigger>
+                <!-- 禁用状态 -->
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource BorderControlDisabledBackgroundBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource BorderControlDisabledBorderBrush}" />
+                    <Setter Property="Opacity" Value="0.6"/>
+                    <Setter Property="Effect" Value="{x:Null}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 清除按钮样式 -->
+        <Style x:Key="ClearButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentThemeButtonStyle}">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="FontSize" Value="18"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource TertiaryTextBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+
     <Border x:Name="MainBorder" Style="{StaticResource HotKeyBorderStyle}"
             KeyboardNavigation.IsTabStop="True">
 
@@ -62,14 +86,29 @@
                        Foreground="{DynamicResource PrimaryBrush}"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
-                       Visibility="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                       FontStyle="Italic"
+                       Visibility="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation 
+                                    Storyboard.TargetProperty="Opacity"
+                                    From="0.5" To="1" Duration="0:0:0.6"
+                                    RepeatBehavior="Forever"
+                                    AutoReverse="True"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
 
             <Button x:Name="ClearButton"
-                    Style="{DynamicResource TransparentThemeButtonStyle}"
-                    Margin="0"
-                    Content="✕"
+                    Style="{StaticResource ClearButtonStyle}"
+                    Content="&#xe60f;"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
+                    FontSize="14" 
                     Visibility="{Binding HasValue, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BooleanToVisibilityConverter}}"
                     Click="ClearButton_Click"
                     ToolTip="清除快捷键"

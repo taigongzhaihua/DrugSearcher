@@ -1,14 +1,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- 基础GroupBox样式 -->
+    <!-- 基础GroupBox样式 - 使用边框型控件资源 -->
     <Style x:Key="BaseGroupBoxStyle" TargetType="GroupBox">
         <Setter Property="BorderThickness" Value="1.2"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="0"/>
-        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BorderControlForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderControlBorderBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Template">
@@ -19,7 +19,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        
+
                         <!-- 头部区域 -->
                         <Border Grid.Row="0" 
                                 Background="{TemplateBinding Background}"
@@ -30,12 +30,12 @@
                                 Panel.ZIndex="1"
                                 Height="30">
                             <ContentPresenter ContentSource="Header" 
-                                              TextElement.Foreground="{TemplateBinding Foreground}"
-                                              TextElement.FontWeight="Bold"
-                                              TextElement.FontSize="14"
+                                              TextElement.Foreground="{DynamicResource Heading6Brush}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"
                                               VerticalAlignment="Center"/>
                         </Border>
-                        
+
                         <!-- 内容区域 -->
                         <Border Grid.Row="1"
                                 Background="{TemplateBinding Background}"
@@ -47,6 +47,15 @@
                             <ContentPresenter Margin="0,15,0,0"/>
                         </Border>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderControlDisabledBorderBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BorderControlDisabledForegroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderControlHoverBorderBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -57,7 +66,7 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="0"/>
-        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="14"/>
@@ -69,18 +78,18 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        
+
                         <!-- 头部区域 -->
                         <Border Grid.Row="0" 
                                 Background="{DynamicResource SurfaceBrush}"
                                 Padding="12,8"
                                 Margin="0,0,0,1">
                             <ContentPresenter ContentSource="Header" 
-                                              TextElement.Foreground="{DynamicResource PrimaryTextBrush}"
-                                              TextElement.FontWeight="Bold"
-                                              TextElement.FontSize="14"/>
+                                              TextElement.Foreground="{DynamicResource Heading5Brush}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"/>
                         </Border>
-                        
+
                         <!-- 内容区域 - 无边框 -->
                         <Border Grid.Row="1"
                                 Background="{TemplateBinding Background}"
@@ -88,6 +97,11 @@
                             <ContentPresenter/>
                         </Border>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -98,7 +112,7 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Margin" Value="8"/>
-        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="14"/>
@@ -106,34 +120,28 @@
             <Setter.Value>
                 <ControlTemplate TargetType="GroupBox">
                     <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
                             BorderThickness="1"
                             CornerRadius="8"
-                            Padding="0">
-                        <Border.Effect>
-                            <DropShadowEffect Color="{DynamicResource ShadowColor}" 
-                                              BlurRadius="10" 
-                                              ShadowDepth="2" 
-                                              Opacity="0.3"/>
-                        </Border.Effect>
-                        
+                            Padding="0"
+                            Effect="{DynamicResource CardShadowEffect}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            
+
                             <!-- 头部区域 -->
                             <Border Grid.Row="0" 
                                     Background="{DynamicResource SurfaceBrush}"
                                     Padding="16,12"
                                     CornerRadius="8,8,0,0">
                                 <ContentPresenter ContentSource="Header" 
-                                                  TextElement.Foreground="{DynamicResource PrimaryTextBrush}"
-                                                  TextElement.FontWeight="Bold"
+                                                  TextElement.Foreground="{DynamicResource Heading4Brush}"
+                                                  TextElement.FontWeight="{TemplateBinding FontWeight}"
                                                   TextElement.FontSize="16"/>
                             </Border>
-                            
+
                             <!-- 内容区域 -->
                             <Border Grid.Row="1"
                                     Background="{TemplateBinding Background}"
@@ -143,6 +151,156 @@
                             </Border>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardDisabledBorderBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledTextBrush}"/>
+                            <Setter Property="Opacity" Value="0.8"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Effect" Value="{DynamicResource ElevatedShadowEffect}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 强调样式GroupBox - 使用主题色 -->
+    <Style x:Key="AccentGroupBoxStyle" TargetType="GroupBox" BasedOn="{StaticResource BaseGroupBoxStyle}">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryControlBackgroundBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 头部区域 - 使用主题色背景 -->
+                        <Border Grid.Row="0" 
+                                Background="{DynamicResource PrimaryControlBackgroundBrush}"
+                                Padding="10,4"
+                                Margin="20,0,0,-15"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Panel.ZIndex="1"
+                                Height="30"
+                                CornerRadius="4">
+                            <ContentPresenter ContentSource="Header" 
+                                              TextElement.Foreground="{DynamicResource PrimaryControlForegroundBrush}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- 内容区域 -->
+                        <Border Grid.Row="1"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="4"
+                                ClipToBounds="True">
+                            <ContentPresenter Margin="0,15,0,0"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryControlDisabledBorderBrush}"/>
+                            <Setter Property="Opacity" Value="0.6"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryControlHoverBackgroundBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 最小化样式GroupBox -->
+    <Style x:Key="MinimalGroupBoxStyle" TargetType="GroupBox">
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="0,12,0,0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 头部区域 -->
+                        <ContentPresenter Grid.Row="0"
+                                          ContentSource="Header" 
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          Margin="0,0,0,8"/>
+
+                        <!-- 内容区域 - 只有顶部边框 -->
+                        <Border Grid.Row="1"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 信息样式GroupBox - 使用信息色 -->
+    <Style x:Key="InfoGroupBoxStyle" TargetType="GroupBox" BasedOn="{StaticResource BaseGroupBoxStyle}">
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoControlBorderBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GroupBox">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- 头部区域 -->
+                        <Border Grid.Row="0" 
+                                Background="{DynamicResource InfoControlBackgroundBrush}"
+                                Padding="10,4"
+                                Margin="20,0,0,-15"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Panel.ZIndex="1"
+                                Height="30"
+                                CornerRadius="4">
+                            <ContentPresenter ContentSource="Header" 
+                                              TextElement.Foreground="{DynamicResource InfoControlForegroundBrush}"
+                                              TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- 内容区域 -->
+                        <Border Grid.Row="1"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="4"
+                                ClipToBounds="True">
+                            <ContentPresenter Margin="0,15,0,0"/>
+                        </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

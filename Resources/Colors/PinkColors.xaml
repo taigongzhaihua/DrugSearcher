@@ -6,13 +6,94 @@
     <Color x:Key="PrimaryDarkColor">#AD1457</Color>
     <Color x:Key="PrimaryDarkHoverColor">#EC407A</Color>
 
+    <!-- 扩展的主题色调 -->
+    <Color x:Key="Primary50">#FCE4EC</Color>
+    <Color x:Key="Primary100">#F8BBD0</Color>
+    <Color x:Key="Primary200">#F48FB1</Color>
+    <Color x:Key="Primary300">#F06292</Color>
+    <Color x:Key="Primary400">#EC407A</Color>
+    <Color x:Key="Primary500">#E91E63</Color>
+    <Color x:Key="Primary600">#D81B60</Color>
+    <Color x:Key="Primary700">#C2185B</Color>
+    <Color x:Key="Primary800">#AD1457</Color>
+    <Color x:Key="Primary900">#880E4F</Color>
+
     <Color x:Key="SecondaryColor">#FF9800</Color>
     <Color x:Key="SecondaryLightColor">#FFCC80</Color>
     <Color x:Key="SecondaryDarkColor">#F57C00</Color>
 
+    <!-- 扩展的次要色调 -->
+    <Color x:Key="Secondary50">#FFF3E0</Color>
+    <Color x:Key="Secondary100">#FFE0B2</Color>
+    <Color x:Key="Secondary200">#FFCC80</Color>
+    <Color x:Key="Secondary300">#FFB74D</Color>
+    <Color x:Key="Secondary400">#FFA726</Color>
+    <Color x:Key="Secondary500">#FF9800</Color>
+    <Color x:Key="Secondary600">#FB8C00</Color>
+    <Color x:Key="Secondary700">#F57C00</Color>
+    <Color x:Key="Secondary800">#EF6C00</Color>
+    <Color x:Key="Secondary900">#E65100</Color>
+
     <Color x:Key="AccentColor">#9C27B0</Color>
     <Color x:Key="AccentLightColor">#CE93D8</Color>
     <Color x:Key="AccentDarkColor">#6A1B9A</Color>
+
+    <!-- 扩展的强调色调 -->
+    <Color x:Key="Accent50">#F3E5F5</Color>
+    <Color x:Key="Accent100">#E1BEE7</Color>
+    <Color x:Key="Accent200">#CE93D8</Color>
+    <Color x:Key="Accent300">#BA68C8</Color>
+    <Color x:Key="Accent400">#AB47BC</Color>
+    <Color x:Key="Accent500">#9C27B0</Color>
+    <Color x:Key="Accent600">#8E24AA</Color>
+    <Color x:Key="Accent700">#7B1FA2</Color>
+    <Color x:Key="Accent800">#6A1B9A</Color>
+    <Color x:Key="Accent900">#4A148C</Color>
+
+    <!-- 标题颜色 - 基于主题色的深浅变体 -->
+    <Color x:Key="Heading1Color">#880E4F</Color>
+    <!-- Primary900 -->
+    <Color x:Key="Heading2Color">#AD1457</Color>
+    <!-- Primary800 -->
+    <Color x:Key="Heading3Color">#C2185B</Color>
+    <!-- Primary700 -->
+    <Color x:Key="Heading4Color">#D81B60</Color>
+    <!-- Primary600 -->
+    <Color x:Key="Heading5Color">#E91E63</Color>
+    <!-- Primary500 -->
+    <Color x:Key="Heading6Color">#EC407A</Color>
+    <!-- Primary400 -->
+
+    <!-- 标题颜色（深色背景用） -->
+    <Color x:Key="Heading1ColorDark">#FCE4EC</Color>
+    <!-- Primary50 -->
+    <Color x:Key="Heading2ColorDark">#F8BBD0</Color>
+    <!-- Primary100 -->
+    <Color x:Key="Heading3ColorDark">#F48FB1</Color>
+    <!-- Primary200 -->
+    <Color x:Key="Heading4ColorDark">#F06292</Color>
+    <!-- Primary300 -->
+    <Color x:Key="Heading5ColorDark">#EC407A</Color>
+    <!-- Primary400 -->
+    <Color x:Key="Heading6ColorDark">#E91E63</Color>
+    <!-- Primary500 -->
+
+    <!-- 状态颜色 -->
+    <Color x:Key="SuccessColor">#4CAF50</Color>
+    <Color x:Key="SuccessLightColor">#81C784</Color>
+    <Color x:Key="SuccessDarkColor">#388E3C</Color>
+
+    <Color x:Key="WarningColor">#FF9800</Color>
+    <Color x:Key="WarningLightColor">#FFCC80</Color>
+    <Color x:Key="WarningDarkColor">#F57C00</Color>
+
+    <Color x:Key="ErrorColor">#F44336</Color>
+    <Color x:Key="ErrorLightColor">#EF5350</Color>
+    <Color x:Key="ErrorDarkColor">#D32F2F</Color>
+
+    <Color x:Key="InfoColor">#2196F3</Color>
+    <Color x:Key="InfoLightColor">#64B5F6</Color>
+    <Color x:Key="InfoDarkColor">#1976D2</Color>
 
     <!-- 画刷 -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
@@ -26,4 +107,36 @@
     <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
     <SolidColorBrush x:Key="AccentLightBrush" Color="{StaticResource AccentLightColor}"/>
     <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentDarkColor}"/>
+
+    <!-- 状态画刷 -->
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="SuccessLightBrush" Color="{StaticResource SuccessLightColor}"/>
+    <SolidColorBrush x:Key="SuccessDarkBrush" Color="{StaticResource SuccessDarkColor}"/>
+
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="WarningLightBrush" Color="{StaticResource WarningLightColor}"/>
+    <SolidColorBrush x:Key="WarningDarkBrush" Color="{StaticResource WarningDarkColor}"/>
+
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
+    <SolidColorBrush x:Key="ErrorLightBrush" Color="{StaticResource ErrorLightColor}"/>
+    <SolidColorBrush x:Key="ErrorDarkBrush" Color="{StaticResource ErrorDarkColor}"/>
+
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}"/>
+    <SolidColorBrush x:Key="InfoLightBrush" Color="{StaticResource InfoLightColor}"/>
+    <SolidColorBrush x:Key="InfoDarkBrush" Color="{StaticResource InfoDarkColor}"/>
+
+    <!-- 标题画刷 -->
+    <SolidColorBrush x:Key="Heading1ColorBrush" Color="{StaticResource Heading1Color}"/>
+    <SolidColorBrush x:Key="Heading2ColorBrush" Color="{StaticResource Heading2Color}"/>
+    <SolidColorBrush x:Key="Heading3ColorBrush" Color="{StaticResource Heading3Color}"/>
+    <SolidColorBrush x:Key="Heading4ColorBrush" Color="{StaticResource Heading4Color}"/>
+    <SolidColorBrush x:Key="Heading5ColorBrush" Color="{StaticResource Heading5Color}"/>
+    <SolidColorBrush x:Key="Heading6ColorBrush" Color="{StaticResource Heading6Color}"/>
+
+    <SolidColorBrush x:Key="Heading1ColorDarkBrush" Color="{StaticResource Heading1ColorDark}"/>
+    <SolidColorBrush x:Key="Heading2ColorDarkBrush" Color="{StaticResource Heading2ColorDark}"/>
+    <SolidColorBrush x:Key="Heading3ColorDarkBrush" Color="{StaticResource Heading3ColorDark}"/>
+    <SolidColorBrush x:Key="Heading4ColorDarkBrush" Color="{StaticResource Heading4ColorDark}"/>
+    <SolidColorBrush x:Key="Heading5ColorDarkBrush" Color="{StaticResource Heading5ColorDark}"/>
+    <SolidColorBrush x:Key="Heading6ColorDarkBrush" Color="{StaticResource Heading6ColorDark}"/>
 </ResourceDictionary>

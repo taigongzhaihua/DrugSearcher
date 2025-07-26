@@ -14,16 +14,16 @@
     <Page.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-        
+
         <!-- 版本卡片样式 -->
         <Style x:Key="VersionCardStyle" TargetType="Border">
-            <Setter Property="behaviors:ThemeBehavior.Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-            <Setter Property="BorderThickness" Value="0.8" />
+            <Setter Property="behaviors:ThemeBehavior.Background" Value="{DynamicResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="20" />
             <Setter Property="Margin" Value="0,0,0,16" />
-            <Setter Property="Effect" Value="{StaticResource DropShadowEffect}" />
+            <Setter Property="Effect" Value="{DynamicResource CardShadowEffect}" />
         </Style>
 
         <!-- 功能列表样式 -->
@@ -77,8 +77,8 @@
 
         <!-- 页面头部 -->
         <Border Grid.Row="0"
-                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
+                behaviors:ThemeBehavior.Background="{DynamicResource PrimaryThemedCardBackgroundBrush}"
+                BorderBrush="{DynamicResource PrimaryThemedCardBorderBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="32,24">
             <Grid>
@@ -93,11 +93,12 @@
                         Width="64" Height="64"
                         Background="{DynamicResource PrimaryBrush}"
                         CornerRadius="16"
-                        Margin="0,0,20,0">
+                        Margin="0,0,20,0"
+                        Effect="{StaticResource HoverShadowEffect}">
                     <TextBlock Text="&#xe629;"
                                FontFamily="{DynamicResource IconFont}"
                                FontSize="36"
-                               Foreground="White"
+                               Foreground="{DynamicResource PrimaryControlForegroundBrush}"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"/>
                 </Border>
@@ -107,7 +108,7 @@
                     <TextBlock Text="{Binding AppName}"
                                FontSize="32"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryTextBrush}" />
+                               Foreground="{DynamicResource Heading2Brush}" />
                     <TextBlock Text="{Binding AppDescription}"
                                FontSize="16"
                                Foreground="{DynamicResource SecondaryTextBrush}"
@@ -127,7 +128,7 @@
                                 Margin="8,0,0,0"
                                 Visibility="{Binding CurrentVersion.IsPreRelease, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <TextBlock Text="预发布版本" 
-                                       Foreground="White"
+                                       Foreground="{DynamicResource WarningControlForegroundBrush}"
                                        FontSize="11"
                                        FontWeight="Medium"/>
                         </Border>
@@ -152,7 +153,9 @@
             <StackPanel MaxWidth="600" HorizontalAlignment="Stretch">
 
                 <!-- 状态消息 -->
-                <Border Background="{DynamicResource PrimaryBrush}"
+                <Border Background="{DynamicResource InfoCardBackgroundBrush}"
+                        BorderBrush="{DynamicResource InfoCardBorderBrush}"
+                        BorderThickness="1"
                         CornerRadius="6"
                         Padding="16,12"
                         Margin="0,0,0,24"
@@ -169,14 +172,14 @@
                                    Text="&#xe61e;"
                                    FontFamily="{DynamicResource IconFont}"
                                    FontSize="18"
-                                   Foreground="White"
+                                   Foreground="{DynamicResource InfoTextBrush}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,12,0"/>
 
                         <!-- 状态文本 -->
                         <TextBlock Grid.Column="1"
                                    Text="{Binding StatusMessage}"
-                                   Foreground="White"
+                                   Foreground="{DynamicResource InfoTextBrush}"
                                    FontSize="14"
                                    FontWeight="Medium"
                                    VerticalAlignment="Center"/>
@@ -187,14 +190,20 @@
                                      Height="4"
                                      IsIndeterminate="True"
                                      Background="Transparent"
-                                     Foreground="White"
+                                     Foreground="{DynamicResource InfoBrush}"
                                      Visibility="{Binding IsCheckingUpdate, Converter={StaticResource BooleanToVisibilityConverter}}"
                                      VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
 
                 <!-- 更新信息 -->
-                <Border Style="{StaticResource VersionCardStyle}"
+                <Border Background="{DynamicResource SuccessCardBackgroundBrush}"
+                        BorderBrush="{DynamicResource SuccessCardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="20"
+                        Margin="0,0,0,16"
+                        Effect="{StaticResource CardShadowEffect}"
                         Visibility="{Binding UpdateCheckResult.HasUpdate, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -216,7 +225,7 @@
                             <TextBlock Text="发现新版本"
                                        FontSize="20"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading4Brush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -232,7 +241,7 @@
                                 <TextBlock Text="{Binding UpdateCheckResult.LatestVersion.Version}"
                                            FontSize="16"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource PrimaryBrush}"/>
+                                           Foreground="{DynamicResource SuccessTextBrush}"/>
                                 <TextBlock Text="{Binding UpdateCheckResult.LatestVersion.ReleaseDate, StringFormat='{}{0:yyyy-MM-dd}'}"
                                            FontSize="12"
                                            Foreground="{DynamicResource SecondaryTextBrush}"/>
@@ -240,7 +249,7 @@
 
                             <Button Grid.Column="2"
                                     Content="立即下载"
-                                    Style="{StaticResource BaseButtonStyle}"
+                                    Style="{StaticResource SuccessButtonStyle}"
                                     Command="{Binding DownloadUpdateCommand}"/>
                         </Grid>
 
@@ -250,7 +259,7 @@
                             <TextBlock Text="新功能"
                                        FontSize="14"
                                        FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading6Brush}"
                                        Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding UpdateCheckResult.LatestVersion.Features}"
                                           Style="{StaticResource FeatureListStyle}"/>
@@ -262,7 +271,7 @@
                             <TextBlock Text="修复内容"
                                        FontSize="14"
                                        FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading6Brush}"
                                        Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding UpdateCheckResult.LatestVersion.Fixes}"
                                           Style="{StaticResource FixListStyle}"/>
@@ -297,7 +306,7 @@
                             <TextBlock Text="当前版本"
                                        FontSize="20"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading4Brush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -325,7 +334,7 @@
                             <TextBlock Text="主要功能"
                                        FontSize="14"
                                        FontWeight="Medium"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading6Brush}"
                                        Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding CurrentVersion.Features}"
                                           Style="{StaticResource FeatureListStyle}"/>
@@ -360,7 +369,7 @@
                             <TextBlock Text="版本历史"
                                        FontSize="20"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading4Brush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -368,7 +377,7 @@
                         <ItemsControl Grid.Row="1" ItemsSource="{Binding VersionHistory}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{DynamicResource SurfaceBrush}"
+                                    <Border Background="{DynamicResource SecondaryBackgroundBrush}"
                                             BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="6"
@@ -389,7 +398,7 @@
                                                            Foreground="{DynamicResource PrimaryTextBrush}"/>
                                                 <TextBlock Text="{Binding ReleaseDate, StringFormat='{}{0:yyyy-MM-dd}'}"
                                                            FontSize="11"
-                                                           Foreground="{DynamicResource SecondaryTextBrush}"/>
+                                                           Foreground="{DynamicResource TertiaryTextBrush}"/>
                                             </StackPanel>
 
                                             <!-- 描述 -->
@@ -407,7 +416,7 @@
                                                     Padding="6,2"
                                                     Visibility="{Binding IsPreRelease, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                 <TextBlock Text="预发布" 
-                                                           Foreground="White"
+                                                           Foreground="{DynamicResource WarningControlForegroundBrush}"
                                                            FontSize="10"
                                                            FontWeight="Medium"/>
                                             </Border>
@@ -438,7 +447,7 @@
                             <TextBlock Text="项目信息"
                                        FontSize="20"
                                        FontWeight="Bold"
-                                       Foreground="{DynamicResource PrimaryTextBrush}"
+                                       Foreground="{DynamicResource Heading4Brush}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
 
@@ -480,7 +489,7 @@
                             <TextBlock Grid.Row="3"
                                        Text="基于 .NET 8 和 WPF 构建"
                                        FontSize="12"
-                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Foreground="{DynamicResource TertiaryTextBrush}"
                                        Margin="0,16,0,0"/>
                         </Grid>
                     </Grid>

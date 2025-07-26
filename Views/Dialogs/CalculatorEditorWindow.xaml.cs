@@ -34,6 +34,7 @@ public partial class CalculatorEditorWindow
         // 获取服务
         _logger = ContainerAccessor.Resolve<ILogger<RealTimeSyntaxService>>();
         _themeManager = ContainerAccessor.Resolve<ThemeManager>();
+        Owner = ContainerAccessor.Resolve<MainWindow>();
 
         // 使用 Loaded 事件确保所有控件都已初始化
         Loaded += OnWindowLoaded;

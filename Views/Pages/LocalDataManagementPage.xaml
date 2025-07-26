@@ -27,19 +27,23 @@
 
         <!-- 统计卡片特定样式 -->
         <Style x:Key="TotalStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="#E3F2FD"/>
+            <Setter Property="Background" Value="{DynamicResource InfoCardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InfoCardBorderBrush}"/>
         </Style>
 
         <Style x:Key="TodayStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="#E8F5E8"/>
+            <Setter Property="Background" Value="{DynamicResource SuccessCardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource SuccessCardBorderBrush}"/>
         </Style>
 
         <Style x:Key="WeekStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="#FFF3E0"/>
+            <Setter Property="Background" Value="{DynamicResource WarningCardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource WarningCardBorderBrush}"/>
         </Style>
 
         <Style x:Key="MonthStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="#FCE4EC"/>
+            <Setter Property="Background" Value="{DynamicResource AccentThemedCardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentThemedCardBackgroundBrush}"/>
         </Style>
     </Page.Resources>
 
@@ -56,7 +60,8 @@
         <!-- 页面标题 -->
         <TextBlock Grid.Row="0" 
                    Text="本地数据管理" 
-                   Style="{StaticResource PageTitleStyle}"/>
+                   Style="{StaticResource PageTitleStyle}"
+                   Foreground="{DynamicResource Heading2Brush}"/>
 
         <!-- 统计信息卡片 -->
         <Grid Grid.Row="1" Margin="0,0,0,24">
@@ -72,12 +77,12 @@
                     <TextBlock Text="总数量" 
                                FontSize="12" 
                                FontWeight="Medium"
-                               Foreground="#666"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
                                Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding Statistics.TotalDrugs}" 
                                FontSize="24" 
                                FontWeight="Bold" 
-                               Foreground="#2196F3"/>
+                               Foreground="{DynamicResource PrimaryThemedCardForegroundBrush}"/>
                 </StackPanel>
             </Border>
 
@@ -86,12 +91,12 @@
                     <TextBlock Text="今日新增" 
                                FontSize="12" 
                                FontWeight="Medium"
-                               Foreground="#666"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
                                Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding Statistics.TodayAdded}" 
                                FontSize="24" 
                                FontWeight="Bold" 
-                               Foreground="#4CAF50"/>
+                               Foreground="{DynamicResource SuccessTextBrush}"/>
                 </StackPanel>
             </Border>
 
@@ -100,12 +105,12 @@
                     <TextBlock Text="本周新增" 
                                FontSize="12" 
                                FontWeight="Medium"
-                               Foreground="#666"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
                                Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding Statistics.WeekAdded}" 
                                FontSize="24" 
                                FontWeight="Bold" 
-                               Foreground="#FF9800"/>
+                               Foreground="{DynamicResource WarningTextBrush}"/>
                 </StackPanel>
             </Border>
 
@@ -114,12 +119,12 @@
                     <TextBlock Text="本月新增" 
                                FontSize="12" 
                                FontWeight="Medium"
-                               Foreground="#666"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
                                Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding Statistics.MonthAdded}" 
                                FontSize="24" 
                                FontWeight="Bold" 
-                               Foreground="#E91E63"/>
+                               Foreground="{DynamicResource AccentThemedCardForegroundBrush}"/>
                 </StackPanel>
             </Border>
         </Grid>
@@ -173,9 +178,12 @@
 
         <!-- 数据表格 -->
         <Border Grid.Row="3" 
-                behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}"
+                behaviors:ThemeBehavior.Background="{DynamicResource BorderBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
                 CornerRadius="8"
-                Effect="{StaticResource LightDropShadowEffect}">
+                Padding="1,10"
+                Effect="{StaticResource CardShadowEffect}">
             <DataGrid x:Name="DrugDataGrid"
                       ItemsSource="{Binding DrugItems}"
                       SelectedItem="{Binding SelectedDrug}"
@@ -206,6 +214,7 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
                                 <Setter Property="FontWeight" Value="Medium"/>
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
@@ -216,7 +225,9 @@
                                         Width="100" 
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}"/>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
+                            </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
@@ -226,7 +237,9 @@
                                         Width="120" 
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}"/>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
+                            </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
@@ -238,6 +251,7 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
                                 <Setter Property="TextWrapping" Value="Wrap"/>
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
@@ -248,7 +262,9 @@
                                         Width="100" 
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}"/>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
+                            </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
@@ -272,6 +288,7 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
                                 <Setter Property="FontFamily" Value="Consolas, Courier New"/>
+                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
@@ -283,7 +300,7 @@
                                 <StackPanel Orientation="Horizontal" 
                                             HorizontalAlignment="Center">
                                     <Button Content="编辑" 
-                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Style="{StaticResource SuccessButtonStyle}"
                                             Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}"
                                             Padding="8,4"
@@ -319,11 +336,11 @@
                        FontSize="14"
                        Foreground="{DynamicResource SecondaryTextBrush}">
                 <Run Text="共"/>
-                <Run Text="{Binding TotalRecords}" FontWeight="Medium"/>
+                <Run Text="{Binding TotalRecords}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
                 <Run Text="条记录，第"/>
-                <Run Text="{Binding CurrentPage}" FontWeight="Medium"/>
+                <Run Text="{Binding CurrentPage}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
                 <Run Text="/"/>
-                <Run Text="{Binding TotalPages}" FontWeight="Medium"/>
+                <Run Text="{Binding TotalPages}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
                 <Run Text="页"/>
             </TextBlock>
 
@@ -341,7 +358,10 @@
 
         <!-- 状态栏 -->
         <Border Grid.Row="5" 
-                Style="{StaticResource StatusBarStyle}"
+                Background="{DynamicResource SecondaryBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16,8"
                 Margin="0,16,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -360,7 +380,8 @@
                              Height="4" 
                              IsIndeterminate="{Binding IsLoading}" 
                              Visibility="{Binding IsLoading, Converter={x:Static converters:Converters.BooleanToVisibilityConverter}}"
-                             Foreground="{DynamicResource PrimaryBrush}"/>
+                             Foreground="{DynamicResource PrimaryBrush}"
+                             Background="{DynamicResource SecondaryBackgroundBrush}"/>
             </Grid>
         </Border>
     </Grid>

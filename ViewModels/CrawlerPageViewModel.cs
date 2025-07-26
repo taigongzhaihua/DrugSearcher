@@ -31,83 +31,59 @@ public partial class CrawlerPageViewModel : ObservableObject
         BatchSize = 10;
         DelayMs = 1000;
 
-        _ = UpdateStatistics();
+        Task.Run(UpdateStatistics);
     }
 
     #region 属性
 
-    [ObservableProperty]
-    public partial int StartId { get; set; }
+    [ObservableProperty] public partial int StartId { get; set; }
 
-    [ObservableProperty]
-    public partial int EndId { get; set; }
+    [ObservableProperty] public partial int EndId { get; set; }
 
-    [ObservableProperty]
-    public partial int BatchSize { get; set; }
+    [ObservableProperty] public partial int BatchSize { get; set; }
 
-    [ObservableProperty]
-    public partial int DelayMs { get; set; }
+    [ObservableProperty] public partial int DelayMs { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsCrawling { get; set; }
+    [ObservableProperty] public partial bool IsCrawling { get; set; }
 
-    [ObservableProperty]
-    public partial bool CanStartCrawl { get; set; } = true;
+    [ObservableProperty] public partial bool CanStartCrawl { get; set; } = true;
 
-    [ObservableProperty]
-    public partial string CrawlButtonText { get; set; } = "开始爬取";
+    [ObservableProperty] public partial string CrawlButtonText { get; set; } = "开始爬取";
 
-    [ObservableProperty]
-    public partial double ProgressPercentage { get; set; }
+    [ObservableProperty] public partial double ProgressPercentage { get; set; }
 
-    [ObservableProperty]
-    public partial string ProgressText { get; set; } = "准备就绪";
+    [ObservableProperty] public partial string ProgressText { get; set; } = "准备就绪";
 
-    [ObservableProperty]
-    public partial int TotalProcessed { get; set; }
+    [ObservableProperty] public partial int TotalProcessed { get; set; }
 
-    [ObservableProperty]
-    public partial int SuccessCount { get; set; }
+    [ObservableProperty] public partial int SuccessCount { get; set; }
 
-    [ObservableProperty]
-    public partial int FailedCount { get; set; }
+    [ObservableProperty] public partial int FailedCount { get; set; }
 
-    [ObservableProperty]
-    public partial int CurrentId { get; set; }
+    [ObservableProperty] public partial int CurrentId { get; set; }
 
-    [ObservableProperty]
-    public partial string EstimatedTimeRemaining { get; set; } = "--";
+    [ObservableProperty] public partial string EstimatedTimeRemaining { get; set; } = "--";
 
-    [ObservableProperty]
-    public partial string CrawlSpeed { get; set; } = "0 条/分钟";
+    [ObservableProperty] public partial string CrawlSpeed { get; set; } = "0 条/分钟";
 
-    [ObservableProperty]
-    public partial DateTime StartTime { get; set; }
+    [ObservableProperty] public partial DateTime StartTime { get; set; }
 
-    [ObservableProperty]
-    public partial DateTime EndTime { get; set; }
+    [ObservableProperty] public partial DateTime EndTime { get; set; }
 
-    [ObservableProperty]
-    public partial string ElapsedTime { get; set; } = "00:00:00";
+    [ObservableProperty] public partial string ElapsedTime { get; set; } = "00:00:00";
 
     // 统计信息
-    [ObservableProperty]
-    public partial int TotalDrugsInDatabase { get; set; }
+    [ObservableProperty] public partial int TotalDrugsInDatabase { get; set; }
 
-    [ObservableProperty]
-    public partial int SuccessfulDrugs { get; set; }
+    [ObservableProperty] public partial int SuccessfulDrugs { get; set; }
 
-    [ObservableProperty]
-    public partial int FailedDrugs { get; set; }
+    [ObservableProperty] public partial int FailedDrugs { get; set; }
 
-    [ObservableProperty]
-    public partial int NotFoundDrugs { get; set; }
+    [ObservableProperty] public partial int NotFoundDrugs { get; set; }
 
-    [ObservableProperty]
-    public partial int ParseErrorDrugs { get; set; }
+    [ObservableProperty] public partial int ParseErrorDrugs { get; set; }
 
-    [ObservableProperty]
-    public partial string CompletionRate { get; set; } = "0%";
+    [ObservableProperty] public partial string CompletionRate { get; set; } = "0%";
     public ObservableCollection<CrawlLogEntry> CrawlLogs { get; }
 
     #endregion
@@ -203,6 +179,7 @@ public partial class CrawlerPageViewModel : ObservableObject
             AddLog($"重试失败：{ex.Message}", LogLevel.Error);
         }
     }
+
     [RelayCommand]
     private async Task CleanupOldRecords()
     {
@@ -256,6 +233,7 @@ public partial class CrawlerPageViewModel : ObservableObject
             AddLog($"获取失败：{ex.Message}", LogLevel.Error);
         }
     }
+
     [RelayCommand]
     private async Task RefreshStatistics()
     {
@@ -321,7 +299,9 @@ public partial class CrawlerPageViewModel : ObservableObject
             CrawlButtonText = "开始爬取";
             CanStartCrawl = true;
 
-            AddLog($@"爬取完成！总计：{result.TotalProcessed}，成功：{result.SuccessCount}，失败：{result.FailedCount}，耗时：{result.Duration:hh\:mm\:ss}", LogLevel.Information);
+            AddLog(
+                $@"爬取完成！总计：{result.TotalProcessed}，成功：{result.SuccessCount}，失败：{result.FailedCount}，耗时：{result.Duration:hh\:mm\:ss}",
+                LogLevel.Information);
 
             await UpdateStatistics();
         }
@@ -343,31 +323,31 @@ public partial class CrawlerPageViewModel : ObservableObject
     }
 
     private void OnCrawlProgress(CrawlProgress progress) => Application.Current.Dispatcher.Invoke(() =>
-                                                                 {
-                                                                     TotalProcessed = progress.TotalProcessed;
-                                                                     SuccessCount = progress.SuccessCount;
-                                                                     FailedCount = progress.FailedCount;
-                                                                     CurrentId = progress.CurrentId;
-                                                                     ProgressPercentage = progress.ProgressPercentage;
-                                                                     ProgressText = $"正在处理 ID: {CurrentId} ({TotalProcessed}/{EndId - StartId + 1})";
+    {
+        TotalProcessed = progress.TotalProcessed;
+        SuccessCount = progress.SuccessCount;
+        FailedCount = progress.FailedCount;
+        CurrentId = progress.CurrentId;
+        ProgressPercentage = progress.ProgressPercentage;
+        ProgressText = $"正在处理 ID: {CurrentId} ({TotalProcessed}/{EndId - StartId + 1})";
 
-                                                                     // 计算速度和预估时间
-                                                                     var elapsed = DateTime.Now - StartTime;
-                                                                     if (elapsed.TotalMinutes > 0)
-                                                                     {
-                                                                         var speed = TotalProcessed / elapsed.TotalMinutes;
-                                                                         CrawlSpeed = $"{speed:F1} 条/分钟";
+        // 计算速度和预估时间
+        var elapsed = DateTime.Now - StartTime;
+        if (elapsed.TotalMinutes > 0)
+        {
+            var speed = TotalProcessed / elapsed.TotalMinutes;
+            CrawlSpeed = $"{speed:F1} 条/分钟";
 
-                                                                         var remaining = EndId - StartId + 1 - TotalProcessed;
-                                                                         if (speed > 0)
-                                                                         {
-                                                                             var estimatedMinutes = remaining / speed;
-                                                                             EstimatedTimeRemaining = TimeSpan.FromMinutes(estimatedMinutes).ToString(@"hh\:mm\:ss");
-                                                                         }
-                                                                     }
+            var remaining = EndId - StartId + 1 - TotalProcessed;
+            if (speed > 0)
+            {
+                var estimatedMinutes = remaining / speed;
+                EstimatedTimeRemaining = TimeSpan.FromMinutes(estimatedMinutes).ToString(@"hh\:mm\:ss");
+            }
+        }
 
-                                                                     ElapsedTime = elapsed.ToString(@"hh\:mm\:ss");
-                                                                 });
+        ElapsedTime = elapsed.ToString(@"hh\:mm\:ss");
+    });
 
     private void ResetProgress()
     {
@@ -404,22 +384,22 @@ public partial class CrawlerPageViewModel : ObservableObject
     }
 
     private void AddLog(string message, LogLevel level) => Application.Current.Dispatcher.Invoke(() =>
-                                                                {
-                                                                    var logEntry = new CrawlLogEntry
-                                                                    {
-                                                                        Timestamp = DateTime.Now,
-                                                                        Level = level,
-                                                                        Message = message
-                                                                    };
+    {
+        var logEntry = new CrawlLogEntry
+        {
+            Timestamp = DateTime.Now,
+            Level = level,
+            Message = message
+        };
 
-                                                                    CrawlLogs.Insert(0, logEntry);
+        CrawlLogs.Insert(0, logEntry);
 
-                                                                    // 限制日志数量，避免内存占用过大
-                                                                    while (CrawlLogs.Count > 1000)
-                                                                    {
-                                                                        CrawlLogs.RemoveAt(CrawlLogs.Count - 1);
-                                                                    }
-                                                                });
+        // 限制日志数量，避免内存占用过大
+        while (CrawlLogs.Count > 1000)
+        {
+            CrawlLogs.RemoveAt(CrawlLogs.Count - 1);
+        }
+    });
 
     #endregion
 }

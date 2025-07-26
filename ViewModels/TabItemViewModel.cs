@@ -34,4 +34,9 @@ public partial class TabItemViewModel : ObservableObject
         Key = key;
         IsSpecialTab = isSpecialTab;
     }
+
+    public override string ToString()
+    {
+        return Content;
+    }
 }

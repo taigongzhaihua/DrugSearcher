@@ -27,6 +27,7 @@ public partial class DrugEditDialog
         {
             _viewModel = new DrugEditDialogViewModel(drugInfo);
             DataContext = _viewModel;
+            Owner = ContainerAccessor.Resolve<MainWindow>();
             ConfigureWindowChrome();
 
             // 窗口加载完成后注册到主题管理器

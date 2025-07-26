@@ -13,11 +13,7 @@
     <Color x:Key="BorderColor">#E0E0E0</Color>
     <Color x:Key="DividerColor">#E0E0E0</Color>
 
-    <Color x:Key="SuccessColor">#4CAF50</Color>
-    <Color x:Key="WarningColor">#FF9800</Color>
-    <Color x:Key="ErrorColor">#F44336</Color>
-
-    <!-- 添加缺失的颜色定义 -->
+    <!-- 控件状态颜色 -->
     <Color x:Key="DisabledColor">#F5F5F5</Color>
     <Color x:Key="HoverColor">#F0F0F0</Color>
     <Color x:Key="PressedColor">#E8E8E8</Color>
@@ -29,40 +25,370 @@
     <Color x:Key="DataGridSelectedTextColor">#FFFFFF</Color>
     <Color x:Key="DataGridAlternateRowColor">#FAFAFA</Color>
 
-    <!-- 背景色 -->
+    <!-- 1. 窗体背景 -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <LinearGradientBrush x:Key="WindowGradientBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFFF" Offset="0"/>
+        <GradientStop Color="#F8F9FA" Offset="1"/>
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="WindowRadialBackgroundBrush" Center="0.5,0" RadiusX="1" RadiusY="1">
+        <GradientStop Color="#FFFFFF" Offset="0"/>
+        <GradientStop Color="#F5F7FA" Offset="1"/>
+    </RadialGradientBrush>
+
+    <!-- 2. 控件样式 - 引用主题颜色 -->
+    <!-- 透明型控件 -->
+    <SolidColorBrush x:Key="TransparentControlBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlBorderBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="TransparentControlHoverBackgroundBrush" Color="#10000000"/>
+    <SolidColorBrush x:Key="TransparentControlHoverBorderBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlHoverForegroundBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="TransparentControlPressedBackgroundBrush" Color="#20000000"/>
+    <SolidColorBrush x:Key="TransparentControlPressedBorderBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlPressedForegroundBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="TransparentControlDisabledBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlDisabledBorderBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="TransparentControlDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+
+    <!-- 默认型控件 -->
+    <SolidColorBrush x:Key="DefaultControlBackgroundBrush" Color="{StaticResource SurfaceColor}"/>
+    <SolidColorBrush x:Key="DefaultControlBorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="DefaultControlForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="DefaultControlHoverBackgroundBrush" Color="{StaticResource HoverColor}"/>
+    <SolidColorBrush x:Key="DefaultControlPressedBackgroundBrush" Color="{StaticResource PressedColor}"/>
+    <SolidColorBrush x:Key="DefaultControlDisabledBackgroundBrush" Color="{StaticResource DisabledColor}"/>
+    <SolidColorBrush x:Key="DefaultControlDisabledBorderBrush" Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="DefaultControlDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+
+    <!-- 强调型控件 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="PrimaryControlBackgroundBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryControlBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryControlForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="PrimaryControlHoverBackgroundBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="PrimaryControlPressedBackgroundBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="PrimaryControlDisabledBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="PrimaryControlDisabledBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="PrimaryControlDisabledForegroundBrush" Color="#BDBDBD"/>
+
+    <!-- 次要强调型控件 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="SecondaryControlBackgroundBrush" Color="{DynamicResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlBorderBrush" Color="{DynamicResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SecondaryControlHoverBackgroundBrush" Color="{DynamicResource SecondaryDarkColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlHoverBorderBrush" Color="{DynamicResource SecondaryDarkColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlHoverForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SecondaryControlPressedBackgroundBrush" Color="{DynamicResource SecondaryDarkColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlPressedBorderBrush" Color="{DynamicResource SecondaryDarkColor}"/>
+    <SolidColorBrush x:Key="SecondaryControlPressedForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SecondaryControlDisabledBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SecondaryControlDisabledBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SecondaryControlDisabledForegroundBrush" Color="#BDBDBD"/>
+
+    <!-- 边框型控件 -->
+    <SolidColorBrush x:Key="BorderControlBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="BorderControlBorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="BorderControlForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="BorderControlHoverBackgroundBrush" Color="#08000000"/>
+    <SolidColorBrush x:Key="BorderControlHoverBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="BorderControlHoverForegroundBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="BorderControlPressedBackgroundBrush" Color="#10000000"/>
+    <SolidColorBrush x:Key="BorderControlPressedBorderBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="BorderControlPressedForegroundBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="BorderControlDisabledBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="BorderControlDisabledBorderBrush" Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="BorderControlDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+
+    <!-- 输入型控件 -->
+    <SolidColorBrush x:Key="InputControlBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="InputControlBorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="InputControlForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="InputControlHoverBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="InputControlHoverBorderBrush" Color="#9E9E9E"/>
+    <SolidColorBrush x:Key="InputControlHoverForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="InputControlFocusedBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="InputControlFocusedBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="InputControlFocusedForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="InputControlDisabledBackgroundBrush" Color="#FAFAFA"/>
+    <SolidColorBrush x:Key="InputControlDisabledBorderBrush" Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="InputControlDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+    <SolidColorBrush x:Key="InputControlPlaceholderForegroundBrush" Color="#9E9E9E"/>
+    <SolidColorBrush x:Key="InputControlSelectionBrush" Color="{DynamicResource PrimaryLightColor}"/>
+    <SolidColorBrush x:Key="InputControlCaretBrush" Color="{DynamicResource PrimaryColor}"/>
+
+    <!-- 选择型控件 -->
+    <SolidColorBrush x:Key="SelectionControlBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SelectionControlBorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="SelectionControlForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckMarkBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="SelectionControlHoverBackgroundBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="SelectionControlHoverBorderBrush" Color="#9E9E9E"/>
+    <SolidColorBrush x:Key="SelectionControlHoverForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlHoverCheckMarkBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="SelectionControlPressedBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SelectionControlPressedBorderBrush" Color="#757575"/>
+    <SolidColorBrush x:Key="SelectionControlPressedForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlPressedCheckMarkBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedBackgroundBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedCheckMarkBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedHoverBackgroundBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedHoverBorderBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedHoverForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedHoverCheckMarkBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedPressedBackgroundBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedPressedBorderBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedPressedForegroundBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedPressedCheckMarkBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SelectionControlDisabledBackgroundBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="SelectionControlDisabledBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SelectionControlDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlDisabledCheckMarkBrush" Color="#BDBDBD"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedDisabledBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedDisabledBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedDisabledForegroundBrush" Color="{StaticResource DisabledTextColor}"/>
+    <SolidColorBrush x:Key="SelectionControlCheckedDisabledCheckMarkBrush" Color="#BDBDBD"/>
+    <SolidColorBrush x:Key="SelectionControlIndeterminateBackgroundBrush" Color="{DynamicResource PrimaryLightColor}"/>
+    <SolidColorBrush x:Key="SelectionControlIndeterminateBorderBrush" Color="{DynamicResource PrimaryLightColor}"/>
+    <SolidColorBrush x:Key="SelectionControlIndeterminateMarkBrush" Color="#FFFFFF"/>
+
+    <!-- Switch控件 -->
+    <SolidColorBrush x:Key="SwitchOffBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SwitchOffBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SwitchOffThumbBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchOffHoverBackgroundBrush" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="SwitchOffHoverBorderBrush" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="SwitchOffHoverThumbBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchOffPressedBackgroundBrush" Color="#C0C0C0"/>
+    <SolidColorBrush x:Key="SwitchOffPressedBorderBrush" Color="#C0C0C0"/>
+    <SolidColorBrush x:Key="SwitchOffPressedThumbBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchOnBackgroundBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SwitchOnBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SwitchOnThumbBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchOnHoverBackgroundBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="SwitchOnHoverBorderBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="SwitchOnHoverThumbBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchOnPressedBackgroundBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="SwitchOnPressedBorderBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="SwitchOnPressedThumbBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="SwitchDisabledBackgroundBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="SwitchDisabledBorderBrush" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="SwitchDisabledThumbBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SwitchOnDisabledBackgroundBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SwitchOnDisabledBorderBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SwitchOnDisabledThumbBrush" Color="#F5F5F5"/>
+
+    <!-- 危险型控件 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="DangerControlBackgroundBrush" Color="{DynamicResource ErrorColor}"/>
+    <SolidColorBrush x:Key="DangerControlBorderBrush" Color="{DynamicResource ErrorColor}"/>
+    <SolidColorBrush x:Key="DangerControlForegroundBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="DangerControlHoverBackgroundBrush" Color="{DynamicResource ErrorDarkColor}"/>
+    <SolidColorBrush x:Key="DangerControlPressedBackgroundBrush" Color="#C62828"/>
+    <SolidColorBrush x:Key="DangerControlDisabledBackgroundBrush" Color="#FFEBEE"/>
+    <SolidColorBrush x:Key="DangerControlDisabledBorderBrush" Color="#FFEBEE"/>
+    <SolidColorBrush x:Key="DangerControlDisabledForegroundBrush" Color="#FFCDD2"/>
+
+    <!-- 警示型控件 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="WarningControlBackgroundBrush" Color="{DynamicResource WarningColor}"/>
+    <SolidColorBrush x:Key="WarningControlBorderBrush" Color="{DynamicResource WarningColor}"/>
+    <SolidColorBrush x:Key="WarningControlForegroundBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="WarningControlHoverBackgroundBrush" Color="{DynamicResource WarningDarkColor}"/>
+    <SolidColorBrush x:Key="WarningControlPressedBackgroundBrush" Color="#E65100"/>
+    <SolidColorBrush x:Key="WarningControlDisabledBackgroundBrush" Color="#FFF3E0"/>
+    <SolidColorBrush x:Key="WarningControlDisabledBorderBrush" Color="#FFF3E0"/>
+    <SolidColorBrush x:Key="WarningControlDisabledForegroundBrush" Color="#FFE0B2"/>
+
+    <!-- 安全型控件 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="SuccessControlBackgroundBrush" Color="{DynamicResource SuccessColor}"/>
+    <SolidColorBrush x:Key="SuccessControlBorderBrush" Color="{DynamicResource SuccessColor}"/>
+    <SolidColorBrush x:Key="SuccessControlForegroundBrush" Color="#E0FFFFFF"/>
+    <SolidColorBrush x:Key="SuccessControlHoverBackgroundBrush" Color="{DynamicResource SuccessDarkColor}"/>
+    <SolidColorBrush x:Key="SuccessControlPressedBackgroundBrush" Color="#2E7D32"/>
+    <SolidColorBrush x:Key="SuccessControlDisabledBackgroundBrush" Color="#E8F5E9"/>
+    <SolidColorBrush x:Key="SuccessControlDisabledBorderBrush" Color="#E8F5E9"/>
+    <SolidColorBrush x:Key="SuccessControlDisabledForegroundBrush" Color="#C8E6C9"/>
+
+    <!-- 3. 卡片样式 - 引用主题颜色 -->
+    <!-- 主题卡片样式 -->
+    <!-- Primary主题卡片 -->
+    <SolidColorBrush x:Key="PrimaryThemedCardBackgroundBrush" Color="{DynamicResource Primary50}" Opacity="0.5"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardBorderBrush" Color="{DynamicResource Primary200}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardHoverBackgroundBrush" Color="{DynamicResource Primary100}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardHoverBorderBrush" Color="{DynamicResource Primary300}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardPressedBackgroundBrush" Color="{DynamicResource Primary200}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardPressedBorderBrush" Color="{DynamicResource Primary400}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardDisabledBackgroundBrush" Color="#F5F7FF"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardDisabledBorderBrush" Color="#E0E5FF"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardForegroundBrush" Color="{DynamicResource Primary700}"/>
+    <SolidColorBrush x:Key="PrimaryThemedCardSecondaryForegroundBrush" Color="{DynamicResource Primary600}"/>
+
+    <!-- Secondary主题卡片 -->
+    <SolidColorBrush x:Key="SecondaryThemedCardBackgroundBrush" Color="{DynamicResource Secondary50}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardBorderBrush" Color="{DynamicResource Secondary200}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardHoverBackgroundBrush" Color="{DynamicResource Secondary100}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardHoverBorderBrush" Color="{DynamicResource Secondary300}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardPressedBackgroundBrush" Color="{DynamicResource Secondary200}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardPressedBorderBrush" Color="{DynamicResource Secondary400}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardDisabledBackgroundBrush" Color="#F0FFF8"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardDisabledBorderBrush" Color="#D0FFE8"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardForegroundBrush" Color="{DynamicResource Secondary700}"/>
+    <SolidColorBrush x:Key="SecondaryThemedCardSecondaryForegroundBrush" Color="{DynamicResource Secondary600}"/>
+
+    <!-- Accent主题卡片 -->
+    <SolidColorBrush x:Key="AccentThemedCardBackgroundBrush" Color="{DynamicResource Accent50}"/>
+    <SolidColorBrush x:Key="AccentThemedCardBorderBrush" Color="{DynamicResource Accent200}"/>
+    <SolidColorBrush x:Key="AccentThemedCardHoverBackgroundBrush" Color="{DynamicResource Accent100}"/>
+    <SolidColorBrush x:Key="AccentThemedCardHoverBorderBrush" Color="{DynamicResource Accent300}"/>
+    <SolidColorBrush x:Key="AccentThemedCardPressedBackgroundBrush" Color="{DynamicResource Accent200}"/>
+    <SolidColorBrush x:Key="AccentThemedCardPressedBorderBrush" Color="{DynamicResource Accent400}"/>
+    <SolidColorBrush x:Key="AccentThemedCardDisabledBackgroundBrush" Color="#FFF5F0"/>
+    <SolidColorBrush x:Key="AccentThemedCardDisabledBorderBrush" Color="#FFE5D0"/>
+    <SolidColorBrush x:Key="AccentThemedCardForegroundBrush" Color="{DynamicResource Accent700}"/>
+    <SolidColorBrush x:Key="AccentThemedCardSecondaryForegroundBrush" Color="{DynamicResource Accent600}"/>
+
+    <!-- 渐变主题卡片背景 -->
+    <LinearGradientBrush x:Key="PrimaryThemedCardGradientBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{DynamicResource Primary50}" Offset="0"/>
+        <GradientStop Color="{DynamicResource Primary100}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SecondaryThemedCardGradientBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{DynamicResource Secondary50}" Offset="0"/>
+        <GradientStop Color="{DynamicResource Secondary100}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AccentThemedCardGradientBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="{DynamicResource Accent50}" Offset="0"/>
+        <GradientStop Color="{DynamicResource Accent100}" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 高亮主题卡片（用于重要内容） -->
+    <SolidColorBrush x:Key="HighlightThemedCardBackgroundBrush" Color="{DynamicResource Primary100}"/>
+    <SolidColorBrush x:Key="HighlightThemedCardBorderBrush" Color="{DynamicResource Primary400}"/>
+    <SolidColorBrush x:Key="HighlightThemedCardHoverBackgroundBrush" Color="{DynamicResource Primary200}"/>
+    <SolidColorBrush x:Key="HighlightThemedCardHoverBorderBrush" Color="{DynamicResource Primary500}"/>
+    <SolidColorBrush x:Key="HighlightThemedCardForegroundBrush" Color="{DynamicResource Primary800}"/>
+
+    <!-- 轮廓主题卡片（只有边框的卡片） -->
+    <SolidColorBrush x:Key="OutlineThemedCardBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="OutlineThemedCardBorderBrush" Color="{DynamicResource Primary300}"/>
+    <SolidColorBrush x:Key="OutlineThemedCardHoverBackgroundBrush" Color="{DynamicResource Primary50}"/>
+    <SolidColorBrush x:Key="OutlineThemedCardHoverBorderBrush" Color="{DynamicResource Primary400}"/>
+    <SolidColorBrush x:Key="OutlineThemedCardPressedBackgroundBrush" Color="{DynamicResource Primary100}"/>
+    <SolidColorBrush x:Key="OutlineThemedCardPressedBorderBrush" Color="{DynamicResource Primary500}"/>
+    <SolidColorBrush x:Key="OutlineThemedCardForegroundBrush" Color="{DynamicResource Primary600}"/>
+
+    <!-- 玻璃态主题卡片 -->
+    <SolidColorBrush x:Key="GlassThemedCardBackgroundBrush" Color="#F8FFFFFF" Opacity="0.95"/>
+    <SolidColorBrush x:Key="GlassThemedCardBorderBrush" Color="{DynamicResource Primary200}" Opacity="0.6"/>
+    <SolidColorBrush x:Key="GlassThemedCardHoverBackgroundBrush" Color="#FCFFFFFF"/>
+    <SolidColorBrush x:Key="GlassThemedCardHoverBorderBrush" Color="{DynamicResource Primary300}" Opacity="0.8"/>
+    <SolidColorBrush x:Key="GlassThemedCardForegroundBrush" Color="{DynamicResource Primary700}"/>
+
+    <!-- 深色主题卡片（不随主题切换） -->
+    <SolidColorBrush x:Key="DarkThemedCardBackgroundBrush" Color="{DynamicResource Primary800}"/>
+    <SolidColorBrush x:Key="DarkThemedCardBorderBrush" Color="{DynamicResource Primary700}"/>
+    <SolidColorBrush x:Key="DarkThemedCardHoverBackgroundBrush" Color="{DynamicResource Primary700}"/>
+    <SolidColorBrush x:Key="DarkThemedCardHoverBorderBrush" Color="{DynamicResource Primary600}"/>
+    <SolidColorBrush x:Key="DarkThemedCardForegroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="DarkThemedCardSecondaryForegroundBrush" Color="{DynamicResource Primary100}"/>
+
+    <!-- 亮色主题卡片（不随主题切换） -->
+    <SolidColorBrush x:Key="LightThemedCardBackgroundBrush" Color="{DynamicResource Primary100}"/>
+    <SolidColorBrush x:Key="LightThemedCardBorderBrush" Color="{DynamicResource Primary200}"/>
+    <SolidColorBrush x:Key="LightThemedCardHoverBackgroundBrush" Color="{DynamicResource Primary50}"/>
+    <SolidColorBrush x:Key="LightThemedCardHoverBorderBrush" Color="{DynamicResource Primary300}"/>
+    <SolidColorBrush x:Key="LightThemedCardForegroundBrush" Color="{DynamicResource Primary900}"/>
+    <SolidColorBrush x:Key="LightThemedCardSecondaryForegroundBrush" Color="{DynamicResource Primary700}"/>
+
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CardBorderBrush" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="CardDisabledBackgroundBrush" Color="#FAFAFA"/>
+    <SolidColorBrush x:Key="CardDisabledBorderBrush" Color="#F0F0F0"/>
+
+    <SolidColorBrush x:Key="DangerCardBackgroundBrush" Color="#FFEBEE"/>
+    <SolidColorBrush x:Key="DangerCardBorderBrush" Color="#FFCDD2"/>
+    <SolidColorBrush x:Key="DangerCardDisabledBackgroundBrush" Color="#FFF5F5"/>
+    <SolidColorBrush x:Key="DangerCardDisabledBorderBrush" Color="#FFE5E5"/>
+
+    <SolidColorBrush x:Key="WarningCardBackgroundBrush" Color="#FFF3E0"/>
+    <SolidColorBrush x:Key="WarningCardBorderBrush" Color="#FFE0B2"/>
+    <SolidColorBrush x:Key="WarningCardDisabledBackgroundBrush" Color="#FFF8F0"/>
+    <SolidColorBrush x:Key="WarningCardDisabledBorderBrush" Color="#FFEDD0"/>
+
+    <SolidColorBrush x:Key="SuccessCardBackgroundBrush" Color="#E8F5E9"/>
+    <SolidColorBrush x:Key="SuccessCardBorderBrush" Color="#C8E6C9"/>
+    <SolidColorBrush x:Key="SuccessCardDisabledBackgroundBrush" Color="#F1F8F1"/>
+    <SolidColorBrush x:Key="SuccessCardDisabledBorderBrush" Color="#E0F2E0"/>
+
+    <SolidColorBrush x:Key="InfoCardBackgroundBrush" Color="{DynamicResource Primary50}"/>
+    <SolidColorBrush x:Key="InfoCardBorderBrush" Color="{DynamicResource Primary100}"/>
+    <SolidColorBrush x:Key="InfoCardDisabledBackgroundBrush" Color="#F0F7FF"/>
+    <SolidColorBrush x:Key="InfoCardDisabledBorderBrush" Color="#D8E9FF"/>
+
+    <!-- 4. 文字样式 - 引用主题颜色的标题 -->
+    <!-- 标题文字 - 使用主题色 -->
+    <SolidColorBrush x:Key="Heading1Brush" Color="{DynamicResource Heading1Color}"/>
+    <SolidColorBrush x:Key="Heading2Brush" Color="{DynamicResource Heading2Color}"/>
+    <SolidColorBrush x:Key="Heading3Brush" Color="{DynamicResource Heading3Color}"/>
+    <SolidColorBrush x:Key="Heading4Brush" Color="{DynamicResource Heading4Color}"/>
+    <SolidColorBrush x:Key="Heading5Brush" Color="{DynamicResource Heading5Color}"/>
+    <SolidColorBrush x:Key="Heading6Brush" Color="{DynamicResource Heading6Color}"/>
+
+    <!-- 正文文字 -->
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}"/>
+    <SolidColorBrush x:Key="TertiaryTextBrush" Color="#9E9E9E"/>
+    <SolidColorBrush x:Key="QuaternaryTextBrush" Color="#BDBDBD"/>
+    <SolidColorBrush x:Key="QuinaryTextBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="SenaryTextBrush" Color="#F5F5F5"/>
+
+    <!-- 状态文字 - 引用主题颜色 -->
+    <SolidColorBrush x:Key="DangerTextBrush" Color="{DynamicResource ErrorColor}"/>
+    <SolidColorBrush x:Key="WarningTextBrush" Color="{DynamicResource WarningColor}"/>
+    <SolidColorBrush x:Key="SuccessTextBrush" Color="{DynamicResource SuccessColor}"/>
+    <SolidColorBrush x:Key="InfoTextBrush" Color="{DynamicResource InfoColor}"/>
+
+    <!-- 5. 阴影效果 -->
+    <DropShadowEffect x:Key="CardShadowEffect" 
+                      Color="{DynamicResource Primary900}" 
+                      Direction="270" 
+                      ShadowDepth="2" 
+                      Opacity="0.1" 
+                      BlurRadius="8"/>
+
+    <DropShadowEffect x:Key="HoverShadowEffect" 
+                      Color="{DynamicResource Primary600}" 
+                      Direction="270" 
+                      ShadowDepth="4" 
+                      Opacity="0.15" 
+                      BlurRadius="12"/>
+
+    <DropShadowEffect x:Key="PopupShadowEffect" 
+                      Color="{DynamicResource Primary900}" 
+                      Direction="270" 
+                      ShadowDepth="4" 
+                      Opacity="0.12" 
+                      BlurRadius="16"/>
+
+    <!-- 原有画刷保留并引用主题颜色 -->
     <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
     <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}"/>
     <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="{StaticResource SecondaryBackgroundColor}"/>
-
-    <!-- 文字色 -->
-    <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}"/>
-    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}"/>
-    <SolidColorBrush x:Key="DisabledTextBrush" Color="{StaticResource DisabledTextColor}"/>
-
-    <!-- 边框色 -->
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
     <SolidColorBrush x:Key="DividerBrush" Color="{StaticResource DividerColor}"/>
-    <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource PrimaryColor}"/>
-
-    <!-- 主题色 -->
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
-    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource PrimaryDarkColor}"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentLightColor}"/>
-
-    <!-- 状态色 -->
-    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
-    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
-    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}"/>
-
-    <!-- 添加缺失的画刷定义 -->
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentLightColor}"/>
     <SolidColorBrush x:Key="DisabledBrush" Color="{StaticResource DisabledColor}"/>
     <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource HoverColor}"/>
     <SolidColorBrush x:Key="PressedBrush" Color="{StaticResource PressedColor}"/>
-    <SolidColorBrush x:Key="PrimaryPressedBrush" Color="{StaticResource PrimaryDarkHoverColor}"/>
+    <SolidColorBrush x:Key="PrimaryPressedBrush" Color="{DynamicResource PrimaryDarkHoverColor}"/>
     <SolidColorBrush x:Key="ScrollBarBrush" Color="{StaticResource ScrollBarColor}"/>
     <SolidColorBrush x:Key="ScrollBarHoverBrush" Color="{StaticResource ScrollBarHoverColor}"/>
-
-    <!-- 画刷 -->
+    <SolidColorBrush x:Key="DisabledTextBrush" Color="{StaticResource DisabledTextColor}"/>
     <SolidColorBrush x:Key="DataGridTextBrush" Color="{StaticResource DataGridTextColor}"/>
     <SolidColorBrush x:Key="DataGridSelectedTextBrush" Color="{StaticResource DataGridSelectedTextColor}"/>
     <SolidColorBrush x:Key="DataGridAlternateRowBrush" Color="{StaticResource DataGridAlternateRowColor}"/>

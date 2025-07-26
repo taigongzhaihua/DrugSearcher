@@ -7,61 +7,73 @@
         <Setter Property="Padding" Value="16,10"/>
     </Style>
 
+    <!-- 成功按钮样式 - 使用成功控件资源 -->
     <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-        <Setter Property="Background" Value="#4CAF50"/>
+        <Setter Property="Background" Value="{DynamicResource SuccessControlBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessControlBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource SuccessControlForegroundBrush}"/>
         <Setter Property="Margin" Value="{StaticResource SmallMargin}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#388E3C"/>
+                <Setter Property="Background" Value="{DynamicResource SuccessControlHoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#2E7D32"/>
+                <Setter Property="Background" Value="{DynamicResource SuccessControlPressedBackgroundBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource SuccessControlDisabledBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource SuccessControlDisabledBorderBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SuccessControlDisabledForegroundBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
+    <!-- 危险按钮样式 - 使用危险控件资源 -->
     <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-        <Setter Property="Background" Value="#F44336"/>
+        <Setter Property="Background" Value="{DynamicResource DangerControlBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DangerControlBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DangerControlForegroundBrush}"/>
         <Setter Property="Margin" Value="{StaticResource SmallMargin}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#D32F2F"/>
+                <Setter Property="Background" Value="{DynamicResource DangerControlHoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#C62828"/>
+                <Setter Property="Background" Value="{DynamicResource DangerControlPressedBackgroundBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource DangerControlDisabledBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource DangerControlDisabledBorderBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource DangerControlDisabledForegroundBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
+    <!-- 警告按钮样式 - 使用警告控件资源 -->
     <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-        <Setter Property="Background" Value="#FF9800"/>
+        <Setter Property="Background" Value="{DynamicResource WarningControlBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningControlBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource WarningControlForegroundBrush}"/>
         <Setter Property="Margin" Value="{StaticResource SmallMargin}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#F57C00"/>
+                <Setter Property="Background" Value="{DynamicResource WarningControlHoverBackgroundBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#EF6C00"/>
+                <Setter Property="Background" Value="{DynamicResource WarningControlPressedBackgroundBrush}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{DynamicResource WarningControlDisabledBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource WarningControlDisabledBorderBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource WarningControlDisabledForegroundBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+    <!-- 次要按钮样式 - 使用默认控件资源 -->
+    <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
         <Setter Property="Padding" Value="16,10"/>
         <Setter Property="Margin" Value="{StaticResource SmallMargin}"/>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{DynamicResource PressedBrush}"/>
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
     <!-- 表单控件样式 -->
@@ -96,21 +108,19 @@
 
     <!-- 统计卡片样式 -->
     <Style x:Key="StatisticCardStyle" TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="16"/>
         <Setter Property="Margin" Value="0,0,8,0"/>
-        <Setter Property="Effect" Value="{StaticResource LightDropShadowEffect}"/>
+        <Setter Property="Effect" Value="{DynamicResource CardShadowEffect}"/>
     </Style>
 
     <!-- 页面标题样式 -->
-    <Style x:Key="PageTitleStyle" TargetType="TextBlock">
-        <Setter Property="FontSize" Value="28"/>
-        <Setter Property="FontWeight" Value="Light"/>
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+    <Style x:Key="PageTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource Heading1Style}">
         <Setter Property="Margin" Value="0,0,0,24"/>
     </Style>
-
 
     <!-- DataGrid 单元格文本样式 -->
     <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
@@ -133,7 +143,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter Property="Background" Value="Transparent"/>
@@ -145,7 +155,7 @@
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -159,7 +169,7 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="True">
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -180,7 +190,7 @@
         <Setter Property="HeadersVisibility" Value="Column"/>
         <Setter Property="SelectionMode" Value="Extended"/>
         <Setter Property="SelectionUnit" Value="FullRow"/>
-        <Setter Property="AlternatingRowBackground" Value="{DynamicResource HoverBrush}"/>
+        <Setter Property="AlternatingRowBackground" Value="{DynamicResource DataGridAlternateRowBrush}"/>
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="CanUserDeleteRows" Value="False"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
@@ -197,8 +207,13 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Style.Triggers>
+            <!-- 交替行背景 -->
+            <Trigger Property="AlternationIndex" Value="1">
+                <Setter Property="Background" Value="{DynamicResource DataGridAlternateRowBrush}"/>
+            </Trigger>
+
             <!-- 鼠标悬停效果 -->
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
@@ -210,8 +225,8 @@
                     <Condition Property="IsSelected" Value="True"/>
                     <Condition Property="Selector.IsSelectionActive" Value="True"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource PrimaryDarkBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource SelectionControlCheckedBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
             </MultiTrigger>
 
             <!-- 选中但失焦（非活动状态） -->
@@ -220,8 +235,8 @@
                     <Condition Property="IsSelected" Value="True"/>
                     <Condition Property="Selector.IsSelectionActive" Value="False"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource SelectionControlCheckedHoverBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedHoverForegroundBrush}"/>
             </MultiTrigger>
 
             <!-- 选中且鼠标悬停 -->
@@ -231,8 +246,8 @@
                     <Condition Property="IsMouseOver" Value="True"/>
                     <Condition Property="Selector.IsSelectionActive" Value="True"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource SelectionControlCheckedHoverBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
             </MultiTrigger>
 
             <!-- 失焦选中且鼠标悬停 -->
@@ -242,9 +257,10 @@
                     <Condition Property="IsMouseOver" Value="True"/>
                     <Condition Property="Selector.IsSelectionActive" Value="False"/>
                 </MultiTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource SelectionControlCheckedHoverBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource SelectionControlCheckedCheckMarkBrush}"/>
             </MultiTrigger>
+
         </Style.Triggers>
     </Style>
 
@@ -265,7 +281,7 @@
     <!-- 增强的 DataGrid 列标题样式 -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Heading4Brush}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="Height" Value="48"/>
@@ -293,7 +309,7 @@
                             <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource PressedBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource ActivatedBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -303,8 +319,8 @@
 
     <!-- 状态栏样式 -->
     <Style x:Key="StatusBarStyle" TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,1,0,0"/>
         <Setter Property="Padding" Value="16,12"/>
     </Style>

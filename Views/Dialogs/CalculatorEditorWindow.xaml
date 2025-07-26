@@ -3,198 +3,255 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
-        xmlns:vm="clr-namespace:DrugSearcher.ViewModels" 
+        xmlns:vm="clr-namespace:DrugSearcher.ViewModels"
         xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle}" 
+        Title="{Binding WindowTitle}"
         Style="{DynamicResource BaseWindowStyle}"
-        Background="{DynamicResource SurfaceBrush}"
+        Background="{DynamicResource BackgroundBrush}"
         WindowState="Maximized"
-        MinHeight="600" MinWidth="1000" 
+        MinHeight="600" MinWidth="1000"
         d:DataContext="{d:DesignInstance vm:CalculatorEditorViewModel}">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="Foreground" Value="{DynamicResource Heading5Brush}" />
         </Style>
 
         <Style x:Key="ToolButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
-            <Setter Property="MinWidth" Value="80"/>
-            <Setter Property="Height" Value="28"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="MinWidth" Value="80" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="FontSize" Value="11" />
         </Style>
     </Window.Resources>
 
     <Grid Margin="8">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
+        <TextBlock Grid.Row="0" Style="{DynamicResource Heading2Style}"
+                   Margin="16,16,16,8"
+                   Text="计算器编辑器"/>
         <!-- 头部基本信息 -->
-        <Border Grid.Row="0" 
-                behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}" 
-                Padding="15,10">
+        <Border Grid.Row="1"
+                behaviors:ThemeBehavior.Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="16" Margin="16,8"
+                Effect="{StaticResource CardShadowEffect}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="计算器名称:" FontWeight="Bold" Margin="0,0,10,0"
-                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"/>
+                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CalculatorName}" Margin="0,0,20,0"
-                         Style="{DynamicResource BaseTextBoxStyle}"/>
+                         Style="{DynamicResource BaseTextBoxStyle}" />
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="描述:" VerticalAlignment="Top" FontWeight="Bold" Margin="0,18,10,0"
-                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"/>
-                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Description}" TextWrapping="Wrap" 
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="描述:" VerticalAlignment="Top" FontWeight="Bold"
+                           Margin="0,18,10,0"
+                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto" />
+                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Description}"
+                         TextWrapping="Wrap"
                          AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,5,0,0"
-                         Style="{DynamicResource BaseTextBoxStyle}"/>
+                         Style="{DynamicResource BaseTextBoxStyle}" />
             </Grid>
         </Border>
 
         <!-- 主要编辑区域 -->
-        <Grid Grid.Row="1" Margin="10,0,10,10" Background="{DynamicResource SurfaceBrush}">
+        <Grid Grid.Row="2" Margin="16,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="600"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="600" />
             </Grid.ColumnDefinitions>
 
             <!-- 左侧：代码编辑器 -->
-            <GroupBox Grid.Column="0" Header="JavaScript 代码编辑器" 
-                      Style="{DynamicResource BaseGroupBoxStyle}" Background="{DynamicResource SurfaceBrush}"
-                      Margin="0,0,0,0">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Effect="{StaticResource CardShadowEffect}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
+                    <!-- 标题 -->
+                    <TextBlock Grid.Row="0"
+                               Text="JavaScript 代码编辑器"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Heading4Brush}"
+                               Margin="15,12,15,8" />
+
                     <!-- 代码工具栏 -->
-                    <Border Grid.Row="0" 
-                            behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}" 
-                            Padding="8,5">
+                    <Border Grid.Row="1"
+                            behaviors:ThemeBehavior.Background="{DynamicResource SecondaryBackgroundBrush}"
+                            Padding="8,5"
+                            Margin="0,0,0,1">
                         <WrapPanel>
-                            <Button Content="插入模板" Command="{Binding InsertCodeTemplateCommand}" Style="{StaticResource ToolButtonStyle}"/>
-                            <Button Content="插入参数" Command="{Binding InsertParameterCodeCommand}" Style="{StaticResource ToolButtonStyle}"
-                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <Separator Width="10"/>
-                            <Button Content="验证语法" Command="{Binding ValidateCodeCommand}" Style="{StaticResource ToolButtonStyle}"/>
-                            <Button Content="测试运行" Command="{Binding TestCalculatorCommand}" Style="{StaticResource ToolButtonStyle}"/>
-                            <Separator Width="10"/>
-                            <Button Content="清空" Command="{Binding ClearCodeCommand}" Style="{StaticResource ToolButtonStyle}"/>
-                            <Button Content="重置" Command="{Binding ResetToDefaultCommand}" Style="{StaticResource ToolButtonStyle}"/>
+                            <Button Content="插入模板" Command="{Binding InsertCodeTemplateCommand}"
+                                    Style="{StaticResource ToolButtonStyle}" />
+                            <Button Content="插入参数" Command="{Binding InsertParameterCodeCommand}"
+                                    Style="{StaticResource ToolButtonStyle}"
+                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Separator Width="10" Background="{DynamicResource DividerBrush}" />
+                            <Button Content="验证语法" Command="{Binding ValidateCodeCommand}"
+                                    Style="{StaticResource ToolButtonStyle}" />
+                            <Button Content="测试运行" Command="{Binding TestCalculatorCommand}"
+                                    Style="{StaticResource ToolButtonStyle}" />
+                            <Separator Width="10" Background="{DynamicResource DividerBrush}" />
+                            <Button Content="清空" Command="{Binding ClearCodeCommand}"
+                                    Style="{StaticResource ToolButtonStyle}" />
+                            <Button Content="重置" Command="{Binding ResetToDefaultCommand}"
+                                    Style="{StaticResource ToolButtonStyle}" />
                         </WrapPanel>
                     </Border>
 
                     <!-- AvalonEdit 代码编辑器 -->
-                    <avalonedit:TextEditor Grid.Row="1" 
-                                           x:Name="CodeEditor"
-                                           Document="{Binding CodeDocument}"
-                                           FontFamily="Consolas, Monaco, 'Courier New'"
-                                           SyntaxHighlighting="JavaScript"
-                                           FontSize="14"
-                                           Padding="10,0,0,0"
-                                           LineNumbersForeground="{DynamicResource PrimaryTextBrush}"
-                                           ShowLineNumbers="True"
-                                           WordWrap="True"
-                                           HorizontalScrollBarVisibility="Auto"
-                                           VerticalScrollBarVisibility="Auto"
-                                           behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}" 
-                                           Foreground="{DynamicResource PrimaryTextBrush}"
-                                           BorderBrush="{DynamicResource BorderBrush}"
-                                           BorderThickness="0,1"
-                                           Margin="0,2,0,2"/>
+                    <Border Grid.Row="2"
+                            Background="{DynamicResource CodeEditorBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            Margin="0">
+                        <avalonedit:TextEditor x:Name="CodeEditor"
+                                               Document="{Binding CodeDocument}"
+                                               FontFamily="Consolas, Monaco, 'Courier New'"
+                                               SyntaxHighlighting="JavaScript"
+                                               FontSize="14"
+                                               Padding="10,5"
+                                               LineNumbersForeground="{DynamicResource TertiaryTextBrush}"
+                                               ShowLineNumbers="True"
+                                               WordWrap="True"
+                                               HorizontalScrollBarVisibility="Auto"
+                                               VerticalScrollBarVisibility="Auto"
+                                               behaviors:ThemeBehavior.Background="{DynamicResource CardBackgroundBrush}"
+                                               Foreground="{DynamicResource PrimaryTextBrush}"
+                                               BorderThickness="0" />
+                    </Border>
 
                     <!-- 状态栏部分 -->
-                    <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" Padding="8,6">
+                    <Border Grid.Row="3"
+                            Background="{DynamicResource SecondaryBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="0,1,0,0"
+                            Padding="8,6"
+                            CornerRadius="0,0,6,6">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <!-- 状态消息 -->
-                            <TextBlock Grid.Column="0" 
-                                       Text="{Binding StatusMessage}" 
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding StatusMessage}"
                                        TextWrapping="Wrap"
                                        FontSize="11"
                                        Style="{DynamicResource DefaultTextStyle}"
-                                       LineHeight="Auto"/>
+                                       LineHeight="Auto" />
 
                             <!-- 语法状态 -->
-                            <TextBlock Grid.Column="1" 
+                            <TextBlock Grid.Column="1"
                                        x:Name="SyntaxStatusText"
                                        Text="语法检测中..."
                                        FontSize="10"
                                        Style="{DynamicResource DefaultTextStyle}"
                                        LineHeight="Auto"
-                                       Margin="10,0,10,0"
-                                       Opacity="0.8"/>
+                                       Foreground="{DynamicResource SecondaryTextBrush}"
+                                       Margin="10,0,10,0" />
 
                             <!-- 代码提示提示 -->
-                            <TextBlock Grid.Column="2" 
-                                       Text="Ctrl+Space: 代码提示" 
+                            <TextBlock Grid.Column="2"
+                                       Text="Ctrl+Space: 代码提示"
                                        FontSize="10"
                                        Style="{DynamicResource DefaultTextStyle}"
                                        LineHeight="Auto"
-                                       Opacity="0.7"/>
+                                       Foreground="{DynamicResource TertiaryTextBrush}" />
                         </Grid>
                     </Border>
                 </Grid>
-            </GroupBox>
+            </Border>
 
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent" ResizeBehavior="PreviousAndNext"/>
+            <GridSplitter Grid.Column="1"
+                          HorizontalAlignment="Stretch"
+                          Background="{DynamicResource WindowBackgroundBrush}"
+                          ResizeBehavior="PreviousAndNext" />
 
             <!-- 右侧：参数管理 -->
-            <GroupBox Grid.Column="2" Header="参数管理" Style="{DynamicResource BaseGroupBoxStyle}" 
-                      Background="{DynamicResource SurfaceBrush}"
-                      BorderBrush="{DynamicResource BorderBrush}">
+            <Border Grid.Column="2"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource CardBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Effect="{StaticResource CardShadowEffect}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
+                    <!-- 标题 -->
+                    <TextBlock Grid.Row="0"
+                               Text="参数管理"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Heading4Brush}"
+                               Margin="15,12,15,8" />
+
                     <!-- 参数操作工具栏 -->
-                    <Border Grid.Row="0" 
-                            behaviors:ThemeBehavior.Background="{DynamicResource SurfaceBrush}" 
-                            Padding="8,5">
+                    <Border Grid.Row="1"
+                            behaviors:ThemeBehavior.Background="{DynamicResource SecondaryBackgroundBrush}"
+                            Padding="8,5"
+                            Margin="0,0,0,1">
                         <WrapPanel HorizontalAlignment="Right">
-                            <Button Content="添加" Command="{Binding AddParameterCommand}" Style="{StaticResource WarningButtonStyle}"/>
-                            <Button Content="删除" Command="{Binding RemoveParameterCommand}" Style="{StaticResource DangerButtonStyle}"
-                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <Button Content="复制" Command="{Binding DuplicateParameterCommand}" Style="{StaticResource SuccessButtonStyle}"
-                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <Button Content="↑" Command="{Binding MoveParameterUpCommand}" Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
-                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <Button Content="↓" Command="{Binding MoveParameterDownCommand}" Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
-                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <Button Content="添加" Command="{Binding AddParameterCommand}"
+                                    Style="{StaticResource WarningButtonStyle}" />
+                            <Button Content="删除" Command="{Binding RemoveParameterCommand}"
+                                    Style="{StaticResource DangerButtonStyle}"
+                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Button Content="复制" Command="{Binding DuplicateParameterCommand}"
+                                    Style="{StaticResource SuccessButtonStyle}"
+                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Button Content="↑" Command="{Binding MoveParameterUpCommand}"
+                                    Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
+                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Button Content="↓" Command="{Binding MoveParameterDownCommand}"
+                                    Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
+                                    IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </WrapPanel>
                     </Border>
 
                     <!-- 参数DataGrid -->
-                    <DataGrid Grid.Row="1" 
-                              ItemsSource="{Binding Parameters}" 
+                    <DataGrid Grid.Row="2"
+                              ItemsSource="{Binding Parameters}"
                               SelectedItem="{Binding SelectedParameter}"
                               CanUserResizeRows="False"
                               GridLinesVisibility="All"
@@ -202,143 +259,158 @@
                               Style="{StaticResource ModernDataGridStyle}"
                               RowStyle="{StaticResource DataGridRowStyle}"
                               ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
-                              Margin="0,2,0,2"
-                              BorderThickness="0,1">
+                              Margin="10,0,10,0">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="参数名" Binding="{Binding Name}" Width="80"/>
-                            <DataGridTextColumn Header="显示名称" Binding="{Binding DisplayName}" Width="100"/>
-                            <DataGridComboBoxColumn Header="类型" 
+                            <DataGridTextColumn Header="参数名" Binding="{Binding Name}" Width="80" />
+                            <DataGridTextColumn Header="显示名称" Binding="{Binding DisplayName}" Width="100" />
+                            <DataGridComboBoxColumn Header="类型"
                                                     SelectedItemBinding="{Binding DataTypeName}"
                                                     Width="80">
                                 <DataGridComboBoxColumn.ElementStyle>
                                     <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{x:Static vm:DosageParameterViewModel.DataTypeOptions}"/>
+                                        <Setter Property="ItemsSource"
+                                                Value="{x:Static vm:DosageParameterViewModel.DataTypeOptions}" />
                                     </Style>
                                 </DataGridComboBoxColumn.ElementStyle>
                                 <DataGridComboBoxColumn.EditingElementStyle>
                                     <Style TargetType="ComboBox" BasedOn="{StaticResource FluentComboBoxStyle}">
-                                        <Setter Property="ItemsSource" Value="{x:Static vm:DosageParameterViewModel.DataTypeOptions}"/>
+                                        <Setter Property="ItemsSource"
+                                                Value="{x:Static vm:DosageParameterViewModel.DataTypeOptions}" />
                                     </Style>
                                 </DataGridComboBoxColumn.EditingElementStyle>
                             </DataGridComboBoxColumn>
-                            <DataGridTextColumn Header="单位" Binding="{Binding Unit}" Width="50"/>
-                            <DataGridCheckBoxColumn Header="必填" Binding="{Binding IsRequired}" Width="50"/>
-                            <DataGridTextColumn Header="默认值" Binding="{Binding DefaultValueString}" Width="80"/>
+                            <DataGridTextColumn Header="单位" Binding="{Binding Unit}" Width="50" />
+                            <DataGridCheckBoxColumn Header="必填" Binding="{Binding IsRequired}" Width="50" />
+                            <DataGridTextColumn Header="默认值" Binding="{Binding DefaultValueString}" Width="80" />
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <!-- 参数详情编辑 -->
-                    <ScrollViewer Grid.Row="2" MaxHeight="300" VerticalScrollBarVisibility="Auto">
-                        <Expander Header="参数详情" IsExpanded="True" Margin="5" 
+                    <ScrollViewer Grid.Row="3" MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                        <Expander Header="参数详情" IsExpanded="True" Margin="10"
                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                  FontSize="20" FontWeight="Bold">
-                            <Grid DataContext="{Binding SelectedParameter}" Margin="5,10">
+                                  Background="{DynamicResource SecondaryBackgroundBrush}"
+                                  BorderBrush="{DynamicResource BorderBrush}"
+                                  BorderThickness="1">
+                            <Grid DataContext="{Binding SelectedParameter}" Margin="10">
                                 <Grid.Style>
                                     <Style TargetType="Grid">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding}" Value="{x:Null}">
-                                                <Setter Property="IsEnabled" Value="False"/>
+                                                <Setter Property="IsEnabled" Value="False" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Grid.Style>
 
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="描述:" FontWeight="Bold" Margin="0,12,5,5"
-                                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto" VerticalAlignment="Top"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Description}" TextWrapping="Wrap" 
+                                           Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource Heading6Brush}" />
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Description}" TextWrapping="Wrap"
                                          AcceptsReturn="True" Margin="0,0,0,5" FontSize="11" VerticalAlignment="Top"
-                                         Style="{DynamicResource BaseTextBoxStyle}"/>
+                                         Style="{DynamicResource BaseTextBoxStyle}" />
 
                                 <!-- 数字类型特有属性 -->
-                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                             Visibility="{Binding IsNumberType, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="0,5">
                                     <TextBlock Text="数值范围:" FontWeight="Bold" Margin="0,0,0,12"
                                                Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"
-                                               FontSize="20"/>
+                                               Foreground="{DynamicResource Heading6Brush}" />
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="最小值:" Margin="0,0,5,0"
-                                                   Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"/>
+                                                   Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto" />
                                         <TextBox Grid.Column="1" Text="{Binding MinValueString}" Margin="0,0,10,0"
-                                                 Style="{DynamicResource BaseTextBoxStyle}"/>
+                                                 Style="{DynamicResource BaseTextBoxStyle}" />
                                         <TextBlock Grid.Column="2" Text="最大值:" Margin="0,0,5,0"
-                                                   Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"/>
+                                                   Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto" />
                                         <TextBox Grid.Column="3" Text="{Binding MaxValueString}"
-                                                 Style="{DynamicResource BaseTextBoxStyle}"/>
+                                                 Style="{DynamicResource BaseTextBoxStyle}" />
                                     </Grid>
                                 </StackPanel>
 
                                 <!-- 选择类型特有属性 -->
-                                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                             Visibility="{Binding IsSelectType, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="0,5">
                                     <TextBlock Text="选项 (用逗号分隔):" FontWeight="Bold" Margin="0,0,0,8"
-                                               Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"/>
-                                    <TextBox Text="{Binding OptionsText}" Height="40" TextWrapping="Wrap" 
+                                               Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"
+                                               Foreground="{DynamicResource Heading6Brush}" />
+                                    <TextBox Text="{Binding OptionsText}" Height="40" TextWrapping="Wrap"
                                              AcceptsReturn="True" FontSize="11"
-                                             Style="{DynamicResource BaseTextBoxStyle}"/>
+                                             Style="{DynamicResource BaseTextBoxStyle}" />
                                 </StackPanel>
                             </Grid>
                         </Expander>
                     </ScrollViewer>
                 </Grid>
-            </GroupBox>
+            </Border>
         </Grid>
 
         <!-- 底部按钮栏 -->
-        <Border Grid.Row="2" Background="{DynamicResource BackgroundBrush}" Padding="15,10">
+        <Border Grid.Row="3"
+                Background="{DynamicResource SecondaryBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="15,10">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <!-- 进度指示器 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <ProgressBar Width="20" Height="20" IsIndeterminate="True" Margin="0,0,10,0"
-                                 Visibility="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                 Visibility="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 Foreground="{DynamicResource InfoBrush}" />
                     <ProgressBar Width="20" Height="20" IsIndeterminate="True" Margin="0,0,10,0"
-                                 Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <TextBlock Text="测试中..." FontStyle="Italic" Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"
-                               Visibility="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <TextBlock Text="保存中..." FontStyle="Italic" Style="{DynamicResource DefaultTextStyle}" LineHeight="Auto"
-                               Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                 Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 Foreground="{DynamicResource PrimaryBrush}" />
+                    <TextBlock Text="测试中..." FontStyle="Italic" Style="{DynamicResource DefaultTextStyle}"
+                               LineHeight="Auto"
+                               Visibility="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               Foreground="{DynamicResource InfoTextBrush}" />
+                    <TextBlock Text="保存中..." FontStyle="Italic" Style="{DynamicResource DefaultTextStyle}"
+                               LineHeight="Auto"
+                               Visibility="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </StackPanel>
 
                 <!-- 操作按钮 -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,30,0">
-                    <Button Content="测试计算器" 
-                            Command="{Binding TestCalculatorCommand}" 
+                    <Button Content="测试计算器"
+                            Command="{Binding TestCalculatorCommand}"
                             Style="{StaticResource WarningButtonStyle}"
                             IsEnabled="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Margin="10"/>
-                    <Button Content="{Binding SaveButtonText}" 
-                            Command="{Binding SaveCalculatorCommand}" 
+                            Margin="10" />
+                    <Button Content="{Binding SaveButtonText}"
+                            Command="{Binding SaveCalculatorCommand}"
                             Style="{StaticResource SuccessButtonStyle}"
                             IsEnabled="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"
-                            Margin="10"/>
-                    <Button Content="取消" 
-                            Click="CancelButton_Click" 
+                            Margin="10" />
+                    <Button Content="取消"
+                            Click="CancelButton_Click"
                             Style="{StaticResource TransparentThemeButtonStyle}"
-                            Margin="10"/>
+                            Margin="10" />
                 </StackPanel>
             </Grid>
         </Border>
