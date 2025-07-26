@@ -29,7 +29,7 @@
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="15"/>
             <Setter Property="Margin" Value="0,0,0,15"/>
-            <Setter Property="Effect" Value="{StaticResource CardShadowEffect}"/>
+            <Setter Property="Effect" Value="{DynamicResource CardShadowEffect}"/>
         </Style>
 
     </Window.Resources>
@@ -46,13 +46,13 @@
         <!-- 标题 -->
         <TextBlock Grid.Row="0" 
                    Text="AI生成药物计算器" 
-                   Style="{StaticResource TitleTextBlockStyle}"/>
+                   Style="{DynamicResource TitleTextBlockStyle}"/>
 
         <!-- 计算器类型选择 -->
-        <Border Grid.Row="1" Style="{StaticResource CardStyle}">
+        <Border Grid.Row="1" Style="{DynamicResource CardStyle}">
             <StackPanel>
                 <TextBlock Text="计算器类型" 
-                           Style="{StaticResource SectionHeaderStyle}"
+                           Style="{DynamicResource SectionHeaderStyle}"
                            Margin="0,0,0,10"/>
 
                 <Grid>
@@ -86,10 +86,10 @@
         </Border>
 
         <!-- 额外要求 -->
-        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+        <Border Grid.Row="2" Style="{DynamicResource CardStyle}">
             <StackPanel>
                 <TextBlock Text="额外要求" 
-                           Style="{StaticResource SectionHeaderStyle}"
+                           Style="{DynamicResource SectionHeaderStyle}"
                            Margin="0,0,0,10"/>
 
                 <TextBlock Text="请输入特殊要求或说明 (可选):" 
@@ -117,7 +117,7 @@
                 CornerRadius="6"
                 Padding="15"
                 Margin="0,0,0,20"
-                Effect="{StaticResource CardShadowEffect}">
+                Effect="{DynamicResource CardShadowEffect}">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                     <TextBlock Text="&#xe61e;"
@@ -127,7 +127,7 @@
                                VerticalAlignment="Center"
                                Margin="0,0,8,0"/>
                     <TextBlock Text="使用说明" 
-                               Style="{StaticResource SectionHeaderStyle}"
+                               Style="{DynamicResource SectionHeaderStyle}"
                                Foreground="{DynamicResource InfoTextBrush}"/>
                 </StackPanel>
 
@@ -164,11 +164,11 @@
                     HorizontalAlignment="Right">
             <Button Content="取消" 
                     Click="CancelButton_Click"
-                    Style="{StaticResource TransparentThemeButtonStyle}"
+                    Style="{DynamicResource TransparentThemeButtonStyle}"
                     Margin="0,0,10,0"/>
             <Button Content="生成计算器" 
                     Click="GenerateButton_Click"
-                    Style="{StaticResource BaseButtonStyle}"/>
+                    Style="{DynamicResource BaseButtonStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -90,7 +90,7 @@
                             </StackPanel>
 
                             <CheckBox Grid.Column="1"
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
+                                      Style="{DynamicResource FluentToggleSwitchStyle}"
                                       IsChecked="{Binding Value, Mode=TwoWay}"
                                       IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
                                       Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -115,11 +115,11 @@
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource SettingTitleStyle}" />
                                 <TextBlock Text="{Binding Description}"
-                                           Style="{StaticResource SettingDescriptionStyle}" />
+                                           Style="{DynamicResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <ComboBox Grid.Column="1"
-                                      Style="{StaticResource FluentComboBoxStyle}"
+                                      Style="{DynamicResource FluentComboBoxStyle}"
                                       ItemsSource="{Binding AdditionalData[ItemsSource]}"
                                       SelectedValue="{Binding Value, Mode=TwoWay}"
                                       IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
@@ -212,11 +212,11 @@
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource SettingTitleStyle}" />
                                 <TextBlock Text="{Binding Description}"
-                                           Style="{StaticResource SettingDescriptionStyle}" />
+                                           Style="{DynamicResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <TextBox Grid.Column="1"
-                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     Style="{DynamicResource BaseTextBoxStyle}"
                                      Text="{Binding Value, Mode=TwoWay}"
                                      IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
                                      VerticalAlignment="Center">
@@ -242,14 +242,14 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource SettingTitleStyle}" />
                                 <TextBlock Text="{Binding Description}"
                                            Style="{DynamicResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <Button Grid.Column="1"
                                     Content="{Binding Value}"
-                                    Style="{StaticResource FluentSecondaryButtonStyle}"
+                                    Style="{DynamicResource FluentSecondaryButtonStyle}"
                                     Command="{Binding DataContext.UpdateSettingCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                     CommandParameter="{Binding}"
                                     IsEnabled="{Binding IsReadOnly, Converter={StaticResource InverseBooleanConverter}}"
@@ -270,7 +270,7 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="{Binding DisplayName}" Style="{DynamicResource SettingTitleStyle}" />
                                 <TextBlock Text="{Binding Description}"
                                            Style="{DynamicResource SettingDescriptionStyle}" />
                             </StackPanel>
@@ -319,7 +319,7 @@
 
                 <TextBox Grid.Column="1"
                          Width="280" VerticalAlignment="Center"
-                         Style="{StaticResource BaseTextBoxStyle}"
+                         Style="{DynamicResource BaseTextBoxStyle}"
                          Text="{Binding SearchText, Mode=TwoWay}"
                          Tag="搜索设置...">
                     <TextBox.InputBindings>
@@ -362,7 +362,7 @@
                 <ItemsControl ItemsSource="{Binding FilteredGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="models:DynamicSettingGroup">
-                            <StackPanel Style="{StaticResource FluentSettingsGroupStyle}">
+                            <StackPanel Style="{DynamicResource FluentSettingsGroupStyle}">
                                 <!-- 分组标题 -->
                                 <Grid Margin="0,0,0,16">
                                     <Grid.ColumnDefinitions>
@@ -378,13 +378,13 @@
                                                    VerticalAlignment="Center"
                                                    Margin="0,0,12,0" />
                                         <TextBlock Text="{Binding DisplayName}"
-                                                   Style="{StaticResource SettingsGroupHeaderStyle}"
+                                                   Style="{DynamicResource SettingsGroupHeaderStyle}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
 
                                     <Button Grid.Column="1"
                                             Content="重置分类"
-                                            Style="{StaticResource ResetButtonStyle}"
+                                            Style="{DynamicResource ResetButtonStyle}"
                                             Command="{Binding DataContext.ResetGroupCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding Name}"
                                             Visibility="{Binding CanReset, Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -402,7 +402,7 @@
                 </ItemsControl>
 
                 <!-- 数据管理 -->
-                <StackPanel Style="{StaticResource FluentSettingsGroupStyle}">
+                <StackPanel Style="{DynamicResource FluentSettingsGroupStyle}">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                         <TextBlock Text="&#xe620;"
                                    FontFamily="{DynamicResource IconFont}"
@@ -410,11 +410,11 @@
                                    Foreground="{DynamicResource PrimaryBrush}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,12,0" />
-                        <TextBlock Text="数据管理" Style="{StaticResource SettingsGroupHeaderStyle}" />
+                        <TextBlock Text="数据管理" Style="{DynamicResource SettingsGroupHeaderStyle}" />
                     </StackPanel>
 
                     <!-- 导入导出设置 -->
-                    <Border Style="{StaticResource FluentSettingsCardStyle}">
+                    <Border Style="{DynamicResource FluentSettingsCardStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -422,18 +422,18 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="备份与恢复" Style="{StaticResource SettingTitleStyle}" />
+                                <TextBlock Text="备份与恢复" Style="{DynamicResource SettingTitleStyle}" />
                                 <TextBlock Text="导出当前设置到文件进行备份，或从备份文件中恢复设置。"
-                                           Style="{StaticResource SettingDescriptionStyle}" />
+                                           Style="{DynamicResource SettingDescriptionStyle}" />
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <Button Content="导出设置"
-                                        Style="{StaticResource BorderButtonStyle}"
+                                        Style="{DynamicResource BorderButtonStyle}"
                                         Command="{Binding ExportSettingsCommand}"
                                         Margin="0,0,8,0" />
                                 <Button Content="导入设置"
-                                        Style="{StaticResource BorderButtonStyle}"
+                                        Style="{DynamicResource BorderButtonStyle}"
                                         Command="{Binding ImportSettingsCommand}" />
                             </StackPanel>
                         </Grid>
@@ -455,10 +455,10 @@
 
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="重置所有设置" 
-                                           Style="{StaticResource SettingTitleStyle}"
+                                           Style="{DynamicResource SettingTitleStyle}"
                                            Foreground="{DynamicResource DangerTextBrush}" />
                                 <TextBlock Text="将所有设置恢复为默认值。此操作不可撤销，请谨慎操作。"
-                                           Style="{StaticResource SettingDescriptionStyle}"
+                                           Style="{DynamicResource SettingDescriptionStyle}"
                                            Foreground="{DynamicResource DangerTextBrush}"
                                            Opacity="0.8" />
                             </StackPanel>

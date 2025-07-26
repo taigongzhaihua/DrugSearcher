@@ -48,7 +48,7 @@
                         CornerRadius="8"
                         Padding="16"
                         Margin="16,16,16,24"
-                        Effect="{StaticResource DropShadowEffect}">
+                        Effect="{DynamicResource DropShadowEffect}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -64,42 +64,42 @@
 
                         <!-- 药物名称 -->
                         <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,0">
-                            <TextBlock Text="药物名称 *" Style="{StaticResource FormLabelStyle}" />
+                            <TextBlock Text="药物名称 *" Style="{DynamicResource FormLabelStyle}" />
                             <TextBox
                                 Text="{Binding DrugName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                                Style="{StaticResource FormTextBoxStyle}" />
+                                Style="{DynamicResource FormTextBoxStyle}" />
                         </StackPanel>
 
                         <!-- 通用名称 -->
                         <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,0">
-                            <TextBlock Text="通用名称" Style="{StaticResource FormLabelStyle}" />
+                            <TextBlock Text="通用名称" Style="{DynamicResource FormLabelStyle}" />
                             <TextBox
                                 Text="{Binding GenericName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                                Style="{StaticResource FormTextBoxStyle}" />
+                                Style="{DynamicResource FormTextBoxStyle}" />
                         </StackPanel>
 
                         <!-- 规格 -->
                         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,0">
-                            <TextBlock Text="规格" Style="{StaticResource FormLabelStyle}" />
+                            <TextBlock Text="规格" Style="{DynamicResource FormLabelStyle}" />
                             <TextBox
                                 Text="{Binding Specification, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                                Style="{StaticResource FormTextBoxStyle}" />
+                                Style="{DynamicResource FormTextBoxStyle}" />
                         </StackPanel>
 
                         <!-- 生产厂家 -->
                         <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,0,0,0">
-                            <TextBlock Text="生产厂家" Style="{StaticResource FormLabelStyle}" />
+                            <TextBlock Text="生产厂家" Style="{DynamicResource FormLabelStyle}" />
                             <TextBox
                                 Text="{Binding Manufacturer, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                                Style="{StaticResource FormTextBoxStyle}" />
+                                Style="{DynamicResource FormTextBoxStyle}" />
                         </StackPanel>
 
                         <!-- 批准文号 -->
                         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                            <TextBlock Text="批准文号" Style="{StaticResource FormLabelStyle}" />
+                            <TextBlock Text="批准文号" Style="{DynamicResource FormLabelStyle}" />
                             <TextBox
                                 Text="{Binding ApprovalNumber, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                                Style="{StaticResource FormTextBoxStyle}" />
+                                Style="{DynamicResource FormTextBoxStyle}" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -117,7 +117,7 @@
                         CornerRadius="8"
                         Padding="16"
                         Margin="16,16,16,24"
-                        Effect="{StaticResource DropShadowEffect}">
+                        Effect="{DynamicResource DropShadowEffect}">
                     <Grid>
 
                         <!-- 中医病名 -->
@@ -129,22 +129,22 @@
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="中医病名" Style="{StaticResource FormLabelStyle}"
+                        <TextBlock Text="中医病名" Style="{DynamicResource FormLabelStyle}"
                                    Grid.Column="0" Grid.Row="0"
                                    Margin="0,0,8,8" />
                         <TextBox
                             Text="{Binding TcmDisease, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, FallbackValue=''}"
-                            Style="{StaticResource FormTextBoxStyle}"
+                            Style="{DynamicResource FormTextBoxStyle}"
                             Grid.Column="0" Grid.Row="1"
                             Margin="0,0,8,0" />
 
                         <!-- 中医辨病辨证 -->
-                        <TextBlock Text="中医辨病辨证" Style="{StaticResource FormLabelStyle}"
+                        <TextBlock Text="中医辨病辨证" Style="{DynamicResource FormLabelStyle}"
                                    Grid.Column="1" Grid.Row="0"
                                    Margin="8,0,0,8" />
                         <TextBox
                             Text="{Binding TcmSyndrome, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextBoxStyle}"
+                            Style="{DynamicResource FormTextBoxStyle}"
                             Grid.Column="1" Grid.Row="1"
                             Margin="8,0,0,0" />
 
@@ -163,42 +163,42 @@
                         CornerRadius="8"
                         Padding="16"
                         Margin="16,16,16,24"
-                        Effect="{StaticResource DropShadowEffect}">
+                        Effect="{DynamicResource DropShadowEffect}">
                     <StackPanel>
                         <!-- 适应症 -->
-                        <TextBlock Text="适应症" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="适应症" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox
                             Text="{Binding Indications, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextAreaStyle}" />
+                            Style="{DynamicResource FormTextAreaStyle}" />
 
                         <!-- 用法用量 -->
-                        <TextBlock Text="用法用量" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="用法用量" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox Text="{Binding Dosage, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                                 Style="{StaticResource FormTextAreaStyle}" />
+                                 Style="{DynamicResource FormTextAreaStyle}" />
 
                         <!-- 药物说明 -->
-                        <TextBlock Text="药物说明" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="药物说明" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox
                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextAreaStyle}" />
+                            Style="{DynamicResource FormTextAreaStyle}" />
 
                         <!-- 不良反应 -->
-                        <TextBlock Text="不良反应" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="不良反应" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox
                             Text="{Binding SideEffects, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextAreaStyle}" />
+                            Style="{DynamicResource FormTextAreaStyle}" />
 
                         <!-- 注意事项 -->
-                        <TextBlock Text="注意事项" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="注意事项" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox
                             Text="{Binding Precautions, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextAreaStyle}" />
+                            Style="{DynamicResource FormTextAreaStyle}" />
 
                         <!-- 备注 -->
-                        <TextBlock Text="备注" Style="{StaticResource FormLabelStyle}" />
+                        <TextBlock Text="备注" Style="{DynamicResource FormLabelStyle}" />
                         <TextBox
                             Text="{Binding Remarks, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                            Style="{StaticResource FormTextAreaStyle}" />
+                            Style="{DynamicResource FormTextAreaStyle}" />
                     </StackPanel>
                 </Border>
             </StackPanel>
@@ -210,14 +210,14 @@
                     HorizontalAlignment="Right"
                     Margin="24,16">
             <Button Content="保存"
-                    Style="{StaticResource PrimaryButtonStyle}"
+                    Style="{DynamicResource PrimaryButtonStyle}"
                     Command="{Binding SaveCommand}"
                     Click="SaveButton_Click"
                     Margin="0,0,8,0"
                     VerticalAlignment="Center" />
 
             <Button Content="取消"
-                    Style="{StaticResource SecondaryButtonStyle}"
+                    Style="{DynamicResource SecondaryButtonStyle}"
                     Click="CancelButton_Click"
                     VerticalAlignment="Center" />
         </StackPanel>

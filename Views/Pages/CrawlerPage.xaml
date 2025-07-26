@@ -49,7 +49,7 @@
                             CornerRadius="8"
                             Padding="20"
                             Margin="0,0,0,20"
-                            Effect="{StaticResource CardShadowEffect}">
+                            Effect="{DynamicResource CardShadowEffect}">
                         <StackPanel>
                             <TextBlock Text="爬取控制"
                                        FontSize="18"
@@ -75,72 +75,72 @@
                                 <!-- 起始ID -->
                                 <TextBlock Grid.Row="0" Grid.Column="0"
                                            Text="起始ID:"
-                                           Style="{StaticResource FormLabelStyle}"
+                                           Style="{DynamicResource FormLabelStyle}"
                                            Margin="0,0,10,0" />
                                 <TextBox Grid.Row="0" Grid.Column="1"
                                          Text="{Binding StartId}"
-                                         Style="{StaticResource FormTextBoxStyle}"
+                                         Style="{DynamicResource FormTextBoxStyle}"
                                          IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                          Margin="10,10,20,10" />
 
                                 <!-- 结束ID -->
                                 <TextBlock Grid.Row="0" Grid.Column="2"
                                            Text="结束ID:"
-                                           Style="{StaticResource FormLabelStyle}"
+                                           Style="{DynamicResource FormLabelStyle}"
                                            Margin="0,0,10,0" />
                                 <TextBox Grid.Row="0" Grid.Column="3"
                                          Text="{Binding EndId}"
-                                         Style="{StaticResource FormTextBoxStyle}"
+                                         Style="{DynamicResource FormTextBoxStyle}"
                                          IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                          Margin="10,10,20,10" />
 
                                 <!-- 批次大小 -->
                                 <TextBlock Grid.Row="1" Grid.Column="0"
                                            Text="批次大小:"
-                                           Style="{StaticResource FormLabelStyle}"
+                                           Style="{DynamicResource FormLabelStyle}"
                                            Margin="0,0,10,0" />
                                 <TextBox Grid.Row="1" Grid.Column="1"
                                          Text="{Binding BatchSize}"
-                                         Style="{StaticResource FormTextBoxStyle}"
+                                         Style="{DynamicResource FormTextBoxStyle}"
                                          IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                          Margin="10,10,20,10" />
 
                                 <!-- 请求间隔 -->
                                 <TextBlock Grid.Row="1" Grid.Column="2"
                                            Text="间隔(ms):"
-                                           Style="{StaticResource FormLabelStyle}"
+                                           Style="{DynamicResource FormLabelStyle}"
                                            Margin="0,0,10,0" />
                                 <TextBox Grid.Row="1" Grid.Column="3"
                                          Text="{Binding DelayMs}"
-                                         Style="{StaticResource FormTextBoxStyle}"
+                                         Style="{DynamicResource FormTextBoxStyle}"
                                          IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                          Margin="10,10,20,10" />
                             </Grid>
 
                             <!-- 快速设置按钮 -->
                             <TextBlock Text="快速设置:"
-                                       Style="{StaticResource FormLabelStyle}"
+                                       Style="{DynamicResource FormLabelStyle}"
                                        Margin="0,10,0,5" />
                             <WrapPanel Margin="0,0,0,15">
                                 <Button Content="测试(1-100)"
                                         Command="{Binding SetQuickRangeCommand}"
                                         CommandParameter="Test"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="前1000条"
                                         Command="{Binding SetQuickRangeCommand}"
                                         CommandParameter="First1000"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="前10000条"
                                         Command="{Binding SetQuickRangeCommand}"
                                         CommandParameter="First10000"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="全部数据"
                                         Command="{Binding SetQuickRangeCommand}"
                                         CommandParameter="All"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                             </WrapPanel>
 
@@ -148,23 +148,23 @@
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="{Binding CrawlButtonText}"
                                         Command="{Binding StartCrawlCommand}"
-                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Style="{DynamicResource PrimaryButtonStyle}"
                                         MinWidth="120" />
                                 <Button Content="重试失败"
                                         Command="{Binding RetryFailedDrugsCommand}"
-                                        Style="{StaticResource WarningButtonStyle}"
+                                        Style="{DynamicResource WarningButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="清理旧记录"
                                         Command="{Binding CleanupOldRecordsCommand}"
-                                        Style="{StaticResource DangerButtonStyle}"
+                                        Style="{DynamicResource DangerButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="最近爬取"
                                         Command="{Binding ViewRecentCrawledCommand}"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                 <Button Content="刷新统计"
                                         Command="{Binding RefreshStatisticsCommand}"
-                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Style="{DynamicResource SecondaryButtonStyle}"
                                         IsEnabled="{Binding IsCrawling, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                             </StackPanel>
                         </StackPanel>
@@ -177,7 +177,7 @@
                             CornerRadius="8"
                             Padding="20"
                             Margin="0,0,0,20"
-                            Effect="{StaticResource CardShadowEffect}">
+                            Effect="{DynamicResource CardShadowEffect}">
                         <StackPanel>
                             <TextBlock Text="爬取进度"
                                        FontSize="18"
@@ -281,7 +281,7 @@
                             CornerRadius="8"
                             Padding="20"
                             Margin="0,0,0,20"
-                            Effect="{StaticResource CardShadowEffect}">
+                            Effect="{DynamicResource CardShadowEffect}">
                         <StackPanel>
                             <TextBlock Text="数据统计"
                                        FontSize="18"
@@ -353,7 +353,7 @@
                         CornerRadius="8"
                         Padding="20"
                         MaxHeight="300"
-                        Effect="{StaticResource CardShadowEffect}">
+                        Effect="{DynamicResource CardShadowEffect}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -369,7 +369,7 @@
                                        HorizontalAlignment="Left" />
                             <Button Content="清空日志"
                                     Command="{Binding ClearLogsCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Style="{DynamicResource SecondaryButtonStyle}"
                                     HorizontalAlignment="Right"
                                     Padding="12,6" />
                         </Grid>

@@ -49,7 +49,7 @@
                 BorderThickness="1"
                 CornerRadius="6"
                 Padding="16" Margin="16,8"
-                Effect="{StaticResource CardShadowEffect}">
+                Effect="{DynamicResource CardShadowEffect}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -91,7 +91,7 @@
                     BorderBrush="{DynamicResource CardBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Effect="{StaticResource CardShadowEffect}">
+                    Effect="{DynamicResource CardShadowEffect}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -115,20 +115,20 @@
                             Margin="0,0,0,1">
                         <WrapPanel>
                             <Button Content="插入模板" Command="{Binding InsertCodeTemplateCommand}"
-                                    Style="{StaticResource ToolButtonStyle}" />
+                                    Style="{DynamicResource ToolButtonStyle}" />
                             <Button Content="插入参数" Command="{Binding InsertParameterCodeCommand}"
-                                    Style="{StaticResource ToolButtonStyle}"
+                                    Style="{DynamicResource ToolButtonStyle}"
                                     IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Separator Width="10" Background="{DynamicResource DividerBrush}" />
                             <Button Content="验证语法" Command="{Binding ValidateCodeCommand}"
-                                    Style="{StaticResource ToolButtonStyle}" />
+                                    Style="{DynamicResource ToolButtonStyle}" />
                             <Button Content="测试运行" Command="{Binding TestCalculatorCommand}"
-                                    Style="{StaticResource ToolButtonStyle}" />
+                                    Style="{DynamicResource ToolButtonStyle}" />
                             <Separator Width="10" Background="{DynamicResource DividerBrush}" />
                             <Button Content="清空" Command="{Binding ClearCodeCommand}"
-                                    Style="{StaticResource ToolButtonStyle}" />
+                                    Style="{DynamicResource ToolButtonStyle}" />
                             <Button Content="重置" Command="{Binding ResetToDefaultCommand}"
-                                    Style="{StaticResource ToolButtonStyle}" />
+                                    Style="{DynamicResource ToolButtonStyle}" />
                         </WrapPanel>
                     </Border>
 
@@ -209,7 +209,7 @@
                     BorderBrush="{DynamicResource CardBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="6"
-                    Effect="{StaticResource CardShadowEffect}">
+                    Effect="{DynamicResource CardShadowEffect}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -233,18 +233,18 @@
                             Margin="0,0,0,1">
                         <WrapPanel HorizontalAlignment="Right">
                             <Button Content="添加" Command="{Binding AddParameterCommand}"
-                                    Style="{StaticResource WarningButtonStyle}" />
+                                    Style="{DynamicResource WarningButtonStyle}" />
                             <Button Content="删除" Command="{Binding RemoveParameterCommand}"
-                                    Style="{StaticResource DangerButtonStyle}"
+                                    Style="{DynamicResource DangerButtonStyle}"
                                     IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Button Content="复制" Command="{Binding DuplicateParameterCommand}"
-                                    Style="{StaticResource SuccessButtonStyle}"
+                                    Style="{DynamicResource SuccessButtonStyle}"
                                     IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Button Content="↑" Command="{Binding MoveParameterUpCommand}"
-                                    Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
+                                    Style="{DynamicResource TransparentThemeButtonStyle}" Width="30"
                                     IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Button Content="↓" Command="{Binding MoveParameterDownCommand}"
-                                    Style="{StaticResource TransparentThemeButtonStyle}" Width="30"
+                                    Style="{DynamicResource TransparentThemeButtonStyle}" Width="30"
                                     IsEnabled="{Binding SelectedParameter, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </WrapPanel>
                     </Border>
@@ -256,9 +256,9 @@
                               CanUserResizeRows="False"
                               GridLinesVisibility="All"
                               behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}"
-                              Style="{StaticResource ModernDataGridStyle}"
-                              RowStyle="{StaticResource DataGridRowStyle}"
-                              ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                              Style="{DynamicResource ModernDataGridStyle}"
+                              RowStyle="{DynamicResource DataGridRowStyle}"
+                              ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}"
                               Margin="10,0,10,0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="参数名" Binding="{Binding Name}" Width="80" />
@@ -399,17 +399,17 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,30,0">
                     <Button Content="测试计算器"
                             Command="{Binding TestCalculatorCommand}"
-                            Style="{StaticResource WarningButtonStyle}"
+                            Style="{DynamicResource WarningButtonStyle}"
                             IsEnabled="{Binding IsTesting, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Margin="10" />
                     <Button Content="{Binding SaveButtonText}"
                             Command="{Binding SaveCalculatorCommand}"
-                            Style="{StaticResource SuccessButtonStyle}"
+                            Style="{DynamicResource SuccessButtonStyle}"
                             IsEnabled="{Binding IsSaving, Converter={StaticResource BooleanToVisibilityConverter}}"
                             Margin="10" />
                     <Button Content="取消"
                             Click="CancelButton_Click"
-                            Style="{StaticResource TransparentThemeButtonStyle}"
+                            Style="{DynamicResource TransparentThemeButtonStyle}"
                             Margin="10" />
                 </StackPanel>
             </Grid>

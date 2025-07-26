@@ -27,19 +27,19 @@
                 <!-- 焦点状态 -->
                 <Trigger Property="IsKeyboardFocusWithin" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource BorderControlHoverBorderBrush}" />
-                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
+                    <Setter Property="Effect" Value="{DynamicResource HoverShadowEffect}"/>
                 </Trigger>
                 <!-- 录制状态 - 使用DataTrigger绑定到UserControl的属性 -->
                 <DataTrigger Binding="{Binding IsRecording, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource BorderControlPressedBorderBrush}" />
                     <Setter Property="Background" Value="{DynamicResource BorderControlPressedBackgroundBrush}"/>
-                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
+                    <Setter Property="Effect" Value="{DynamicResource HoverShadowEffect}"/>
                 </DataTrigger>
                 <!-- 悬停状态 -->
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource BorderControlHoverBorderBrush}" />
                     <Setter Property="Background" Value="{DynamicResource BorderControlHoverBackgroundBrush}" />
-                    <Setter Property="Effect" Value="{StaticResource HoverShadowEffect}"/>
+                    <Setter Property="Effect" Value="{DynamicResource HoverShadowEffect}"/>
                 </Trigger>
                 <!-- 禁用状态 -->
                 <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
@@ -70,7 +70,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Border x:Name="MainBorder" Style="{StaticResource HotKeyBorderStyle}"
+    <Border x:Name="MainBorder" Style="{DynamicResource HotKeyBorderStyle}"
             KeyboardNavigation.IsTabStop="True">
 
         <Grid>

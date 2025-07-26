@@ -711,7 +711,7 @@
                 <!-- 上按钮 -->
                 <RepeatButton Grid.Row="0"
                               Command="ScrollBar.LineUpCommand"
-                              Style="{StaticResource ScrollBarEndButtonStyle}"
+                              Style="{DynamicResource ScrollBarEndButtonStyle}"
                               Content="&#xe641;" />
 
                 <!-- 滚动轨道 -->
@@ -721,11 +721,11 @@
                        Margin="0,3">
                     <Track.DecreaseRepeatButton>
                         <RepeatButton Command="ScrollBar.PageUpCommand"
-                                      Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                      Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                     </Track.DecreaseRepeatButton>
                     <Track.IncreaseRepeatButton>
                         <RepeatButton Command="ScrollBar.PageDownCommand"
-                                      Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                      Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                     </Track.IncreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb>
@@ -779,7 +779,7 @@
                 <!-- 下按钮 -->
                 <RepeatButton Grid.Row="2"
                               Command="ScrollBar.LineDownCommand"
-                              Style="{StaticResource ScrollBarEndButtonStyle}"
+                              Style="{DynamicResource ScrollBarEndButtonStyle}"
                               Content="&#xe640;" />
             </Grid>
         </Border>
@@ -803,7 +803,7 @@
                 <!-- 左按钮 -->
                 <RepeatButton Grid.Column="0"
                               Command="ScrollBar.LineLeftCommand"
-                              Style="{StaticResource ScrollBarEndButtonStyle}"
+                              Style="{DynamicResource ScrollBarEndButtonStyle}"
                               Content="&#xe643;" />
 
                 <!-- 滚动轨道 -->
@@ -813,11 +813,11 @@
                        Margin="3,0">
                     <Track.DecreaseRepeatButton>
                         <RepeatButton Command="ScrollBar.PageLeftCommand" VerticalAlignment="Center"
-                                      Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                      Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                     </Track.DecreaseRepeatButton>
                     <Track.IncreaseRepeatButton>
                         <RepeatButton Command="ScrollBar.PageRightCommand" VerticalAlignment="Center"
-                                      Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                      Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                     </Track.IncreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb>
@@ -871,7 +871,7 @@
                 <!-- 右按钮 -->
                 <RepeatButton Grid.Column="2"
                               Command="ScrollBar.LineRightCommand"
-                              Style="{StaticResource ScrollBarEndButtonStyle}"
+                              Style="{DynamicResource ScrollBarEndButtonStyle}"
                               Content="&#xe642;" />
             </Grid>
         </Border>
@@ -884,11 +884,11 @@
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
                 <Setter Property="Width" Value="16" />
-                <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}" />
+                <Setter Property="Template" Value="{DynamicResource VerticalScrollBarTemplate}" />
             </Trigger>
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="Height" Value="16" />
-                <Setter Property="Template" Value="{StaticResource HorizontalScrollBarTemplate}" />
+                <Setter Property="Template" Value="{DynamicResource HorizontalScrollBarTemplate}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -905,10 +905,10 @@
                                IsDirectionReversed="{Binding Orientation, RelativeSource={RelativeSource TemplatedParent}, 
                                                  Converter={StaticResource OrientationToBoolConverter}}">
                             <Track.DecreaseRepeatButton>
-                                <RepeatButton Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                <RepeatButton Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                             </Track.DecreaseRepeatButton>
                             <Track.IncreaseRepeatButton>
-                                <RepeatButton Style="{StaticResource ScrollBarTrackButtonStyle}" />
+                                <RepeatButton Style="{DynamicResource ScrollBarTrackButtonStyle}" />
                             </Track.IncreaseRepeatButton>
                             <Track.Thumb>
                                 <Thumb>

@@ -34,7 +34,7 @@
                                 <Setter TargetName="Border" Property="BorderBrush"
                                         Value="{DynamicResource PrimaryBrush}" />
                                 <Setter TargetName="Border" Property="Effect"
-                                        Value="{StaticResource HoverShadowEffect}" />
+                                        Value="{DynamicResource HoverShadowEffect}" />
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Border" Property="Background"
@@ -87,7 +87,7 @@
                             <!-- 文本输入框 -->
                             <TextBox Grid.Row="0" Grid.Column="1"
                                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
-                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     Style="{DynamicResource BaseTextBoxStyle}"
                                      Margin="10,0, 0,0"
                                      VerticalAlignment="Center"
                                      Tag="{Binding Description}" />
@@ -158,7 +158,7 @@
                             <!-- 数字输入框 -->
                             <TextBox Grid.Row="0" Grid.Column="1"
                                      Text="{Binding Value, UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
-                                     Style="{StaticResource NumericTextBoxStyle}"
+                                     Style="{DynamicResource NumericTextBoxStyle}"
                                      Margin="10,0,0,0"
                                      VerticalAlignment="Center"
                                      Tag="{Binding Description}">
@@ -234,7 +234,7 @@
                             <!-- 开关 -->
                             <CheckBox Grid.Row="0" Grid.Column="1"
                                       IsChecked="{Binding Value}"
-                                      Style="{StaticResource FluentToggleSwitchStyle}"
+                                      Style="{DynamicResource FluentToggleSwitchStyle}"
                                       Margin="10,0"
                                       VerticalAlignment="Center"
                                       ToolTip="{Binding Description}" />
@@ -317,7 +317,7 @@
                             <ComboBox Grid.Row="0" Grid.Column="1"
                                       ItemsSource="{Binding Options}"
                                       SelectedItem="{Binding Value}"
-                                      Style="{StaticResource FluentComboBoxStyle}"
+                                      Style="{DynamicResource FluentComboBoxStyle}"
                                       Margin="10,0,0,0"
                                       VerticalAlignment="Center"
                                       ToolTip="{Binding Description}" />
@@ -436,7 +436,7 @@
                 CornerRadius="8"
                 Padding="20"
                 Margin="16,0,16,16"
-                Effect="{StaticResource CardShadowEffect}">
+                Effect="{DynamicResource CardShadowEffect}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -454,7 +454,7 @@
                     <TextBox Grid.Column="0"
                              Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
                              Tag="请输入药物名称、通用名或批准文号"
-                             Style="{StaticResource BaseTextBoxStyle}">
+                             Style="{DynamicResource BaseTextBoxStyle}">
                         <i:Interaction.Behaviors>
                             <behaviors:KeyDownBehavior Key="Enter" Command="{Binding SearchCommand}" />
                         </i:Interaction.Behaviors>
@@ -463,7 +463,7 @@
                     <!-- 搜索按钮 -->
                     <Button Grid.Column="1"
                             Content="搜索"
-                            Style="{StaticResource BaseButtonStyle}"
+                            Style="{DynamicResource BaseButtonStyle}"
                             Margin="10,0,0,0"
                             Command="{Binding SearchCommand}"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
@@ -643,7 +643,7 @@
                                 Content="上一页"
                                 Command="{Binding LoadPreviousPageCommand}"
                                 IsEnabled="{Binding HasPreviousPage}"
-                                Style="{StaticResource BaseButtonStyle}"
+                                Style="{DynamicResource BaseButtonStyle}"
                                 Padding="10,5" />
 
                         <!-- 页码信息 -->
@@ -675,7 +675,7 @@
                                 Content="下一页"
                                 Command="{Binding LoadNextPageCommand}"
                                 IsEnabled="{Binding HasNextPage}"
-                                Style="{StaticResource BaseButtonStyle}"
+                                Style="{DynamicResource BaseButtonStyle}"
                                 Padding="10,5" />
                     </Grid>
                 </Border>
@@ -715,7 +715,7 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Margin="8,0,16,16"
-                Effect="{StaticResource CardShadowEffect}"
+                Effect="{DynamicResource CardShadowEffect}"
                 Visibility="{Binding IsDetailPanelVisible, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
             <!-- 默认提示 -->
             <TextBlock Text="请在左侧搜索并选择药物以查看详细信息"
@@ -738,7 +738,7 @@
                             CornerRadius="8"
                             Margin="0,0,0,10"
                             Padding="16"
-                            Effect="{StaticResource CardShadowEffect}">
+                            Effect="{DynamicResource CardShadowEffect}">
                         <!-- 基本信息 -->
 
 
@@ -862,7 +862,7 @@
                             CornerRadius="6"
                             Padding="10"
                             Margin="0,10"
-                            Effect="{StaticResource CardShadowEffect}"
+                            Effect="{DynamicResource CardShadowEffect}"
                             Visibility="{Binding TcmDisease, Converter={StaticResource BooleanToVisibilityConverter}}">
                         
                             <Grid Margin="10,0"
@@ -915,7 +915,7 @@
                             BorderThickness="1"
                             CornerRadius="6"
                             Padding="8,16"
-                            Effect="{StaticResource CardShadowEffect}">
+                            Effect="{DynamicResource CardShadowEffect}">
                         <TabControl x:Name="DrugInfoTab"
                                     HorizontalAlignment="Stretch"
                                     ItemsSource="{Binding TabItems}"
@@ -959,7 +959,7 @@
                                 CornerRadius="6"
                                 Padding="15"
                                 Margin="0,0,0,10"
-                                Effect="{StaticResource CardShadowEffect}">
+                                Effect="{DynamicResource CardShadowEffect}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -989,17 +989,17 @@
                                     <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
                                         <Button Content="创建计算器"
                                                 Command="{Binding CreateCalculatorCommand}"
-                                                Style="{StaticResource BaseButtonStyle}"
+                                                Style="{DynamicResource BaseButtonStyle}"
                                                 Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         <Button Content="编辑计算器"
                                                 Command="{Binding EditCalculatorCommand}"
-                                                Style="{StaticResource BaseButtonStyle}"
+                                                Style="{DynamicResource BaseButtonStyle}"
                                                 IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Visibility="{Binding HasCalculators, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Margin="10,0,0,0" />
                                         <Button Content="AI生成计算器"
                                                 Command="{Binding GenerateCalculatorWithAiCommand}"
-                                                Style="{StaticResource BaseButtonStyle}"
+                                                Style="{DynamicResource BaseButtonStyle}"
                                                 IsEnabled="{Binding SelectedCalculator, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Visibility="{Binding HasCalculators, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
                                                 Margin="10,0,0,0" />
@@ -1115,7 +1115,7 @@
                                 CornerRadius="6"
                                 Padding="15"
                                 Margin="0,0,0,10"
-                                Effect="{StaticResource CardShadowEffect}"
+                                Effect="{DynamicResource CardShadowEffect}"
                                 Visibility="{Binding CalculatorParameters.Count, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -1159,11 +1159,11 @@
                                 <StackPanel Grid.Row="2" Orientation="Horizontal"
                                             Margin="0,10,0,0">
                                     <Button Content="计算剂量"
-                                            Style="{StaticResource BaseButtonStyle}"
+                                            Style="{DynamicResource BaseButtonStyle}"
                                             Command="{Binding CalculateCommand}"
                                             IsEnabled="{Binding IsCalculating, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                     <Button Content="清空结果"
-                                            Style="{StaticResource BaseButtonStyle}"
+                                            Style="{DynamicResource BaseButtonStyle}"
                                             Command="{Binding ClearCalculationResultsCommand}"
                                             Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             Margin="10,0,0,0" />
@@ -1190,7 +1190,7 @@
                                 BorderThickness="1"
                                 CornerRadius="6"
                                 Padding="15"
-                                Effect="{StaticResource CardShadowEffect}"
+                                Effect="{DynamicResource CardShadowEffect}"
                                 Visibility="{Binding HasCalculationResults, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Grid>
                                 <Grid.RowDefinitions>

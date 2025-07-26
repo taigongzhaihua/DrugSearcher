@@ -9,7 +9,7 @@
         Title="{Binding Title}"
         Height="780"
         Width="1100"
-        Style="{StaticResource BaseWindowStyle}"
+        Style="{DynamicResource BaseWindowStyle}"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}">
 
     <Window.Resources>
@@ -19,7 +19,7 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8"/>
-            <Setter Property="Effect" Value="{StaticResource PopupShadowEffect}"/>
+            <Setter Property="Effect" Value="{DynamicResource PopupShadowEffect}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
@@ -90,8 +90,8 @@
                                             BorderBrush="{DynamicResource BorderBrush}"
                                             BorderThickness="1"
                                             CornerRadius="8"
-                                            Padding="8"
-                                            Effect="{StaticResource PopupShadowEffect}">
+                                            Padding="8" Margin="10"
+                                            Effect="{DynamicResource PopupShadowEffect}">
                                         <StackPanel IsItemsHost="True"/>
                                     </Border>
                                 </Popup>
@@ -162,7 +162,7 @@
                                             BorderThickness="1"
                                             CornerRadius="8"
                                             Padding="8"
-                                            Effect="{StaticResource PopupShadowEffect}">
+                                            Effect="{DynamicResource PopupShadowEffect}">
                                         <StackPanel IsItemsHost="True"/>
                                     </Border>
                                 </Popup>
@@ -270,7 +270,7 @@
                     <!-- 功能菜单 -->
                     <Button.ContextMenu>
                         <ContextMenu x:Name="FunctionContextMenu" 
-                                     Style="{StaticResource FunctionContextMenuStyle}">
+                                     Style="{DynamicResource FunctionContextMenuStyle}">
 
                             <!-- 菜单标题 -->
                             <MenuItem Header="功能菜单" 
@@ -278,34 +278,34 @@
                                       FontWeight="Bold"
                                       Foreground="{DynamicResource Heading4Brush}"/>
 
-                            <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                            <Separator Style="{DynamicResource MenuSeparatorStyle}"/>
 
                             <!-- 数据管理 -->
                             <MenuItem x:Name="LoacalDataMenuItem"
                                       Header="本地数据管理"
                                       Tag="&#xe623;"
-                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Style="{DynamicResource FunctionMenuItemStyle}"
                                       Click="DataManagementMenuItem_Click"
                                       ToolTip="本地数据管理"/>
 
                             <MenuItem x:Name="CrawlMenuItem"
                                       Header="爬虫页面"
                                       Tag="&#xe628;"
-                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Style="{DynamicResource FunctionMenuItemStyle}"
                                       Click="MenuItem_OnClick"/>
 
                             <!-- 设置 -->
                             <MenuItem x:Name="SettingsMenuItem"
                                       Header="设置"
                                       Tag="{Binding SettingsButtonText}"
-                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Style="{DynamicResource FunctionMenuItemStyle}"
                                       Click="SettingsMenuItem_Click"
                                       ToolTip="应用设置"/>
 
                             <!-- 主题设置 -->
                             <MenuItem Header="主题设置"
                                       Tag="&#xe614;"
-                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Style="{DynamicResource FunctionMenuItemStyle}"
                                       ToolTip="主题和外观设置">
 
                                 <!-- 主题子菜单 -->
@@ -314,16 +314,16 @@
 
                                     <MenuItem Header="切换明暗模式"
                                               Tag="{Binding ThemeButtonText}"
-                                              Style="{StaticResource FunctionMenuItemStyle}"
+                                              Style="{DynamicResource FunctionMenuItemStyle}"
                                               Command="{Binding SwitchThemeCommand}"
                                               ToolTip="{Binding ThemeTooltip}"/>
 
 
-                                    <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                                    <Separator Style="{DynamicResource MenuSeparatorStyle}"/>
 
                                     <!-- 颜色主题选择 -->
                                     <MenuItem Header="蓝色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Blue"
                                               IsCheckable="True"
@@ -331,7 +331,7 @@
                                               Foreground="#2196F3"/>
 
                                     <MenuItem Header="粉色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Pink"
                                               IsCheckable="True"
@@ -339,7 +339,7 @@
                                               Foreground="#E91E63"/>
 
                                     <MenuItem Header="青色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Cyan"
                                               IsCheckable="True"
@@ -347,7 +347,7 @@
                                               Foreground="#00BCD4"/>
 
                                     <MenuItem Header="绿色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Green"
                                               IsCheckable="True"
@@ -355,7 +355,7 @@
                                               Foreground="#4CAF50"/>
 
                                     <MenuItem Header="紫色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Purple"
                                               IsCheckable="True"
@@ -363,7 +363,7 @@
                                               Foreground="#9C27B0"/>
 
                                     <MenuItem Header="橙色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Orange"
                                               IsCheckable="True"
@@ -371,7 +371,7 @@
                                               Foreground="#FF9800"/>
 
                                     <MenuItem Header="红色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Red"
                                               IsCheckable="True"
@@ -379,7 +379,7 @@
                                               Foreground="#F44336" />
 
                                     <MenuItem Header="靛蓝色主题"
-                                              Style="{StaticResource ThemeColorMenuItemStyle}"
+                                              Style="{DynamicResource ThemeColorMenuItemStyle}"
                                               Command="{Binding SwitchThemeColorCommand}"
                                               CommandParameter="Indigo"
                                               IsCheckable="True"
@@ -388,13 +388,13 @@
                                 </MenuItem.Items>
                             </MenuItem>
 
-                            <Separator Style="{StaticResource MenuSeparatorStyle}"/>
+                            <Separator Style="{DynamicResource MenuSeparatorStyle}"/>
 
                             <!-- 关于 -->
                             <MenuItem x:Name="AboutMenuItem"
                                       Header="关于"
                                       Tag="&#xe621;"
-                                      Style="{StaticResource FunctionMenuItemStyle}"
+                                      Style="{DynamicResource FunctionMenuItemStyle}"
                                       Click="AboutMenuItem_Click"
                                       ToolTip="关于应用程序"/>
                         </ContextMenu>
@@ -456,7 +456,7 @@
                         Padding="4"
                         CornerRadius="4"
                         Width="24" Height="24"
-                        Effect="{StaticResource CardShadowEffect}">
+                        Effect="{DynamicResource CardShadowEffect}">
                     <TextBlock x:Name="ApplicationIcon"
                                Text="&#xe629;"
                                FontFamily="{DynamicResource IconFont}"
