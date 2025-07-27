@@ -12,6 +12,7 @@
       xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="900"
+      behaviors:ThemeBehavior.Background="{DynamicResource WindowBackgroundBrush}"
       d:DataContext="{d:DesignInstance viewModels:SettingsPageViewModel}"
       Title="设置">
 
@@ -299,7 +300,7 @@
                 behaviors:ThemeBehavior.Background="{DynamicResource PrimaryThemedCardBackgroundBrush}"
                 BorderBrush="{DynamicResource PrimaryThemedCardBorderBrush}"
                 BorderThickness="0,0,0,1"
-                Padding="32,24">
+                Padding="32,64,32,24">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

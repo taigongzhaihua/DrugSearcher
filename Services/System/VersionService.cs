@@ -353,26 +353,15 @@ public class VersionService(HttpClient httpClient) : IVersionService
         foreach (var header in sectionHeaders)
         {
             var headerIndex = body.IndexOf(header, StringComparison.OrdinalIgnoreCase);
-            if (headerIndex >= 0)
-            {
-                var startIndex = headerIndex + header.Length;
-                var endIndex = body.IndexOf('\n', startIndex);
+            if (headerIndex < 0) continue;
+            var startIndex = headerIndex + header.Length;
+            var endIndex = body.IndexOf('\n', startIndex);
 
-                if (endIndex > startIndex)
-                {
-                    var section = body[startIndex..endIndex];
-                    var items = section.Split(['-', '*'], StringSplitOptions.RemoveEmptyEntries);
+            if (endIndex <= startIndex) continue;
+            var section = body[startIndex..endIndex];
+            var items = section.Split(['-', '*'], StringSplitOptions.RemoveEmptyEntries);
 
-                    foreach (var item in items)
-                    {
-                        var trimmed = item.Trim();
-                        if (!string.IsNullOrEmpty(trimmed))
-                        {
-                            features.Add(trimmed);
-                        }
-                    }
-                }
-            }
+            features.AddRange(items.Select(item => item.Trim()).Where(trimmed => !string.IsNullOrEmpty(trimmed)));
         }
 
         return features;

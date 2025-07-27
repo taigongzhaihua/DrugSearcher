@@ -208,10 +208,11 @@
         </Style>
 
         <Style x:Key="CaptionButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentThemeButtonStyle}">
-            <Setter Property="Height" Value="30"/>
+            <Setter Property="Height" Value="28"/>
             <Setter Property="Width" Value="28"/>
-            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="ToolTipService.InitialShowDelay" Value="100"/>
         </Style>
 
     </Window.Resources>
@@ -447,7 +448,8 @@
             <!-- 应用图标和标题栏 -->
             <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                         Orientation="Horizontal"
-                        Margin="15,10,0,10">
+                        Margin="15,10,0,10"
+                        Panel.ZIndex="10">
 
                 <!-- 应用图标 -->
                 <Border Background="{DynamicResource PrimaryBrush}"
@@ -456,6 +458,7 @@
                         Padding="4"
                         CornerRadius="4"
                         Width="24" Height="24"
+                        
                         Effect="{DynamicResource CardShadowEffect}">
                     <TextBlock x:Name="ApplicationIcon"
                                Text="&#xe629;"
@@ -475,8 +478,8 @@
 
             <!-- 页面导航框架 -->
             <Frame x:Name="MainFrame"
-                   Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                   Margin="5"
+                   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                   Margin="0"
                    NavigationUIVisibility="Hidden"
                    Background="Transparent" />
         </Grid>

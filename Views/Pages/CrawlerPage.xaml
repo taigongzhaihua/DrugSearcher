@@ -25,7 +25,7 @@
                    Text="药物数据爬取"
                    Style="{StaticResource PageTitleStyle}"
                    Foreground="{DynamicResource Heading2Brush}"
-                   Margin="0,0,0,20" />
+                   Margin="0,40,0,24" />
         <ScrollViewer Grid.Row="1">
             <Grid Margin="20">
                 <Grid.RowDefinitions>

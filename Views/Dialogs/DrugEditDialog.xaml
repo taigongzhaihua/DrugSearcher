@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:DrugSearcher.ViewModels"
-        xmlns:converters="clr-namespace:DrugSearcher.Converters"
+        xmlns:converters="clr-namespace:DrugSearcher.Converters" 
+        xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
         mc:Ignorable="d"
         Title="{Binding IsEditMode, Converter={x:Static converters:Converters.EditModeToTitleConverter}, FallbackValue=药物信息}"
         Height="750"
@@ -12,7 +13,7 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         ShowInTaskbar="False"
-        Background="{DynamicResource BackgroundBrush}"
+        behaviors:ThemeBehavior.Background="{DynamicResource WindowBackgroundBrush}"
         d:DataContext="{d:DesignInstance viewModels:DrugEditDialogViewModel}">
 
     <Grid>

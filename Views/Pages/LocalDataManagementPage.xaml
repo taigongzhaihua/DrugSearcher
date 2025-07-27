@@ -9,131 +9,132 @@
       xmlns:behaviors="clr-namespace:DrugSearcher.Behaviors"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewModels:LocalDataManagementViewModel}"
-      Title="本地数据管理"
-      behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}">
+      behaviors:ThemeBehavior.Background="{DynamicResource WindowBackgroundBrush}"
+      Title="本地数据管理">
 
     <Page.Resources>
         <!-- 数据源显示模板 -->
         <DataTemplate x:Key="DataSourceTemplate" DataType="{x:Type model:BaseDrugInfo}">
-            <Border Background="{Binding DataSourceColor}" 
-                    CornerRadius="12" 
+            <Border Background="{Binding DataSourceColor}"
+                    CornerRadius="12"
                     Padding="8,4">
-                <TextBlock Text="{Binding DataSourceText}" 
-                           Foreground="White" 
-                           FontSize="11" 
-                           FontWeight="Medium"/>
+                <TextBlock Text="{Binding DataSourceText}"
+                           Foreground="White"
+                           FontSize="11"
+                           FontWeight="Medium" />
             </Border>
         </DataTemplate>
 
         <!-- 统计卡片特定样式 -->
         <Style x:Key="TotalStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="{DynamicResource InfoCardBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource InfoCardBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource InfoCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InfoCardBorderBrush}" />
         </Style>
 
         <Style x:Key="TodayStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="{DynamicResource SuccessCardBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource SuccessCardBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SuccessCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SuccessCardBorderBrush}" />
         </Style>
 
         <Style x:Key="WeekStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="{DynamicResource WarningCardBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource WarningCardBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource WarningCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource WarningCardBorderBrush}" />
         </Style>
 
         <Style x:Key="MonthStatCardStyle" TargetType="Border" BasedOn="{StaticResource StatisticCardStyle}">
-            <Setter Property="Background" Value="{DynamicResource AccentThemedCardBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentThemedCardBackgroundBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource AccentThemedCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentThemedCardBackgroundBrush}" />
         </Style>
     </Page.Resources>
 
-    <Grid Margin="{StaticResource LargeMargin}">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- 页面标题 -->
-        <TextBlock Grid.Row="0" 
-                   Text="本地数据管理" 
+        <TextBlock Grid.Row="0"
+                   Text="本地数据管理"
                    Style="{DynamicResource PageTitleStyle}"
-                   Foreground="{DynamicResource Heading2Brush}"/>
+                   Foreground="{DynamicResource Heading2Brush}" 
+                   Margin="16,56,16,24"/>
 
         <!-- 统计信息卡片 -->
-        <Grid Grid.Row="1" Margin="0,0,0,24">
+        <Grid Grid.Row="1" Margin="16,0,16,24">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{DynamicResource TotalStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="总数量" 
-                               FontSize="12" 
+                    <TextBlock Text="总数量"
+                               FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource SecondaryTextBrush}"
-                               Margin="0,0,0,4"/>
-                    <TextBlock Text="{Binding Statistics.TotalDrugs}" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource PrimaryThemedCardForegroundBrush}"/>
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding Statistics.TotalDrugs}"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryThemedCardForegroundBrush}" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="1" Style="{DynamicResource TodayStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="今日新增" 
-                               FontSize="12" 
+                    <TextBlock Text="今日新增"
+                               FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource SecondaryTextBrush}"
-                               Margin="0,0,0,4"/>
-                    <TextBlock Text="{Binding Statistics.TodayAdded}" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource SuccessTextBrush}"/>
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding Statistics.TodayAdded}"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource SuccessTextBrush}" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="2" Style="{DynamicResource WeekStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="本周新增" 
-                               FontSize="12" 
+                    <TextBlock Text="本周新增"
+                               FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource SecondaryTextBrush}"
-                               Margin="0,0,0,4"/>
-                    <TextBlock Text="{Binding Statistics.WeekAdded}" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource WarningTextBrush}"/>
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding Statistics.WeekAdded}"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource WarningTextBrush}" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="3" Style="{DynamicResource MonthStatCardStyle}">
                 <StackPanel>
-                    <TextBlock Text="本月新增" 
-                               FontSize="12" 
+                    <TextBlock Text="本月新增"
+                               FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource SecondaryTextBrush}"
-                               Margin="0,0,0,4"/>
-                    <TextBlock Text="{Binding Statistics.MonthAdded}" 
-                               FontSize="24" 
-                               FontWeight="Bold" 
-                               Foreground="{DynamicResource AccentThemedCardForegroundBrush}"/>
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding Statistics.MonthAdded}"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentThemedCardForegroundBrush}" />
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- 工具栏 -->
-        <Grid Grid.Row="2" Margin="0,0,0,16">
+        <Grid Grid.Row="2" Margin="16,0,16,16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- 搜索区域 -->
@@ -143,245 +144,240 @@
                          Style="{DynamicResource SearchTextBoxStyle}"
                          Width="300">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
 
-                <Button Content="搜索" 
+                <Button Content="搜索"
                         Style="{DynamicResource PrimaryButtonStyle}"
-                        Command="{Binding SearchCommand}"/>
+                        Command="{Binding SearchCommand}" />
 
-                <Button Content="刷新" 
+                <Button Content="刷新"
                         Style="{DynamicResource PrimaryButtonStyle}"
-                        Command="{Binding RefreshCommand}"/>
+                        Command="{Binding RefreshCommand}" />
             </StackPanel>
 
             <!-- 操作按钮区域 -->
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Content="添加药物" 
+                <Button Content="添加药物"
                         Style="{DynamicResource SuccessButtonStyle}"
-                        Command="{Binding AddCommand}"/>
+                        Command="{Binding AddCommand}" />
 
-                <Button Content="批量删除" 
+                <Button Content="批量删除"
                         Style="{DynamicResource DangerButtonStyle}"
-                        Command="{Binding BatchDeleteCommand}"/>
+                        Command="{Binding BatchDeleteCommand}" />
 
-                <Button Content="导入Excel" 
+                <Button Content="导入Excel"
                         Style="{DynamicResource WarningButtonStyle}"
-                        Command="{Binding ImportExcelCommand}"/>
+                        Command="{Binding ImportExcelCommand}" />
 
-                <Button Content="导出Excel" 
+                <Button Content="导出Excel"
                         Style="{DynamicResource WarningButtonStyle}"
-                        Command="{Binding ExportExcelCommand}"/>
+                        Command="{Binding ExportExcelCommand}" />
             </StackPanel>
         </Grid>
 
         <!-- 数据表格 -->
-        <Border Grid.Row="3" 
-                behaviors:ThemeBehavior.Background="{DynamicResource BorderBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
-                BorderThickness="1"
-                CornerRadius="8"
-                Padding="1,10"
-                Effect="{DynamicResource CardShadowEffect}">
-            <DataGrid x:Name="DrugDataGrid"
-                      ItemsSource="{Binding DrugItems}"
-                      SelectedItem="{Binding SelectedDrug}"
-                      Style="{DynamicResource ModernDataGridStyle}"
-                      RowStyle="{DynamicResource DataGridRowStyle}"
-                      ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}"
-                      SelectionChanged="DrugDataGrid_SelectionChanged">
 
-                <DataGrid.Columns>
-                    <!-- 选择列 -->
-                    <DataGridCheckBoxColumn Width="50" 
-                                            Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}"
-                                            Header="">
-                        <DataGridCheckBoxColumn.HeaderTemplate>
-                            <DataTemplate>
-                                <CheckBox x:Name="SelectAllCheckBox" 
-                                          Checked="SelectAllCheckBox_Checked"
-                                          Unchecked="SelectAllCheckBox_Unchecked"/>
-                            </DataTemplate>
-                        </DataGridCheckBoxColumn.HeaderTemplate>
-                    </DataGridCheckBoxColumn>
+        <DataGrid x:Name="DrugDataGrid" Grid.Row="3"
+                  ItemsSource="{Binding DrugItems}"
+                  SelectedItem="{Binding SelectedDrug}"
+                  Style="{DynamicResource ModernDataGridStyle}"
+                  RowStyle="{DynamicResource DataGridRowStyle}"
+                  ColumnHeaderStyle="{DynamicResource DataGridColumnHeaderStyle}"
+                  SelectionChanged="DrugDataGrid_SelectionChanged"
+                  Effect="{DynamicResource CardShadowEffect}"
+                  Margin="16,0">
 
-                    <!-- 药物名称 -->
-                    <DataGridTextColumn Header="药品名称" 
-                                        Binding="{Binding DrugName}" 
-                                        Width="150" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
-                                <Setter Property="FontWeight" Value="Medium"/>
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+            <DataGrid.Columns>
+                <!-- 选择列 -->
+                <DataGridCheckBoxColumn Width="50"
+                                        Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=DataGridRow}}"
+                                        Header="">
+                    <DataGridCheckBoxColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <CheckBox x:Name="SelectAllCheckBox"
+                                      Checked="SelectAllCheckBox_Checked"
+                                      Unchecked="SelectAllCheckBox_Unchecked" />
+                        </DataTemplate>
+                    </DataGridCheckBoxColumn.HeaderTemplate>
+                </DataGridCheckBoxColumn>
 
-                    <!-- 规格 -->
-                    <DataGridTextColumn Header="规格" 
-                                        Binding="{Binding Specification}" 
-                                        Width="100" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- 药物名称 -->
+                <DataGridTextColumn Header="药品名称"
+                                    Binding="{Binding DrugName}"
+                                    Width="150"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                            <Setter Property="FontWeight" Value="Medium" />
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                    <!-- 用法用量 -->
-                    <DataGridTextColumn Header="用法用量" 
-                                        Binding="{Binding Dosage}" 
-                                        Width="120" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- 规格 -->
+                <DataGridTextColumn Header="规格"
+                                    Binding="{Binding Specification}"
+                                    Width="100"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                    <!-- 适应症 -->
-                    <DataGridTextColumn Header="适应症" 
-                                        Binding="{Binding Indications}" 
-                                        Width="150" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
-                                <Setter Property="TextWrapping" Value="Wrap"/>
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- 用法用量 -->
+                <DataGridTextColumn Header="用法用量"
+                                    Binding="{Binding Dosage}"
+                                    Width="120"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                    <!-- 备注 -->
-                    <DataGridTextColumn Header="备注" 
-                                        Binding="{Binding Remarks}" 
-                                        Width="100" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- 适应症 -->
+                <DataGridTextColumn Header="适应症"
+                                    Binding="{Binding Indications}"
+                                    Width="150"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                    <!-- 数据来源 -->
-                    <DataGridTemplateColumn Header="数据来源" Width="90">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ContentPresenter Content="{Binding}" 
-                                                  ContentTemplate="{StaticResource DataSourceTemplate}"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Center"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+                <!-- 备注 -->
+                <DataGridTextColumn Header="备注"
+                                    Binding="{Binding Remarks}"
+                                    Width="100"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridTextColumnStyle}">
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                    <!-- 创建时间 -->
-                    <DataGridTextColumn Header="创建时间" 
-                                        Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}" 
-                                        Width="140" 
-                                        IsReadOnly="True">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
-                                <Setter Property="FontFamily" Value="Consolas, Courier New"/>
-                                <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                <!-- 数据来源 -->
+                <DataGridTemplateColumn Header="数据来源" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ContentPresenter Content="{Binding}"
+                                              ContentTemplate="{StaticResource DataSourceTemplate}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                    <!-- 操作列 -->
-                    <DataGridTemplateColumn Header="操作" Width="140">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" 
-                                            HorizontalAlignment="Center">
-                                    <Button Content="编辑" 
-                                            Style="{DynamicResource SuccessButtonStyle}"
-                                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            FontSize="12"
-                                            Margin="2,0"/>
+                <!-- 创建时间 -->
+                <DataGridTextColumn Header="创建时间"
+                                    Binding="{Binding CreatedAt, StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                    Width="140"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCenteredTextColumnStyle}">
+                            <Setter Property="FontFamily" Value="Consolas, Courier New" />
+                            <Setter Property="Foreground" Value="{DynamicResource DataGridTextBrush}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
-                                    <Button Content="删除" 
-                                            Style="{DynamicResource DangerButtonStyle}"
-                                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                            CommandParameter="{Binding}"
-                                            Padding="8,4"
-                                            FontSize="12"
-                                            Margin="2,0"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Border>
+                <!-- 操作列 -->
+                <DataGridTemplateColumn Header="操作" Width="140">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <Button Content="编辑"
+                                        Style="{DynamicResource SuccessButtonStyle}"
+                                        Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                        CommandParameter="{Binding}"
+                                        Padding="8,4"
+                                        FontSize="12"
+                                        Margin="2,0" />
+
+                                <Button Content="删除"
+                                        Style="{DynamicResource DangerButtonStyle}"
+                                        Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                        CommandParameter="{Binding}"
+                                        Padding="8,4"
+                                        FontSize="12"
+                                        Margin="2,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
         <!-- 分页控件 -->
-        <Grid Grid.Row="4" Margin="0,16,0,0">
+        <Grid Grid.Row="4" Margin="16,16,16,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- 记录信息 -->
-            <TextBlock Grid.Column="0" 
+            <TextBlock Grid.Column="0"
                        VerticalAlignment="Center"
                        FontSize="14"
                        Foreground="{DynamicResource SecondaryTextBrush}">
-                <Run Text="共"/>
-                <Run Text="{Binding TotalRecords}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                <Run Text="条记录，第"/>
-                <Run Text="{Binding CurrentPage}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                <Run Text="/"/>
-                <Run Text="{Binding TotalPages}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}"/>
-                <Run Text="页"/>
+                <Run Text="共" />
+                <Run Text="{Binding TotalRecords}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+                <Run Text="条记录，第" />
+                <Run Text="{Binding CurrentPage}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+                <Run Text="/" />
+                <Run Text="{Binding TotalPages}" FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+                <Run Text="页" />
             </TextBlock>
 
             <!-- 分页按钮 -->
             <StackPanel Grid.Column="2" Orientation="Horizontal">
-                <Button Content="上一页" 
+                <Button Content="上一页"
                         Style="{DynamicResource PrimaryButtonStyle}"
-                        Command="{Binding PreviousPageCommand}"/>
+                        Command="{Binding PreviousPageCommand}" />
 
-                <Button Content="下一页" 
+                <Button Content="下一页"
                         Style="{DynamicResource PrimaryButtonStyle}"
-                        Command="{Binding NextPageCommand}"/>
+                        Command="{Binding NextPageCommand}" />
             </StackPanel>
         </Grid>
 
         <!-- 状态栏 -->
-        <Border Grid.Row="5" 
+        <Border Grid.Row="5"
                 Background="{DynamicResource SecondaryBackgroundBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0"
                 Padding="16,8"
-                Margin="0,16,0,0">
+                Margin="0,16,0,4">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" 
-                           Text="{Binding StatusMessage}" 
-                           FontSize="13" 
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
+                           FontSize="13"
                            Foreground="{DynamicResource SecondaryTextBrush}"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center" />
 
-                <ProgressBar Grid.Column="1" 
-                             Width="200" 
-                             Height="4" 
-                             IsIndeterminate="{Binding IsLoading}" 
+                <ProgressBar Grid.Column="1"
+                             Width="200"
+                             Height="4"
+                             IsIndeterminate="{Binding IsLoading}"
                              Visibility="{Binding IsLoading, Converter={x:Static converters:Converters.BooleanToVisibilityConverter}}"
                              Foreground="{DynamicResource PrimaryBrush}"
-                             Background="{DynamicResource SecondaryBackgroundBrush}"/>
+                             Background="{DynamicResource SecondaryBackgroundBrush}" />
             </Grid>
         </Border>
     </Grid>

@@ -80,7 +80,7 @@
                 behaviors:ThemeBehavior.Background="{DynamicResource PrimaryThemedCardBackgroundBrush}"
                 BorderBrush="{DynamicResource PrimaryThemedCardBorderBrush}"
                 BorderThickness="0,0,0,1"
-                Padding="32,24">
+                Padding="32,64,32,24">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

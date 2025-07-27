@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
         Style="{DynamicResource BaseWindowStyle}"
-        Background="{DynamicResource BackgroundBrush}"
+        behaviors:ThemeBehavior.Background="{DynamicResource WindowBackgroundBrush}"
         WindowState="Maximized"
         MinHeight="600" MinWidth="1000"
         d:DataContext="{d:DesignInstance vm:CalculatorEditorViewModel}">

@@ -6,7 +6,7 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Style="{DynamicResource BaseWindowStyle}"
-        behaviors:ThemeBehavior.Background="{DynamicResource BackgroundBrush}">
+        behaviors:ThemeBehavior.Background="{DynamicResource WindowBackgroundBrush}">
 
     <Window.Resources>
         <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource DefaultTextStyle}">
