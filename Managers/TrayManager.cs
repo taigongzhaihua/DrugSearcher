@@ -425,10 +425,7 @@ public class TrayManager : IDisposable
     /// </summary>
     public void ForceShowTrayIcon()
     {
-        if (_notifyIcon != null)
-        {
-            _notifyIcon.Visible = true;
-        }
+        if (_notifyIcon != null) _notifyIcon.Visible = true;
     }
 
     /// <summary>
@@ -436,10 +433,7 @@ public class TrayManager : IDisposable
     /// </summary>
     public void ForceHideTrayIcon()
     {
-        if (_notifyIcon != null)
-        {
-            _notifyIcon.Visible = false;
-        }
+        if (_notifyIcon != null) _notifyIcon.Visible = false;
     }
 
     /// <summary>
@@ -462,10 +456,7 @@ public class TrayManager : IDisposable
         {
             Debug.WriteLine($"更新托盘图标可见性失败: {ex.Message}");
             // 发生错误时默认显示托盘图标
-            if (_notifyIcon != null)
-            {
-                _notifyIcon.Visible = true;
-            }
+            if (_notifyIcon != null) _notifyIcon.Visible = true;
         }
     }
 
@@ -505,10 +496,7 @@ public class TrayManager : IDisposable
             RemoveWindowEventHandlers();
 
             // 隐藏托盘图标
-            if (_notifyIcon != null)
-            {
-                _notifyIcon.Visible = false;
-            }
+            if (_notifyIcon != null) _notifyIcon.Visible = false;
 
             // 退出应用程序
             Application.Current.Shutdown();
@@ -539,10 +527,7 @@ public class TrayManager : IDisposable
         try
         {
             // 更新显示/隐藏菜单项文本
-            if (_showHideMenuItem != null)
-            {
-                _showHideMenuItem.Text = IsWindowVisible() ? "隐藏到托盘" : "显示主窗口";
-            }
+            if (_showHideMenuItem != null) _showHideMenuItem.Text = IsWindowVisible() ? "隐藏到托盘" : "显示主窗口";
 
             // 更新设置菜单项的选中状态
             await UpdateToggleMenuItemStatesAsync();

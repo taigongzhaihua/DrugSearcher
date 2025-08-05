@@ -129,10 +129,7 @@ public partial class HotKeyInputControl : UserControl
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         // 确保控件可以获取焦点
-        if (MainBorder != null)
-        {
-            MainBorder.Focusable = true;
-        }
+        if (MainBorder != null) MainBorder.Focusable = true;
     }
 
     protected override void OnMouseDown(MouseButtonEventArgs e)
