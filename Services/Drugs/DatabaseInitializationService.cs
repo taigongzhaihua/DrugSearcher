@@ -26,16 +26,19 @@ public class DatabaseInitializationService(
             await drugContext.Database.EnsureCreatedAsync();
 
             // 验证表是否存在
-            var localCount = await drugContext.LocalDrugInfos.CountAsync();
-            var onlineCount = await drugContext.OnlineDrugInfos.CountAsync();
+            var localCount = await (drugContext.LocalDrugInfos ?? throw new InvalidOperationException()).CountAsync();
+            var onlineCount = await (drugContext.OnlineDrugInfos ?? throw new InvalidOperationException()).CountAsync();
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation($"药物数据库初始化完成 - 本地药物: {localCount}条, 在线药物: {onlineCount}条");
 
-            logger.LogInformation($"药物数据库初始化完成 - 本地药物: {localCount}条, 在线药物: {onlineCount}条");
-
-            logger.LogInformation("所有数据库初始化完成");
+                logger.LogInformation("所有数据库初始化完成");
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "数据库初始化失败");
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "数据库初始化失败");
             throw;
         }
     }
@@ -51,8 +54,8 @@ public class DatabaseInitializationService(
             if (!canConnect) return false;
 
             // 测试表访问
-            await context.LocalDrugInfos.CountAsync();
-            await context.OnlineDrugInfos.CountAsync();
+            await (context.LocalDrugInfos ?? throw new InvalidOperationException()).CountAsync();
+            await (context.OnlineDrugInfos ?? throw new InvalidOperationException()).CountAsync();
 
             return true;
         }

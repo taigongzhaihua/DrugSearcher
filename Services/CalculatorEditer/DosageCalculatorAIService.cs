@@ -25,19 +25,23 @@ public class DosageCalculatorAiService
         httpClient.Timeout = TimeSpan.FromMinutes(10);
     }
 
-    private const string ApiKey = "sk-dfb77b5548ee436598c26e39c2c75432";
-    private const string ApiEndpoint = "https://api.deepseek.com/v1/chat/completions";
+    private const string API_KEY = "sk-dfb77b5548ee436598c26e39c2c75432";
+    private const string API_ENDPOINT = "https://api.deepseek.com/v1/chat/completions";
+
 
     /// <summary>
     /// 根据药物信息生成计算器（流式版本，包含思维链）
     /// </summary>
     public async IAsyncEnumerable<DosageCalculatorGenerationProgress> GenerateCalculatorStreamAsync(
-        BaseDrugInfo drugInfo,
-        string calculatorType = "通用剂量计算器",
-        string additionalRequirements = "",
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    BaseDrugInfo drugInfo,
+    ILogger logger, string calculatorType = "通用剂量计算器",
+    string additionalRequirements = "",
+    [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("开始为药物 {DrugName} 生成计算器（流式）", drugInfo.DrugName);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("开始为药物 {DrugName} 生成计算器（流式）", drugInfo.DrugName);
+        }
 
         yield return new DosageCalculatorGenerationProgress
         {
@@ -99,7 +103,7 @@ public class DosageCalculatorAiService
             ReasoningContent = reasoningContent.ToString()
         };
 
-        var result = ParseAiResponse(completeResponse.ToString(), drugInfo);
+        var result = ParseAiResponse(completeResponse.ToString(), drugInfo, Get_logger());
 
         yield return new DosageCalculatorGenerationProgress
         {
@@ -111,7 +115,10 @@ public class DosageCalculatorAiService
             ElapsedTime = DateTime.Now - startTime
         };
 
-        _logger.LogInformation("成功为药物 {DrugName} 生成计算器", drugInfo.DrugName);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("成功为药物 {DrugName} 生成计算器", drugInfo.DrugName);
+        }
     }
 
     /// <summary>
@@ -126,10 +133,11 @@ public class DosageCalculatorAiService
             model = "deepseek-reasoner",
             messages = new[]
             {
-                new {
+                new
+                {
                     role = "system",
                     content = "你是一个专业的药物计算器开发专家，精通药物剂量计算和JavaScript编程。" +
-                             "你需要根据药物信息生成完整的剂量计算器配置。"
+                              "你需要根据药物信息生成完整的剂量计算器配置。"
                 },
                 new { role = "user", content = prompt }
             },
@@ -142,9 +150,9 @@ public class DosageCalculatorAiService
         var json = JsonSerializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint);
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, API_ENDPOINT);
         requestMessage.Content = content;
-        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", API_KEY);
         requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
         using var response = await _httpClient
@@ -431,7 +439,12 @@ public class DosageCalculatorAiService
         PropertyNameCaseInsensitive = true
     };
 
-    private DosageCalculatorGenerationResult ParseAiResponse(string aiResponse, BaseDrugInfo drugInfo)
+    public ILogger Get_logger()
+    {
+        return _logger;
+    }
+
+    private static DosageCalculatorGenerationResult ParseAiResponse(string aiResponse, BaseDrugInfo drugInfo, ILogger logger)
     {
         try
         {
@@ -463,7 +476,10 @@ public class DosageCalculatorAiService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "解析AI响应失败: {Response}", aiResponse);
+            if (logger.IsEnabled(LogLevel.Error))
+            {
+                logger.LogError(ex, "解析AI响应失败: {Response}", aiResponse);
+            }
             return new DosageCalculatorGenerationResult
             {
                 Success = false,
@@ -480,6 +496,7 @@ public class DosageCalculatorAiService
 public class DeepseekStreamChunk
 {
     public string? Content { get; set; }
+
     public string? ReasoningContent { get; set; }
 }
 
@@ -489,12 +506,19 @@ public class DeepseekStreamChunk
 public class DosageCalculatorGenerationProgress
 {
     public GenerationStatus Status { get; set; }
+
     public string Message { get; set; } = string.Empty;
+
     public int Progress { get; set; }
+
     public string? PartialContent { get; set; }
+
     public string? StreamChunk { get; set; }
+
     public string? ReasoningContent { get; set; }
+
     public TimeSpan? ElapsedTime { get; set; }
+
     public DosageCalculatorGenerationResult? Result { get; set; }
 }
 
@@ -517,24 +541,33 @@ public enum GenerationStatus
 public class DeepseekStreamingResponse
 {
     [JsonPropertyName("id")] public string? Id { get; set; }
+
     [JsonPropertyName("object")] public string? Object { get; set; }
+
     [JsonPropertyName("created")] public long Created { get; set; }
+
     [JsonPropertyName("model")] public string? Model { get; set; }
+
     [JsonPropertyName("choices")] public List<StreamingChoice>? Choices { get; set; }
 }
 
 public class StreamingChoice
 {
     [JsonPropertyName("index")] public int Index { get; set; }
+
     [JsonPropertyName("delta")] public StreamingDelta? Delta { get; set; }
+
     [JsonPropertyName("finish_reason")] public string? FinishReason { get; set; }
 }
 
 public class StreamingDelta
 {
     [JsonPropertyName("role")] public string? Role { get; set; }
+
     [JsonPropertyName("content")] public string? Content { get; set; }
-    [JsonPropertyName("reasoning_content")] public string? ReasoningContent { get; set; }
+
+    [JsonPropertyName("reasoning_content")]
+    public string? ReasoningContent { get; set; }
 }
 
 /// <summary>
@@ -543,8 +576,11 @@ public class StreamingDelta
 public class CalculatorConfig
 {
     public string CalculatorName { get; set; } = string.Empty;
+
     public string Description { get; set; } = string.Empty;
+
     public List<DosageParameter> Parameters { get; set; } = [];
+
     public string CalculationCode { get; set; } = string.Empty;
 }
 
@@ -554,8 +590,12 @@ public class CalculatorConfig
 public class DosageCalculatorGenerationResult
 {
     public bool Success { get; set; }
+
     public DosageCalculator? Calculator { get; set; }
+
     public List<DosageParameter> Parameters { get; set; } = [];
+
     public string? ErrorMessage { get; set; }
+
     public string? RawResponse { get; set; }
 }

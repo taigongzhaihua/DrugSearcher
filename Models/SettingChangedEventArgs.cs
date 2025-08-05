@@ -4,7 +4,10 @@ public class SettingChangedEventArgs(string key, object? oldValue, object? newVa
     : EventArgs
 {
     public string Key { get; } = key;
+
     public object? OldValue { get; } = oldValue;
+
     public object? NewValue { get; } = newValue;
+
     public Type ValueType { get; } = valueType;
 }

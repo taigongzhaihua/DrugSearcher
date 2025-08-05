@@ -205,7 +205,7 @@ public class TrayManager : IDisposable
     {
         if (_mainWindow.WindowState == WindowState.Minimized)
         {
-            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayIcon, true);
+            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_ICON, true);
             if (showTrayIcon)
             {
                 await HideToTrayAsync();
@@ -221,8 +221,8 @@ public class TrayManager : IDisposable
         if (_isExiting)
             return;
 
-        var minimizeOnClose = await _settingsService.GetSettingAsync(SettingKeys.MinimizeToTrayOnClose, true);
-        var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayIcon, true);
+        var minimizeOnClose = await _settingsService.GetSettingAsync(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, true);
+        var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_ICON, true);
 
         if (minimizeOnClose && showTrayIcon)
         {
@@ -238,13 +238,13 @@ public class TrayManager : IDisposable
     {
         switch (e.Key)
         {
-            case SettingKeys.ShowTrayIcon:
+            case SettingKeys.SHOW_TRAY_ICON:
                 await UpdateTrayIconVisibilityAsync();
                 break;
-            case SettingKeys.ShowTrayNotifications:
+            case SettingKeys.SHOW_TRAY_NOTIFICATIONS:
                 // 通知设置变更，无需特殊处理
                 break;
-            case SettingKeys.MinimizeToTrayOnClose:
+            case SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE:
                 // 关闭行为设置变更，无需特殊处理
                 break;
         }
@@ -284,8 +284,8 @@ public class TrayManager : IDisposable
     {
         try
         {
-            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayIcon, true);
-            await _settingsService.SetSettingAsync(SettingKeys.ShowTrayIcon, !currentValue);
+            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_ICON, true);
+            await _settingsService.SetSettingAsync(SettingKeys.SHOW_TRAY_ICON, !currentValue);
         }
         catch (Exception ex)
         {
@@ -300,8 +300,8 @@ public class TrayManager : IDisposable
     {
         try
         {
-            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayNotifications, true);
-            await _settingsService.SetSettingAsync(SettingKeys.ShowTrayNotifications, !currentValue);
+            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_NOTIFICATIONS, true);
+            await _settingsService.SetSettingAsync(SettingKeys.SHOW_TRAY_NOTIFICATIONS, !currentValue);
         }
         catch (Exception ex)
         {
@@ -316,8 +316,8 @@ public class TrayManager : IDisposable
     {
         try
         {
-            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.MinimizeToTrayOnClose, true);
-            await _settingsService.SetSettingAsync(SettingKeys.MinimizeToTrayOnClose, !currentValue);
+            var currentValue = await _settingsService.GetSettingAsync(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, true);
+            await _settingsService.SetSettingAsync(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, !currentValue);
         }
         catch (Exception ex)
         {
@@ -451,7 +451,7 @@ public class TrayManager : IDisposable
 
         try
         {
-            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayIcon, true);
+            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_ICON, true);
 
             // 如果设置为显示托盘图标，则显示
             // 如果窗口隐藏且设置为不显示托盘图标，则强制显示（避免程序无法访问）
@@ -480,7 +480,7 @@ public class TrayManager : IDisposable
     {
         try
         {
-            var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayNotifications, true);
+            var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_NOTIFICATIONS, true);
             if (_notifyIcon is { Visible: true } && showNotifications)
             {
                 _notifyIcon.ShowBalloonTip(timeout, title, message, icon);
@@ -560,19 +560,19 @@ public class TrayManager : IDisposable
     {
         if (_trayIconToggleMenuItem != null)
         {
-            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayIcon, true);
+            var showTrayIcon = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_ICON, true);
             _trayIconToggleMenuItem.Checked = showTrayIcon;
         }
 
         if (_notificationsToggleMenuItem != null)
         {
-            var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayNotifications, true);
+            var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_NOTIFICATIONS, true);
             _notificationsToggleMenuItem.Checked = showNotifications;
         }
 
         if (_minimizeOnCloseMenuItem != null)
         {
-            var minimizeOnClose = await _settingsService.GetSettingAsync(SettingKeys.MinimizeToTrayOnClose, true);
+            var minimizeOnClose = await _settingsService.GetSettingAsync(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, true);
             _minimizeOnCloseMenuItem.Checked = minimizeOnClose;
         }
     }
@@ -582,7 +582,7 @@ public class TrayManager : IDisposable
     /// </summary>
     private async Task ShowHideNotificationAsync()
     {
-        var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.ShowTrayNotifications, true);
+        var showNotifications = await _settingsService.GetSettingAsync(SettingKeys.SHOW_TRAY_NOTIFICATIONS, true);
         if (_notifyIcon is { Visible: true } && showNotifications)
         {
             _notifyIcon.ShowBalloonTip(2000,

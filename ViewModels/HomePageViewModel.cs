@@ -25,7 +25,7 @@ public partial class HomePageViewModel : ObservableObject
     private List<(string Key, string Header, bool IsSpecial)>? _tabDefinitions;
 
     // 分页相关
-    private const int PageSize = 30;
+    private const int PAGE_SIZE = 30;
     private string _lastSearchTerm = string.Empty;
 
     public HomePageViewModel(
@@ -177,12 +177,19 @@ public partial class HomePageViewModel : ObservableObject
     // Tab相关
     [ObservableProperty]
     public partial TabItemViewModel? SelectedTab { get; set; }
+
     public ObservableCollection<UnifiedDrugSearchResult?> SearchResults { get; } = [];
+
     public ObservableCollection<string> SearchSuggestions { get; } = [];
+
     public ObservableCollection<TabItemViewModel> TabItems { get; } = [];
+
     public ObservableCollection<DosageCalculator> AvailableCalculators { get; } = [];
+
     public ObservableCollection<DosageParameter> CalculatorParameters { get; } = [];
+
     public ObservableCollection<DosageCalculationResult> CalculationResults { get; } = [];
+
     public BaseDrugInfo? SelectedDrugInfo => SelectedDrug?.DrugInfo;
 
     #endregion
@@ -474,7 +481,7 @@ public partial class HomePageViewModel : ObservableObject
                     SearchLocalDb = IsLocalDbEnabled,
                     SearchOnline = IsOnlineEnabled,
                     PageIndex = CurrentPage - 1, // 转换为0基索引
-                    PageSize = PageSize
+                    PageSize = PAGE_SIZE
                 };
 
                 var results = await _drugSearchService.SearchDrugsWithPaginationAsync(searchCriteria);
@@ -521,8 +528,8 @@ public partial class HomePageViewModel : ObservableObject
         HasNextPage = results.HasNextPage;
 
         // 更新结果计数
-        var startItem = results.TotalCount > 0 ? (CurrentPage - 1) * PageSize + 1 : 0;
-        var endItem = Math.Min(CurrentPage * PageSize, results.TotalCount);
+        var startItem = results.TotalCount > 0 ? (CurrentPage - 1) * PAGE_SIZE + 1 : 0;
+        var endItem = Math.Min(CurrentPage * PAGE_SIZE, results.TotalCount);
 
         ResultCount = $"搜索结果: {results.TotalCount} 条";
         PageInfo = results.TotalCount > 0
@@ -577,7 +584,7 @@ public partial class HomePageViewModel : ObservableObject
                 if (SelectedDrugInfo != null)
                     await foreach (var progress in _aiService.GenerateCalculatorStreamAsync(
                                        SelectedDrugInfo,
-                                       request.CalculatorType,
+_aiService.Get_logger(), request.CalculatorType,
                                        request.AdditionalRequirements))
                     {
                         await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -762,8 +769,8 @@ public partial class HomePageViewModel : ObservableObject
         {
             object value = param.DataType switch
             {
-                ParameterTypes.Number => Convert.ToDouble(param.Value),
-                ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
+                ParameterTypes.NUMBER => Convert.ToDouble(param.Value),
+                ParameterTypes.BOOLEAN => Convert.ToBoolean(param.Value),
                 _ => param.Value.ToString() ?? string.Empty
             };
             if (param.Name != null) paramDict[param.Name] = value;
@@ -987,6 +994,7 @@ public partial class HomePageViewModel : ObservableObject
     public class CalculatorGenerationRequest
     {
         public string CalculatorType { get; set; } = "通用剂量计算器";
+
         public string AdditionalRequirements { get; set; } = string.Empty;
     }
 }

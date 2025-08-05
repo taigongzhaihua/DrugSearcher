@@ -5,13 +5,13 @@ namespace DrugSearcher.ViewModels;
 /// <summary>
 /// Tab项视图模型
 /// </summary>
-public partial class TabItemViewModel : ObservableObject
+public partial class TabItemViewModel(string header, string key, bool isSpecialTab = false) : ObservableObject
 {
     [ObservableProperty]
-    public partial string Header { get; set; } = string.Empty;
+    public partial string Header { get; set; } = header;
 
     [ObservableProperty]
-    public partial string Key { get; set; } = string.Empty;
+    public partial string Key { get; set; } = key;
 
     [ObservableProperty]
     public partial string Content { get; set; } = string.Empty;
@@ -26,14 +26,7 @@ public partial class TabItemViewModel : ObservableObject
     public partial bool IsLoaded { get; set; }
 
     [ObservableProperty]
-    public partial bool IsSpecialTab { get; set; }
-
-    public TabItemViewModel(string header, string key, bool isSpecialTab = false)
-    {
-        Header = header;
-        Key = key;
-        IsSpecialTab = isSpecialTab;
-    }
+    public partial bool IsSpecialTab { get; set; } = isSpecialTab;
 
     public override string ToString()
     {

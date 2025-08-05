@@ -398,7 +398,7 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     /// <summary>
     /// 检查是否为主题相关设置
     /// </summary>
-    private static bool IsThemeRelatedSetting(string key) => key is SettingKeys.ThemeMode or SettingKeys.ThemeColor;
+    private static bool IsThemeRelatedSetting(string key) => key is SettingKeys.THEME_MODE or SettingKeys.THEME_COLOR;
 
     /// <summary>
     /// 检查设置值是否未发生变化
@@ -768,8 +768,8 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     {
         try
         {
-            var themeMode = await _settingsService.GetSettingAsync(SettingKeys.ThemeMode, ThemeMode.Light);
-            var themeColor = await _settingsService.GetSettingAsync(SettingKeys.ThemeColor, ThemeColor.Blue);
+            var themeMode = await _settingsService.GetSettingAsync(SettingKeys.THEME_MODE, ThemeMode.Light);
+            var themeColor = await _settingsService.GetSettingAsync(SettingKeys.THEME_COLOR, ThemeColor.Blue);
 
             var themeConfig = new ThemeConfig(themeMode, themeColor);
             Debug.WriteLine($"从设置加载主题: {themeConfig}");
@@ -791,8 +791,8 @@ public partial class ThemeManager : ObservableObject, IThemeService, IDisposable
     {
         try
         {
-            await _settingsService.SetSettingAsync(SettingKeys.ThemeMode, themeConfig.Mode);
-            await _settingsService.SetSettingAsync(SettingKeys.ThemeColor, themeConfig.Color);
+            await _settingsService.SetSettingAsync(SettingKeys.THEME_MODE, themeConfig.Mode);
+            await _settingsService.SetSettingAsync(SettingKeys.THEME_COLOR, themeConfig.Color);
 
             Debug.WriteLine($"已保存主题设置: {themeConfig}");
         }

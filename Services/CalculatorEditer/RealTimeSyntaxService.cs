@@ -76,7 +76,7 @@ public partial class RealTimeSyntaxService : IDisposable
 
         // 更新已知的数组类型参数
         _knownArrayVariables.Clear();
-        foreach (var param in _parameters.Where(p => p.DataType == ParameterTypes.Array && !string.IsNullOrEmpty(p.Name)))
+        foreach (var param in _parameters.Where(p => p.DataType == ParameterTypes.ARRAY && !string.IsNullOrEmpty(p.Name)))
         {
             if (param.Name != null) _knownArrayVariables.TryAdd(param.Name, true);
         }
@@ -1959,11 +1959,11 @@ public partial class RealTimeSyntaxService : IDisposable
     /// </summary>
     private static string GetParameterDefaultValue(DosageParameter parameter) => parameter.DataType switch
     {
-        ParameterTypes.Number => parameter.DefaultValue?.ToString() ?? "0",
-        ParameterTypes.Boolean => parameter.DefaultValue?.ToString()?.ToLower() ?? "false",
-        ParameterTypes.Text => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
-        ParameterTypes.Select => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
-        ParameterTypes.Array => parameter.DefaultValue?.ToString() ?? "[]",
+        ParameterTypes.NUMBER => parameter.DefaultValue?.ToString() ?? "0",
+        ParameterTypes.BOOLEAN => parameter.DefaultValue?.ToString()?.ToLower() ?? "false",
+        ParameterTypes.TEXT => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
+        ParameterTypes.SELECT => $"'{parameter.DefaultValue?.ToString() ?? ""}'",
+        ParameterTypes.ARRAY => parameter.DefaultValue?.ToString() ?? "[]",
         _ => $"'{parameter.DefaultValue?.ToString() ?? ""}'"
     };
 
@@ -2002,7 +2002,7 @@ public partial class RealTimeSyntaxService : IDisposable
                 Severity = SyntaxErrorSeverity.Error
             };
 
-        _logger.LogDebug($"V8错误行号调整：原始行号 {line}，前置行数 {_headerLinesCount}，调整后行号 {adjustedLine}，将被过滤");
+        if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug($"V8错误行号调整：原始行号 {line}，前置行数 {_headerLinesCount}，调整后行号 {adjustedLine}，将被过滤");
         return null;
     }
 
@@ -2155,9 +2155,13 @@ public partial class RealTimeSyntaxService : IDisposable
     private class FunctionCallInfo
     {
         public string? FunctionName { get; init; } = "";
+
         public string? ArgumentsText { get; init; } = "";
+
         public int ArgumentsStartIndex { get; init; }
+
         public bool IsControlFlow { get; init; }
+
         public bool IsMethodCall { get; init; }
     }
 
@@ -2167,6 +2171,7 @@ public partial class RealTimeSyntaxService : IDisposable
     private class ArgumentsExtractionResult
     {
         public string? ArgumentsText { get; init; } = "";
+
         public int EndIndex { get; init; }
     }
 
@@ -2310,8 +2315,11 @@ public static class BracketMatchingService
 public class BracketInfo
 {
     public char Character { get; set; }
+
     public char ExpectedClosing { get; set; }
+
     public int Line { get; set; }
+
     public int Column { get; set; }
 }
 
@@ -2321,6 +2329,7 @@ public class BracketInfo
 internal class FunctionArgument
 {
     public string? Text { get; set; }
+
     public int StartIndex { get; set; }
 }
 

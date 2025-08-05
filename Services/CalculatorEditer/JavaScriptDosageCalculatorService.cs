@@ -59,21 +59,23 @@ public class JavaScriptDosageCalculatorService(
             {
                 param.Value = param.GetDefaultValueByDataType();
             }
-
-            logger.LogDebug("Successfully loaded {Count} parameters for calculator {CalculatorId}",
+            if (logger.IsEnabled(LogLevel.Debug))
+                logger.LogDebug("Successfully loaded {Count} parameters for calculator {CalculatorId}",
                 parameters.Count, calculatorId);
 
             return parameters;
         }
         catch (JsonException ex)
         {
-            logger.LogError(ex, "JSON deserialization failed for calculator {CalculatorId}. Content: {Content}",
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "JSON deserialization failed for calculator {CalculatorId}. Content: {Content}",
                 calculatorId, calculator.ParameterDefinitions);
             return [];
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to deserialize parameter definitions for calculator {CalculatorId}", calculatorId);
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "Failed to deserialize parameter definitions for calculator {CalculatorId}", calculatorId);
             return [];
         }
     }
@@ -116,8 +118,8 @@ public class JavaScriptDosageCalculatorService(
 
             // 执行JavaScript代码
             var results = await ExecuteJavaScriptAsync(calculationCode, request.Parameters);
-
-            logger.LogInformation("测试计算完成，共 {Count} 个结果", results.Count);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("测试计算完成，共 {Count} 个结果", results.Count);
             return results;
         }
         catch (Exception ex)
@@ -125,7 +127,7 @@ public class JavaScriptDosageCalculatorService(
             logger.LogError(ex, "测试计算失败");
             return
             [
-                new()
+                new DosageCalculationResult
                 {
                     Description = "测试失败",
                     IsWarning = true,
@@ -153,12 +155,14 @@ public class JavaScriptDosageCalculatorService(
 
             // 更新计算器
             var updatedCalculator = await calculatorRepository.UpdateAsync(calculator);
-            logger.LogInformation("计算器更新成功: {CalculatorName}", calculator.CalculatorName);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("计算器更新成功: {CalculatorName}", calculator.CalculatorName);
             return updatedCalculator;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "更新计算器失败: {CalculatorName}", calculator.CalculatorName);
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "更新计算器失败: {CalculatorName}", calculator.CalculatorName);
             throw;
         }
     }
@@ -212,7 +216,8 @@ public class JavaScriptDosageCalculatorService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "验证并保存计算器失败: {CalculatorName}", calculator.CalculatorName);
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "验证并保存计算器失败: {CalculatorName}", calculator.CalculatorName);
             throw;
         }
     }
@@ -238,16 +243,17 @@ public class JavaScriptDosageCalculatorService(
                 var resultsJson = engine.Evaluate("JSON.stringify(results)").ToString();
                 var results = JsonSerializer.Deserialize<List<DosageCalculationResult>>(
                     resultsJson ?? string.Empty, CachedJsonSerializerOptions) ?? [];
-
-                logger.LogDebug("JavaScript execution completed successfully, {Count} results returned", results.Count);
+                if (logger.IsEnabled(LogLevel.Debug))
+                    logger.LogDebug("JavaScript execution completed successfully, {Count} results returned", results.Count);
                 return results;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "JavaScript execution failed: {Message}", ex.Message);
+                if (logger.IsEnabled(LogLevel.Error))
+                    logger.LogError(ex, "JavaScript execution failed: {Message}", ex.Message);
                 return
                 [
-                    new()
+                    new DosageCalculationResult
                     {
                         Description = "计算错误",
                         IsWarning = true,
@@ -363,7 +369,8 @@ public class JavaScriptDosageCalculatorService(
         var fullScript = scriptBuilder.ToString();
 
         // 记录完整脚本用于调试
-        logger.LogDebug("Full JavaScript code:\n{Script}", fullScript);
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("Full JavaScript code:\n{Script}", fullScript);
 
         return fullScript;
     }
@@ -499,7 +506,8 @@ public class JavaScriptDosageCalculatorService(
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "JavaScript validation failed: {Message}", ex.Message);
+            if (logger.IsEnabled(LogLevel.Warning))
+                logger.LogWarning(ex, "JavaScript validation failed: {Message}", ex.Message);
             return false;
         }
     }

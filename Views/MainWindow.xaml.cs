@@ -801,7 +801,7 @@ public partial class MainWindow
             if (_settingsService == null)
                 return false;
 
-            return await _settingsService.GetSettingAsync(SettingKeys.MinimizeToTrayOnClose, false);
+            return await _settingsService.GetSettingAsync(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, false);
         }
         catch (Exception ex)
         {

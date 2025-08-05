@@ -79,7 +79,7 @@ public class DrugSearchService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "获取药物详情时发生错误，ID: {Id}, 数据源: {DataSource}", id, dataSource);
+            if (logger.IsEnabled(LogLevel.Error)) logger.LogError(ex, "获取药物详情时发生错误，ID: {Id}, 数据源: {DataSource}", id, dataSource);
             return null;
         }
     }
@@ -199,7 +199,8 @@ public class DrugSearchService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "获取搜索建议失败，关键词: {keyword}", keyword);
+            if (logger.IsEnabled(LogLevel.Error))
+                logger.LogError(ex, "获取搜索建议失败，关键词: {keyword}", keyword);
             return [];
         }
     }
@@ -225,7 +226,7 @@ public class DrugSearchService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "搜索本地药物失败，搜索词: {searchTerm}", searchTerm);
+            if (logger.IsEnabled(LogLevel.Error)) logger.LogError(ex, "搜索本地药物失败，搜索词: {searchTerm}", searchTerm);
             return [];
         }
     }
@@ -254,7 +255,7 @@ public class DrugSearchService(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "搜索在线药物失败，搜索词: {searchTerm}", searchTerm);
+            if (logger.IsEnabled(LogLevel.Error)) logger.LogError(ex, "搜索在线药物失败，搜索词: {searchTerm}", searchTerm);
             return [];
         }
     }

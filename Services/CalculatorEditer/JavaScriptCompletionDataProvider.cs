@@ -394,7 +394,7 @@ public partial class JavaScriptCompletionDataProvider
     {
         varName = varName.Trim();
         var param = _parameters.FirstOrDefault(p => p.Name == varName);
-        return param is { DataType: ParameterTypes.Array };
+        return param is { DataType: ParameterTypes.ARRAY };
     }
 
     /// <summary>
@@ -700,7 +700,9 @@ public partial class JavaScriptCompletionDataProvider
     private class MemberAccessInfo
     {
         public bool IsMemberAccess { get; set; }
+
         public string ObjectExpression { get; set; } = "";
+
         public string MemberPrefix { get; set; } = "";
     }
 }
@@ -711,8 +713,11 @@ public partial class JavaScriptCompletionDataProvider
 public class LocalVariable
 {
     public string? Name { get; set; }
+
     public string? Type { get; set; }
+
     public int LineNumber { get; set; }
+
     public bool IsFunction { get; set; }
 }
 
@@ -722,6 +727,7 @@ public class LocalVariable
 public class LocalVariableCompletionData(LocalVariable variable) : ICompletionData
 {
     public string? Text { get; } = variable.Name;
+
     public object Content { get; } = $"{variable.Name} ({variable.Type})";
 
     public object Description { get; } = $"局部{GetTypeDescription(variable.Type)}: {variable.Name}" +
@@ -751,8 +757,11 @@ public class MethodCompletionData(string? text, string? signature, string? descr
     : ICompletionData
 {
     public string? Text { get; } = text;
+
     public object? Content { get; } = signature;
+
     public object? Description { get; } = description;
+
     public ImageSource? Image => null;
     public double Priority => 1.0;
 
@@ -774,6 +783,7 @@ public class MethodCompletionData(string? text, string? signature, string? descr
 public class ParameterCompletionData(DosageParameter parameter) : ICompletionData
 {
     public string? Text { get; } = parameter.Name;
+
     public object Content { get; } = $"{parameter.Name} ({parameter.DataType})";
 
     public object Description { get; } =
@@ -792,8 +802,11 @@ public class ParameterCompletionData(DosageParameter parameter) : ICompletionDat
 public class PropertyCompletionData(string name, string description) : ICompletionData
 {
     public string Text { get; } = name;
+
     public object Content { get; } = name;
+
     public object Description { get; } = description;
+
     public ImageSource? Image => null;
     public double Priority => 0.7;
 
@@ -807,8 +820,11 @@ public class PropertyCompletionData(string name, string description) : ICompleti
 public class KeywordCompletionData(string? text, string description, string? insertionText) : ICompletionData
 {
     public string? Text { get; } = text;
+
     public object? Content { get; } = text;
+
     public object Description { get; } = description;
+
     public ImageSource? Image => null;
     public double Priority => 0.9;
 

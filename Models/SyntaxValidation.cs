@@ -6,7 +6,9 @@ namespace DrugSearcher.Models;
 public class SyntaxValidationResult
 {
     public bool IsValid { get; set; }
+
     public List<SyntaxError> Errors { get; set; } = [];
+
     public DateTime ValidationTime { get; set; } = DateTime.Now;
 }
 
@@ -16,8 +18,11 @@ public class SyntaxValidationResult
 public class SyntaxError
 {
     public string? Message { get; set; }
+
     public int Line { get; set; }
+
     public int Column { get; set; }
+
     public SyntaxErrorSeverity Severity { get; set; }
 }
 

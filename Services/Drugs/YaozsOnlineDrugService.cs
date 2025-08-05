@@ -16,7 +16,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
     private readonly HttpClient _httpClient;
     private readonly IOnlineDrugRepository _onlineDrugRepository;
     private readonly ILogger<YaozsOnlineDrugService> _logger;
-    private const string BaseUrl = "https://www.yaozs.com/sms{0:D6}/";
+    private const string BASE_URL = "https://www.yaozs.com/sms{0:D6}/";
 
     public YaozsOnlineDrugService(
         HttpClient httpClient,
@@ -42,7 +42,8 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"搜索在线药物信息时发生错误，关键词: {keyword}");
+            if (_logger.IsEnabled(LogLevel.Error))
+                _logger.LogError(ex, $"搜索在线药物信息时发生错误，关键词: {keyword}");
             return [];
         }
     }
@@ -64,7 +65,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"获取药物详情时发生错误，ID: {id}");
+            if (_logger.IsEnabled(LogLevel.Error)) _logger.LogError(ex, $"获取药物详情时发生错误，ID: {id}");
             return null;
         }
     }
@@ -73,8 +74,8 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
     {
         try
         {
-            var url = string.Format(BaseUrl, id);
-            _logger.LogInformation($"开始爬取药物信息，ID: {id}, URL: {url}");
+            var url = string.Format(BASE_URL, id);
+            if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"开始爬取药物信息，ID: {id}, URL: {url}");
 
             using var response = await _httpClient.GetAsync(url);
 
@@ -87,7 +88,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning($"HTTP请求失败，状态码: {response.StatusCode}, URL: {url}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"HTTP请求失败，状态码: {response.StatusCode}, URL: {url}");
                 drugInfo.CrawlStatus = response.StatusCode == System.Net.HttpStatusCode.NotFound
                     ? CrawlStatus.NotFound
                     : CrawlStatus.Failed;
@@ -99,7 +100,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
             var html = await response.Content.ReadAsStringAsync();
             if (string.IsNullOrEmpty(html))
             {
-                _logger.LogWarning($"页面内容为空，URL: {url}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"页面内容为空，URL: {url}");
                 drugInfo.CrawlStatus = CrawlStatus.Failed;
                 await _onlineDrugRepository.AddOrUpdateAsync(drugInfo);
                 return drugInfo;
@@ -109,11 +110,11 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
             var parsedDrug = ParseDrugInfoWithHtmlAgilityPack(html, id, url);
             if (parsedDrug.CrawlStatus == CrawlStatus.Success)
             {
-                _logger.LogInformation($"成功解析药物信息: {parsedDrug.DrugName}");
+                if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"成功解析药物信息: {parsedDrug.DrugName}");
             }
             else
             {
-                _logger.LogWarning($"解析药物信息失败，ID: {id}, 状态: {parsedDrug.CrawlStatus}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"解析药物信息失败，ID: {id}, 状态: {parsedDrug.CrawlStatus}");
             }
 
             await _onlineDrugRepository.AddOrUpdateAsync(parsedDrug);
@@ -121,13 +122,13 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"爬取药物信息时发生错误，ID: {id}");
+            if (_logger.IsEnabled(LogLevel.Error)) _logger.LogError(ex, $"爬取药物信息时发生错误，ID: {id}");
 
             // 保存失败记录
             var failedDrug = new OnlineDrugInfo
             {
                 Id = id,
-                SourceUrl = string.Format(BaseUrl, id),
+                SourceUrl = string.Format(BASE_URL, id),
                 CrawlStatus = CrawlStatus.Failed,
                 CrawledAt = DateTime.Now
             };
@@ -158,13 +159,13 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
             // 查找所有class为"row"的div元素
             var rowNodes = doc.DocumentNode.SelectNodes("//div[@class='row']");
 
-            if (rowNodes == null || rowNodes.Count == 0)
+            if (rowNodes.Count == 0)
             {
-                _logger.LogWarning($"未找到任何 class='row' 的元素，ID: {id}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"未找到任何 class='row' 的元素，ID: {id}");
                 return drugInfo;
             }
 
-            _logger.LogDebug("找到 {rowNodes.Count} 个 row 元素，ID: {id}", rowNodes.Count, id);
+            if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("找到 {rowNodes.Count} 个 row 元素，ID: {id}", rowNodes.Count, id);
 
             // 提取所有key-value对
             var dataDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -176,12 +177,12 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
                 var (key, value) = keyValuePair.Value;
                 if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(value)) continue;
                 dataDict[key] = value;
-                _logger.LogDebug("提取到数据 - {key}: {value}...", key, value[..Math.Min(50, value.Length)]);
+                if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("提取到数据 - {key}: {value}...", key, value[..Math.Min(50, value.Length)]);
             }
 
             if (dataDict.Count == 0)
             {
-                _logger.LogWarning($"未能从row元素中提取到任何有效数据，ID: {id}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"未能从row元素中提取到任何有效数据，ID: {id}");
                 return drugInfo;
             }
 
@@ -192,23 +193,23 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
             if (!string.IsNullOrEmpty(drugInfo.DrugName) && drugInfo.DrugName != "未知药物")
             {
                 drugInfo.CrawlStatus = CrawlStatus.Success;
-                _logger.LogInformation($"成功解析药物: {drugInfo.DrugName}, ID: {id}");
+                if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"成功解析药物: {drugInfo.DrugName}, ID: {id}");
             }
             else
             {
                 drugInfo.CrawlStatus = CrawlStatus.ParseError;
-                _logger.LogWarning($"未能解析出有效药物名称，ID: {id}");
+                if (_logger.IsEnabled(LogLevel.Warning)) _logger.LogWarning($"未能解析出有效药物名称，ID: {id}");
 
                 // 记录可用的键以便调试
                 var availableKeys = string.Join(", ", dataDict.Keys);
-                _logger.LogDebug($"可用的数据键 (ID: {id}): {availableKeys}");
+                if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug($"可用的数据键 (ID: {id}): {availableKeys}");
             }
 
             return drugInfo;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"解析药物信息时发生错误，ID: {id}");
+            if (_logger.IsEnabled(LogLevel.Error)) _logger.LogError(ex, $"解析药物信息时发生错误，ID: {id}");
             return new OnlineDrugInfo
             {
                 Id = id,
@@ -230,12 +231,6 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
             // 查找label和span元素
             var labelNode = rowNode.SelectSingleNode(".//label");
             var spanNode = rowNode.SelectSingleNode(".//span");
-
-            if (labelNode == null || spanNode == null)
-            {
-                _logger.LogDebug($"Row元素缺少label或span: {rowNode.OuterHtml[..Math.Min(100, rowNode.OuterHtml.Length)]}");
-                return null;
-            }
 
             // 提取key（label的文本内容）
             var key = CleanText(labelNode.InnerText);
@@ -407,7 +402,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         var semaphore = new SemaphoreSlim(batchSize, batchSize);
         var tasks = new List<Task>();
 
-        _logger.LogInformation($"开始批量爬取药物信息，范围: {startId}-{endId}, 批次大小: {batchSize}, 延迟: {delayMs}ms");
+        if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"开始批量爬取药物信息，范围: {startId}-{endId}, 批次大小: {batchSize}, 延迟: {delayMs}ms");
 
         for (var id = startId; id <= endId; id++)
         {
@@ -490,7 +485,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         }
 
         result.EndTime = DateTime.Now;
-        _logger.LogInformation($"爬取完成，总计: {result.TotalProcessed}, 成功: {result.SuccessCount}, 失败: {result.FailedCount}");
+        if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"爬取完成，总计: {result.TotalProcessed}, 成功: {result.SuccessCount}, 失败: {result.FailedCount}");
 
         return result;
     }
@@ -524,7 +519,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
 
     public async Task<CrawlResult> RetryCrawlFailedDrugsAsync(List<int> failedIds, IProgress<CrawlProgress>? progress = null)
     {
-        _logger.LogInformation($"开始重新爬取失败的药物，数量: {failedIds.Count}");
+        if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"开始重新爬取失败的药物，数量: {failedIds.Count}");
 
         var result = new CrawlResult();
 
@@ -563,7 +558,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
         }
 
         result.EndTime = DateTime.Now;
-        _logger.LogInformation($"重新爬取完成，总计: {result.TotalProcessed}, 成功: {result.SuccessCount}, 失败: {result.FailedCount}");
+        if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation($"重新爬取完成，总计: {result.TotalProcessed}, 成功: {result.SuccessCount}, 失败: {result.FailedCount}");
 
         return result;
     }
@@ -595,7 +590,7 @@ public partial class YaozsOnlineDrugService : IOnlineDrugService
 
             var totalCleaned = failedCleaned + parseErrorCleaned;
 
-            _logger.LogInformation($"清理完成，删除了 {totalCleaned} 条旧记录（失败: {failedCleaned}, 解析错误: {parseErrorCleaned}）");
+            if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation(message: $"清理完成，删除了 {totalCleaned} 条旧记录（失败: {failedCleaned}, 解析错误: {parseErrorCleaned}）");
 
             return totalCleaned;
         }

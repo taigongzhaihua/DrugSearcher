@@ -143,7 +143,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var userSettings = await dbContext.Settings
+            var userSettings = await (dbContext.Settings ?? throw new InvalidOperationException())
                 .Where(s => s.UserId == _currentUserId)
                 .ToListAsync();
 
@@ -229,7 +229,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var setting = await dbContext.Settings
+            var setting = await (dbContext.Settings ?? throw new InvalidOperationException())
                 .FirstOrDefaultAsync(s => s.Key == key && s.UserId == _currentUserId);
 
             return setting != null ? ConvertFromString(setting.Value, setting.ValueType) : null;
@@ -306,35 +306,38 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var existingSetting = await dbContext.Settings
-                .FirstOrDefaultAsync(s => s.Key == key && s.UserId == _currentUserId);
-
-            var valueType = typeof(T).Name;
-            var valueString = ConvertToString(value);
-
-            if (existingSetting != null)
+            if (dbContext.Settings != null)
             {
-                // 更新现有设置
-                existingSetting.Value = valueString;
-                existingSetting.ValueType = valueType;
-                existingSetting.UpdatedAt = DateTime.UtcNow;
-            }
-            else
-            {
-                // 创建新设置
-                var definition = _settingDefinitions.TryGetValue(key, out var def) ? def : null;
-                var newSetting = new SettingItem
+                var existingSetting = await dbContext.Settings
+                    .FirstOrDefaultAsync(s => s.Key == key && s.UserId == _currentUserId);
+
+                var valueType = typeof(T).Name;
+                var valueString = ConvertToString(value);
+
+                if (existingSetting != null)
                 {
-                    Key = key,
-                    ValueType = valueType,
-                    Value = valueString,
-                    UserId = _currentUserId,
-                    Description = definition?.Description,
-                    Category = definition?.Category,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                dbContext.Settings.Add(newSetting);
+                    // 更新现有设置
+                    existingSetting.Value = valueString;
+                    existingSetting.ValueType = valueType;
+                    existingSetting.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    // 创建新设置
+                    var definition = _settingDefinitions.TryGetValue(key, out var def) ? def : null;
+                    var newSetting = new SettingItem
+                    {
+                        Key = key,
+                        ValueType = valueType,
+                        Value = valueString,
+                        UserId = _currentUserId,
+                        Description = definition?.Description,
+                        Category = definition?.Category,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    dbContext.Settings.Add(newSetting);
+                }
             }
 
             await dbContext.SaveChangesAsync();
@@ -371,7 +374,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
             try
             {
                 await using var dbContext = _dbContextFactory.CreateDbContext();
-                return await dbContext.Settings.AnyAsync(s => s.Key == key && s.UserId == _currentUserId);
+                return await (dbContext.Settings ?? throw new InvalidOperationException()).AnyAsync(s => s.Key == key && s.UserId == _currentUserId);
             }
             catch
             {
@@ -418,13 +421,16 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var setting = await dbContext.Settings
-                .FirstOrDefaultAsync(s => s.Key == key && s.UserId == _currentUserId);
-
-            if (setting != null)
+            if (dbContext.Settings != null)
             {
-                dbContext.Settings.Remove(setting);
-                await dbContext.SaveChangesAsync();
+                var setting = await dbContext.Settings
+                    .FirstOrDefaultAsync(s => s.Key == key && s.UserId == _currentUserId);
+
+                if (setting != null)
+                {
+                    dbContext.Settings.Remove(setting);
+                    await dbContext.SaveChangesAsync();
+                }
             }
         }
         catch (Exception ex)
@@ -445,7 +451,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var categorySettings = await dbContext.Settings
+            var categorySettings = await (dbContext.Settings ?? throw new InvalidOperationException())
                 .Where(s => s.UserId == _currentUserId && s.Category == category)
                 .ToListAsync();
 
@@ -586,7 +592,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var userSettings = await dbContext.Settings
+            var userSettings = await (dbContext.Settings ?? throw new InvalidOperationException())
                 .Where(s => s.UserId == _currentUserId)
                 .ToListAsync();
 
@@ -608,7 +614,7 @@ public class UserSettingsService : IUserSettingsService, INotifyPropertyChanged
         try
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var categorySettings = await dbContext.Settings
+            var categorySettings = await (dbContext.Settings ?? throw new InvalidOperationException())
                 .Where(s => s.UserId == _currentUserId && s.Category == category)
                 .ToListAsync();
 

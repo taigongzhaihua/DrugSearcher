@@ -1,22 +1,28 @@
-﻿using Autofac;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace DrugSearcher.Configuration;
 
 public static class ContainerAccessor
 {
-    private static IContainer? _container;
+    private static IServiceProvider? _container;
 
-    public static IContainer Container => _container ?? throw new InvalidOperationException("Container not initialized");
+    public static IServiceProvider Container =>
+        _container ?? throw new InvalidOperationException("Container not initialized");
 
     public static bool IsInitialized => _container != null;
 
-    public static void Initialize(IContainer container) => _container = container;
+    public static void Initialize(IServiceProvider container) =>
+        _container = container;
 
-    public static T Resolve<T>() where T : notnull => Container.Resolve<T>();
+    public static T Resolve<T>() where T : notnull =>
+        Container.GetRequiredService<T>();
 
     public static void Dispose()
     {
-        _container?.Dispose();
+        if (_container is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
         _container = null;
     }
 }

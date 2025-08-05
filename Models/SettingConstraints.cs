@@ -8,30 +8,30 @@ public static class SettingConstraints
     /// <summary>
     /// 设置键最大长度
     /// </summary>
-    public const int MaxKeyLength = 100;
+    public const int MAX_KEY_LENGTH = 100;
 
     /// <summary>
     /// 值类型名称最大长度
     /// </summary>
-    public const int MaxValueTypeLength = 50;
+    public const int MAX_VALUE_TYPE_LENGTH = 50;
 
     /// <summary>
     /// 设置值最大长度
     /// </summary>
-    public const int MaxValueLength = 4000;
+    public const int MAX_VALUE_LENGTH = 4000;
 
     /// <summary>
     /// 描述最大长度
     /// </summary>
-    public const int MaxDescriptionLength = 500;
+    public const int MAX_DESCRIPTION_LENGTH = 500;
 
     /// <summary>
     /// 分类名称最大长度
     /// </summary>
-    public const int MaxCategoryLength = 50;
+    public const int MAX_CATEGORY_LENGTH = 50;
 
     /// <summary>
     /// 用户ID最大长度
     /// </summary>
-    public const int MaxUserIdLength = 100;
+    public const int MAX_USER_ID_LENGTH = 100;
 }

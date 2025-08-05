@@ -1,6 +1,7 @@
 using DrugSearcher.Data;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace DrugSearcher.Repositories;
 
@@ -12,12 +13,14 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<LocalDrugInfo?> GetByIdAsync(int id)
     {
         await using var context = contextFactory.CreateDbContext();
+        Debug.Assert(context.LocalDrugInfos != null);
         return await context.LocalDrugInfos.FindAsync(id);
     }
 
     public async Task<List<LocalDrugInfo>> GetAllAsync()
     {
         await using var context = contextFactory.CreateDbContext();
+        Debug.Assert(context.LocalDrugInfos != null);
         return await context.LocalDrugInfos
             .OrderBy(d => d.DrugName)
             .ToListAsync();
@@ -27,6 +30,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     {
         await using var context = contextFactory.CreateDbContext();
 
+        if (context.LocalDrugInfos == null) return (null, 0);
         var totalCount = await context.LocalDrugInfos.CountAsync();
         var items = await context.LocalDrugInfos
             .OrderBy(d => d.DrugName)
@@ -35,6 +39,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
             .ToListAsync();
 
         return (items, totalCount);
+
     }
 
     public async Task<List<LocalDrugInfo>> SearchAsync(string keyword)
@@ -45,7 +50,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
         await using var context = contextFactory.CreateDbContext();
         var keywordLower = keyword.Trim().ToLower();
 
-        return await context.LocalDrugInfos
+        return await (context.LocalDrugInfos ?? throw new InvalidOperationException())
             .Where(d =>
                 EF.Functions.Like(d.DrugName.ToLower(), $"%{keywordLower}%") ||
                 (d.GenericName != null && EF.Functions.Like(d.GenericName.ToLower(), $"%{keywordLower}%")) ||
@@ -64,7 +69,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
         await using var context = contextFactory.CreateDbContext();
         var keywordLower = keyword.Trim().ToLower();
 
-        return await context.LocalDrugInfos
+        return await (context.LocalDrugInfos ?? throw new InvalidOperationException())
             .Where(d => EF.Functions.Like(d.DrugName.ToLower(), $"%{keywordLower}%"))
             .Select(d => d.DrugName)
             .Distinct()
@@ -76,7 +81,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     {
         await using var context = contextFactory.CreateDbContext();
 
-        return await context.LocalDrugInfos
+        return await (context.LocalDrugInfos ?? throw new InvalidOperationException())
             .AnyAsync(d => d.DrugName == drugName &&
                            d.Specification == specification &&
                            d.Manufacturer == manufacturer);
@@ -85,7 +90,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<LocalDrugInfo> AddAsync(LocalDrugInfo localDrugInfo)
     {
         await using var context = contextFactory.CreateDbContext();
-        context.LocalDrugInfos.Add(localDrugInfo);
+        (context.LocalDrugInfos ?? throw new InvalidOperationException()).Add(localDrugInfo);
         await context.SaveChangesAsync();
         return localDrugInfo;
     }
@@ -93,7 +98,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<List<LocalDrugInfo>> AddRangeAsync(List<LocalDrugInfo> drugInfos)
     {
         await using var context = contextFactory.CreateDbContext();
-        context.LocalDrugInfos.AddRange(drugInfos);
+        (context.LocalDrugInfos ?? throw new InvalidOperationException()).AddRange(drugInfos);
         await context.SaveChangesAsync();
         return drugInfos;
     }
@@ -101,7 +106,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<LocalDrugInfo> UpdateAsync(LocalDrugInfo localDrugInfo)
     {
         await using var context = contextFactory.CreateDbContext();
-        context.LocalDrugInfos.Update(localDrugInfo);
+        (context.LocalDrugInfos ?? throw new InvalidOperationException()).Update(localDrugInfo);
         await context.SaveChangesAsync();
         return localDrugInfo;
     }
@@ -109,7 +114,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<List<LocalDrugInfo>> UpdateRangeAsync(List<LocalDrugInfo> drugInfos)
     {
         await using var context = contextFactory.CreateDbContext();
-        context.LocalDrugInfos.UpdateRange(drugInfos);
+        (context.LocalDrugInfos ?? throw new InvalidOperationException()).UpdateRange(drugInfos);
         await context.SaveChangesAsync();
         return drugInfos;
     }
@@ -117,6 +122,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<bool> DeleteAsync(int id)
     {
         await using var context = contextFactory.CreateDbContext();
+        Debug.Assert(context.LocalDrugInfos != null);
         var drugInfo = await context.LocalDrugInfos.FindAsync(id);
         if (drugInfo == null) return false;
 
@@ -128,7 +134,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
     public async Task<bool> DeleteRangeAsync(List<int> ids)
     {
         await using var context = contextFactory.CreateDbContext();
-        var drugInfos = await context.LocalDrugInfos
+        var drugInfos = await (context.LocalDrugInfos ?? throw new InvalidOperationException())
             .Where(d => ids.Contains(d.Id))
             .ToListAsync();
 
@@ -146,7 +152,7 @@ public class DrugRepository(IDrugDbContextFactory contextFactory) : IDrugReposit
 
         foreach (var item in importData)
         {
-            var existing = await context.LocalDrugInfos
+            var existing = await (context.LocalDrugInfos ?? throw new InvalidOperationException())
                 .FirstOrDefaultAsync(d => d.DrugName == item.DrugName &&
                                           d.Specification == item.Specification &&
                                           d.Manufacturer == item.Manufacturer);

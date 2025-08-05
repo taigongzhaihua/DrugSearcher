@@ -25,4 +25,8 @@ public record ThemeConfig(ThemeMode Mode, ThemeColor Color)
 
         return new ThemeConfig(ThemeMode.Light, ThemeColor.Blue);
     }
+
+    public ThemeMode Mode { get; init; } = Mode;
+
+    public ThemeColor Color { get; init; } = Color;
 }

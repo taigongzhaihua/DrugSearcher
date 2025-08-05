@@ -28,23 +28,23 @@ public static partial class SingleInstanceManager
 
     #region 常量定义
 
-    private const string AppName = "DrugSearcher_SingleInstance";
-    private const string PipeName = "DrugSearcher_ActivationPipe";
-    private const string ActivationMessage = "ACTIVATE";
+    private const string APP_NAME = "DrugSearcher_SingleInstance";
+    private const string PIPE_NAME = "DrugSearcher_ActivationPipe";
+    private const string ACTIVATION_MESSAGE = "ACTIVATE";
 
     // 窗口显示常量
-    private const int SwRestore = 9;
-    private const int SwShowNormal = 1;
+    private const int SW_RESTORE = 9;
+    private const int SW_SHOW_NORMAL = 1;
 
     // 窗口闪烁常量
-    private const uint FlashwAll = 3;
-    private const uint FlashwTimerNoFg = 12;
-    private const uint FlashCount = 3;
+    private const uint FLASHW_ALL = 3;
+    private const uint FLASHW_TIMER_NO_FG = 12;
+    private const uint FLASH_COUNT = 3;
 
     // 超时常量
-    private const int PipeConnectionTimeout = 2000;
-    private const int IoErrorRetryDelay = 2000;
-    private const int GeneralErrorRetryDelay = 1000;
+    private const int PIPE_CONNECTION_TIMEOUT = 2000;
+    private const int IO_ERROR_RETRY_DELAY = 2000;
+    private const int GENERAL_ERROR_RETRY_DELAY = 1000;
 
     #endregion
 
@@ -114,7 +114,7 @@ public static partial class SingleInstanceManager
     {
         try
         {
-            _mutex = new Mutex(true, AppName, out var createdNew);
+            _mutex = new Mutex(true, APP_NAME, out var createdNew);
 
             Debug.WriteLine(createdNew ? "这是第一个应用程序实例" : "检测到应用程序已在运行");
 
@@ -137,13 +137,13 @@ public static partial class SingleInstanceManager
         {
             Debug.WriteLine("正在通知第一个实例激活窗口...");
 
-            using var pipeClient = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
+            using var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.Out);
 
             // 连接到管道服务器
-            pipeClient.Connect(PipeConnectionTimeout);
+            pipeClient.Connect(PIPE_CONNECTION_TIMEOUT);
 
             // 发送激活消息
-            var message = Encoding.UTF8.GetBytes(ActivationMessage);
+            var message = Encoding.UTF8.GetBytes(ACTIVATION_MESSAGE);
             pipeClient.Write(message, 0, message.Length);
             pipeClient.Flush();
 
@@ -272,12 +272,12 @@ public static partial class SingleInstanceManager
             catch (IOException ioEx)
             {
                 Debug.WriteLine($"管道服务器IO错误: {ioEx.Message}");
-                await Task.Delay(IoErrorRetryDelay, cancellationToken);
+                await Task.Delay(IO_ERROR_RETRY_DELAY, cancellationToken);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"管道服务器错误: {ex.Message}");
-                await Task.Delay(GeneralErrorRetryDelay, cancellationToken);
+                await Task.Delay(GENERAL_ERROR_RETRY_DELAY, cancellationToken);
             }
             finally
             {
@@ -295,7 +295,7 @@ public static partial class SingleInstanceManager
     /// </summary>
     /// <returns>管道服务器实例</returns>
     private static NamedPipeServerStream CreatePipeServer() => new(
-            PipeName,
+            PIPE_NAME,
             PipeDirection.In,
             maxNumberOfServerInstances: 1,
             PipeTransmissionMode.Byte,
@@ -321,7 +321,7 @@ public static partial class SingleInstanceManager
 
             Debug.WriteLine($"收到消息: {message}");
 
-            if (message == ActivationMessage)
+            if (message == ACTIVATION_MESSAGE)
             {
                 // 在UI线程上激活窗口
                 await Application.Current.Dispatcher.InvokeAsync(() =>
@@ -467,7 +467,7 @@ public static partial class SingleInstanceManager
         {
             Debug.WriteLine("窗口已最小化，正在恢复...");
             window.WindowState = WindowState.Normal;
-            ShowWindow(windowHandle, SwRestore);
+            ShowWindow(windowHandle, SW_RESTORE);
         }
     }
 
@@ -480,7 +480,7 @@ public static partial class SingleInstanceManager
     {
         window.Show();
         window.ShowInTaskbar = true;
-        ShowWindow(windowHandle, SwShowNormal);
+        ShowWindow(windowHandle, SW_SHOW_NORMAL);
     }
 
     /// <summary>
@@ -622,8 +622,8 @@ public static partial class SingleInstanceManager
             {
                 cbSize = (uint)Marshal.SizeOf<FlashWindowInfo>(),
                 hwnd = hWnd,
-                dwFlags = FlashwAll | FlashwTimerNoFg,
-                uCount = FlashCount,
+                dwFlags = FLASHW_ALL | FLASHW_TIMER_NO_FG,
+                uCount = FLASH_COUNT,
                 dwTimeout = 0 // 使用默认闪烁频率
             };
 

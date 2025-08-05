@@ -299,7 +299,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     {
         var trayGroup = new DynamicSettingGroup
         {
-            Name = SettingCategories.Tray,
+            Name = SettingCategories.TRAY,
             DisplayName = "系统托盘",
             Description = "管理系统托盘相关设置",
             Icon = "\ue61e",
@@ -309,10 +309,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 关闭时最小化到托盘
         trayGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.MinimizeToTrayOnClose,
+            Key = SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE,
             DisplayName = "关闭时最小化到托盘",
             Description = "点击关闭按钮时将窗口最小化到系统托盘，而不是完全退出应用程序。",
-            Category = SettingCategories.Tray,
+            Category = SettingCategories.TRAY,
             SettingType = DynamicSettingType.Toggle,
             DefaultValue = true,
             Order = 1,
@@ -322,10 +322,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 显示托盘图标
         trayGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.ShowTrayIcon,
+            Key = SettingKeys.SHOW_TRAY_ICON,
             DisplayName = "显示系统托盘图标",
             Description = "在系统托盘区域显示应用程序图标，方便快速访问和控制应用程序。",
-            Category = SettingCategories.Tray,
+            Category = SettingCategories.TRAY,
             SettingType = DynamicSettingType.Toggle,
             DefaultValue = true,
             Order = 2,
@@ -335,10 +335,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 显示托盘通知
         trayGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.ShowTrayNotifications,
+            Key = SettingKeys.SHOW_TRAY_NOTIFICATIONS,
             DisplayName = "显示托盘通知",
             Description = "允许应用程序通过系统托盘显示重要通知和状态更新。",
-            Category = SettingCategories.Tray,
+            Category = SettingCategories.TRAY,
             SettingType = DynamicSettingType.Toggle,
             DefaultValue = true,
             Order = 3,
@@ -353,7 +353,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     {
         var uiGroup = new DynamicSettingGroup
         {
-            Name = SettingCategories.Ui,
+            Name = SettingCategories.UI,
             DisplayName = "外观",
             Description = "自定义应用程序的外观和主题",
             Icon = "\ue61f",
@@ -363,10 +363,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 主题模式 - 修复：不需要 DisplayMemberPath 和 SelectedValuePath
         uiGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.ThemeMode,
+            Key = SettingKeys.THEME_MODE,
             DisplayName = "主题模式",
             Description = "选择应用程序的外观主题。浅色模式适合白天使用，深色模式有助于减少眼疲劳。",
-            Category = SettingCategories.Ui,
+            Category = SettingCategories.UI,
             SettingType = DynamicSettingType.ComboBox,
             DefaultValue = ThemeMode.Light,
             Order = 1,
@@ -381,10 +381,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 主题颜色 - 修复：不需要 DisplayMemberPath 和 SelectedValuePath
         uiGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.ThemeColor,
+            Key = SettingKeys.THEME_COLOR,
             DisplayName = "主题颜色",
             Description = "选择应用程序的强调色，这将影响按钮、链接和其他交互元素的颜色。",
-            Category = SettingCategories.Ui,
+            Category = SettingCategories.UI,
             SettingType = DynamicSettingType.ComboBox,
             DefaultValue = ThemeColor.Blue,
             Order = 2,
@@ -399,10 +399,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 字体大小 - 修复：使用 double 类型
         uiGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.FontSize,
+            Key = SettingKeys.FONT_SIZE,
             DisplayName = "字体大小",
             Description = "调整界面文字的显示大小，较大的字体有助于提高可读性。",
-            Category = SettingCategories.Ui,
+            Category = SettingCategories.UI,
             SettingType = DynamicSettingType.Slider,
             DefaultValue = 12.0, // 修复：使用 double
             Order = 3,
@@ -419,10 +419,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 界面语言 - 修复：正确设置 DisplayMemberPath 和 SelectedValuePath
         uiGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.Language,
+            Key = SettingKeys.LANGUAGE,
             DisplayName = "界面语言",
             Description = "选择应用程序界面的显示语言。更改后可能需要重启应用程序。",
-            Category = SettingCategories.Ui,
+            Category = SettingCategories.UI,
             SettingType = DynamicSettingType.ComboBox,
             DefaultValue = "zh-CN",
             Order = 4,
@@ -450,7 +450,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     {
         var hotKeyGroup = new DynamicSettingGroup
         {
-            Name = SettingCategories.HotKey,
+            Name = SettingCategories.HOT_KEY,
             DisplayName = "快捷键",
             Description = "自定义应用程序的快捷键设置",
             Icon = "\ue623",
@@ -460,10 +460,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 显示主窗口快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeyShowMainWindow,
+            Key = SettingKeys.HOT_KEY_SHOW_MAIN_WINDOW,
             DisplayName = "显示主窗口",
             Description = "显示或隐藏主窗口的全局快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.F1, ModifierKeys.Alt),
             Order = 1,
@@ -474,10 +474,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 快速搜索快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeyQuickSearch,
+            Key = SettingKeys.HOT_KEY_QUICK_SEARCH,
             DisplayName = "快速搜索",
             Description = "快速启动搜索功能的全局快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.F2, ModifierKeys.Control | ModifierKeys.Alt),
             Order = 2,
@@ -488,10 +488,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 搜索快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeySearch,
+            Key = SettingKeys.HOT_KEY_SEARCH,
             DisplayName = "搜索",
             Description = "在应用程序内执行搜索的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.F, ModifierKeys.Control),
             Order = 3,
@@ -502,10 +502,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 刷新快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeyRefresh,
+            Key = SettingKeys.HOT_KEY_REFRESH,
             DisplayName = "刷新",
             Description = "刷新当前页面或数据的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.F5, ModifierKeys.None),
             Order = 4,
@@ -516,10 +516,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 设置快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeySettings,
+            Key = SettingKeys.HOT_KEY_SETTINGS,
             DisplayName = "设置",
             Description = "打开设置页面的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.S, ModifierKeys.Control),
             Order = 5,
@@ -530,10 +530,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 退出快捷键
         hotKeyGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.HotKeyExit,
+            Key = SettingKeys.HOT_KEY_EXIT,
             DisplayName = "退出",
             Description = "退出应用程序的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             SettingType = DynamicSettingType.HotKey,
             DefaultValue = CreateDefaultHotKeySetting(Key.Q, ModifierKeys.Control),
             Order = 6,
@@ -551,7 +551,7 @@ public class DynamicSettingsService : IDynamicSettingsService
     {
         var appGroup = new DynamicSettingGroup
         {
-            Name = SettingCategories.Application,
+            Name = SettingCategories.APPLICATION,
             DisplayName = "应用程序",
             Description = "管理应用程序行为和启动设置",
             Icon = "\ue621",
@@ -561,10 +561,10 @@ public class DynamicSettingsService : IDynamicSettingsService
         // 开机自启动
         appGroup.Items.Add(new DynamicSettingItem
         {
-            Key = SettingKeys.AutoStartup,
+            Key = SettingKeys.AUTO_STARTUP,
             DisplayName = "开机自启动",
             Description = "启用后，应用程序将在系统启动时自动运行，无需手动打开。",
-            Category = SettingCategories.Application,
+            Category = SettingCategories.APPLICATION,
             SettingType = DynamicSettingType.Toggle,
             DefaultValue = false,
             Order = 1,
@@ -646,10 +646,10 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <returns>显示名称</returns>
     private static string GetCategoryDisplayName(string category) => category switch
     {
-        SettingCategories.Tray => "系统托盘",
-        SettingCategories.Ui => "外观",
-        SettingCategories.Application => "应用程序",
-        SettingCategories.Search => "搜索",
+        SettingCategories.TRAY => "系统托盘",
+        SettingCategories.UI => "外观",
+        SettingCategories.APPLICATION => "应用程序",
+        SettingCategories.SEARCH => "搜索",
         _ => category
     };
 
@@ -660,10 +660,10 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <returns>图标</returns>
     private static string GetCategoryIcon(string category) => category switch
     {
-        SettingCategories.Tray => "\ue61e",
-        SettingCategories.Ui => "\ue61f",
-        SettingCategories.Application => "\ue621",
-        SettingCategories.Search => "\ue622",
+        SettingCategories.TRAY => "\ue61e",
+        SettingCategories.UI => "\ue61f",
+        SettingCategories.APPLICATION => "\ue621",
+        SettingCategories.SEARCH => "\ue622",
         _ => "\ue620"
     };
 
@@ -674,10 +674,10 @@ public class DynamicSettingsService : IDynamicSettingsService
     /// <returns>排序值</returns>
     private static int GetCategoryOrder(string category) => category switch
     {
-        SettingCategories.Tray => 1,
-        SettingCategories.Ui => 2,
-        SettingCategories.Application => 3,
-        SettingCategories.Search => 4,
+        SettingCategories.TRAY => 1,
+        SettingCategories.UI => 2,
+        SettingCategories.APPLICATION => 3,
+        SettingCategories.SEARCH => 4,
         _ => 999
     };
 

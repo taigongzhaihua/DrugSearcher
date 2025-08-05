@@ -63,12 +63,12 @@ public class HotKeyService : IHotKeyService
             Debug.WriteLine("开始注册默认快捷键...");
 
             // 从设置中加载快捷键配置
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeyShowMainWindow, OnShowMainWindow, "显示主窗口", true);
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeyQuickSearch, OnQuickSearch, "快速搜索", true);
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeySearch, OnSearch, "搜索", false);
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeyRefresh, OnRefresh, "刷新", false);
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeySettings, OnSettings, "设置", false);
-            await RegisterHotKeyFromSetting(SettingKeys.HotKeyExit, OnExit, "退出", false);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_SHOW_MAIN_WINDOW, OnShowMainWindow, "显示主窗口", true);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_QUICK_SEARCH, OnQuickSearch, "快速搜索", true);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_SEARCH, OnSearch, "搜索", false);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_REFRESH, OnRefresh, "刷新", false);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_SETTINGS, OnSettings, "设置", false);
+            await RegisterHotKeyFromSetting(SettingKeys.HOT_KEY_EXIT, OnExit, "退出", false);
 
             _isInitialized = true;
             Debug.WriteLine("默认快捷键注册完成");
@@ -377,12 +377,12 @@ public class HotKeyService : IHotKeyService
     /// </summary>
     private Dictionary<string, (Action callback, string description, bool isGlobal)> GetHotKeyActionMappings() => new()
     {
-            { SettingKeys.HotKeyShowMainWindow, (OnShowMainWindow, "显示主窗口", true) },
-            { SettingKeys.HotKeyQuickSearch, (OnQuickSearch, "快速搜索", true) },
-            { SettingKeys.HotKeySearch, (OnSearch, "搜索", false) },
-            { SettingKeys.HotKeyRefresh, (OnRefresh, "刷新", false) },
-            { SettingKeys.HotKeySettings, (OnSettings, "设置", false) },
-            { SettingKeys.HotKeyExit, (OnExit, "退出", false) }
+            { SettingKeys.HOT_KEY_SHOW_MAIN_WINDOW, (OnShowMainWindow, "显示主窗口", true) },
+            { SettingKeys.HOT_KEY_QUICK_SEARCH, (OnQuickSearch, "快速搜索", true) },
+            { SettingKeys.HOT_KEY_SEARCH, (OnSearch, "搜索", false) },
+            { SettingKeys.HOT_KEY_REFRESH, (OnRefresh, "刷新", false) },
+            { SettingKeys.HOT_KEY_SETTINGS, (OnSettings, "设置", false) },
+            { SettingKeys.HOT_KEY_EXIT, (OnExit, "退出", false) }
         };
 
     #endregion

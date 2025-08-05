@@ -23,6 +23,8 @@ public interface IVersionService
     /// <returns>版本历史</returns>
     Task<IEnumerable<VersionInfo>> GetVersionHistoryAsync();
 
+    Task<bool> CleanupOldVersionsAsync();
+    Task<bool> ApplyUpdateAsync(UpdateProgressCallback? progressCallback = null);
     /// <summary>
     /// 清除版本缓存
     /// </summary>
@@ -35,12 +37,23 @@ public interface IVersionService
 public class VersionInfo
 {
     public string Version { get; set; } = string.Empty;
+
     public DateTime ReleaseDate { get; set; }
+
     public string Description { get; set; } = string.Empty;
+
     public List<string> Features { get; set; } = [];
+
     public List<string> Fixes { get; set; } = [];
+
+    public bool IsClickOnceDeployed { get; set; }
+
+    public Dictionary<string, string> DeploymentInfo { get; set; } = [];
+
     public bool IsPreRelease { get; set; }
+
     public string DownloadUrl { get; set; } = string.Empty;
+
     public long FileSize { get; set; }
 }
 
@@ -50,7 +63,12 @@ public class VersionInfo
 public class UpdateCheckResult
 {
     public bool HasUpdate { get; set; }
+
     public VersionInfo? LatestVersion { get; set; }
+
     public string Message { get; set; } = string.Empty;
+
+    public string ErrorMessage { get; set; } = string.Empty;
+
     public bool IsRequired { get; set; }
 }

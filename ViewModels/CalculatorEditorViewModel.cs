@@ -66,6 +66,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     [ObservableProperty]
     public partial DosageParameterViewModel? SelectedParameter { get; set; }
+
     public ObservableCollection<DosageParameterViewModel> Parameters { get; }
 
     public string WindowTitle => IsEditing ? $"编辑计算器 - {_drugInfo.DrugName}" : $"创建计算器 - {_drugInfo.DrugName}";
@@ -111,7 +112,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         {
             Name = GenerateParameterName(),
             DisplayName = "新参数",
-            DataType = ParameterTypes.Number,
+            DataType = ParameterTypes.NUMBER,
             Unit = "",
             IsRequired = false,
             DefaultValue = 0,
@@ -521,7 +522,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         {
             Name = "weight",
             DisplayName = "体重",
-            DataType = ParameterTypes.Number,
+            DataType = ParameterTypes.NUMBER,
             Unit = "kg",
             IsRequired = true,
             DefaultValue = 70,
@@ -534,7 +535,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         {
             Name = "age",
             DisplayName = "年龄",
-            DataType = ParameterTypes.Number,
+            DataType = ParameterTypes.NUMBER,
             Unit = "岁",
             IsRequired = true,
             DefaultValue = 35,
@@ -547,7 +548,7 @@ public partial class CalculatorEditorViewModel : ObservableObject
         {
             Name = "severity",
             DisplayName = "病情严重程度",
-            DataType = ParameterTypes.Select,
+            DataType = ParameterTypes.SELECT,
             IsRequired = true,
             DefaultValue = "中度",
             OptionsText = "轻度, 中度, 重度",
@@ -570,9 +571,9 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     private static string GenerateParameterCode(DosageParameterViewModel parameter) => parameter.DataType switch
     {
-        ParameterTypes.Number => $"// 获取{parameter.DisplayName}\n{parameter.Name} = parseFloat({parameter.Name}) || {parameter.DefaultValue ?? 0};\n",
-        ParameterTypes.Boolean => $"// 获取{parameter.DisplayName}\n{parameter.Name} = Boolean({parameter.Name});\n",
-        ParameterTypes.Select => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n",
+        ParameterTypes.NUMBER => $"// 获取{parameter.DisplayName}\n{parameter.Name} = parseFloat({parameter.Name}) || {parameter.DefaultValue ?? 0};\n",
+        ParameterTypes.BOOLEAN => $"// 获取{parameter.DisplayName}\n{parameter.Name} = Boolean({parameter.Name});\n",
+        ParameterTypes.SELECT => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n",
         _ => $"// 获取{parameter.DisplayName}\n{parameter.Name} = {parameter.Name} || '{parameter.DefaultValue ?? ""}';\n"
     };
 
@@ -739,9 +740,9 @@ public partial class CalculatorEditorViewModel : ObservableObject
 
     private static object GetTestValue(DosageParameterViewModel param) => param.DataType switch
     {
-        ParameterTypes.Number => param.DefaultValue ?? 0,
-        ParameterTypes.Boolean => param.DefaultValue ?? false,
-        ParameterTypes.Select => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
+        ParameterTypes.NUMBER => param.DefaultValue ?? 0,
+        ParameterTypes.BOOLEAN => param.DefaultValue ?? false,
+        ParameterTypes.SELECT => param.DefaultValue ?? param.Options?.FirstOrDefault() ?? "",
         _ => param.DefaultValue ?? ""
     };
 

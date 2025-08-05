@@ -141,8 +141,8 @@ public static partial class WindowColorManager
         var result = SetWindows10Colors(hwnd, borderColor, actualTitleBarColor);
         if (result == null) return unsupportedResult;
         _ = RefreshWindow(window);
-        ++ window.Width ;
-        -- window.Width ;
+        ++window.Width;
+        --window.Width;
         return result;
 
     }
@@ -438,5 +438,13 @@ public record WindowColorResult(bool BorderSuccess, bool TitleBarSuccess, string
 {
     public bool IsFullySuccessful => BorderSuccess && TitleBarSuccess;
     public bool IsPartiallySuccessful => BorderSuccess || TitleBarSuccess;
+
+    public bool BorderSuccess { get; init; } = BorderSuccess;
+
+    public bool TitleBarSuccess { get; init; } = TitleBarSuccess;
+
+    public string Method { get; init; } = Method;
+
+    public string Message { get; init; } = Message;
 }
 #endregion

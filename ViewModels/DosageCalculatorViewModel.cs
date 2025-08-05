@@ -36,8 +36,11 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
 
     [ObservableProperty]
     public partial string StatusMessage { get; set; } = "请选择药物以查看可用的计算器";
+
     public ObservableCollection<DosageCalculator> AvailableCalculators { get; } = [];
+
     public ObservableCollection<DosageParameter> Parameters { get; } = [];
+
     public ObservableCollection<DosageCalculationResult> CalculationResults { get; } = [];
 
     #endregion
@@ -109,8 +112,8 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
                 {
                     param.Value = param.DataType switch
                     {
-                        ParameterTypes.Boolean => false,
-                        ParameterTypes.Number => 0.0,
+                        ParameterTypes.BOOLEAN => false,
+                        ParameterTypes.NUMBER => 0.0,
                         _ => string.Empty
                     };
                 }
@@ -160,8 +163,8 @@ public partial class DosageCalculatorViewModel(JavaScriptDosageCalculatorService
                     // 根据参数类型转换值
                     object value = param.DataType switch
                     {
-                        ParameterTypes.Number => Convert.ToDouble(param.Value),
-                        ParameterTypes.Boolean => Convert.ToBoolean(param.Value),
+                        ParameterTypes.NUMBER => Convert.ToDouble(param.Value),
+                        ParameterTypes.BOOLEAN => Convert.ToBoolean(param.Value),
                         _ => param.Value.ToString() ?? string.Empty
                     };
                     if (param.Name != null) paramDict[param.Name] = value;

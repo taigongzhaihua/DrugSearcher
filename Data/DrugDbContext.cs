@@ -11,17 +11,17 @@ public class DrugDbContext(DbContextOptions<DrugDbContext> options) : DbContext(
     /// <summary>
     /// 本地药物信息表
     /// </summary>
-    public DbSet<LocalDrugInfo> LocalDrugInfos { get; set; }
+    public DbSet<LocalDrugInfo>? LocalDrugInfos { get; set; }
 
     /// <summary>
     /// 在线药物信息表
     /// </summary>
-    public DbSet<OnlineDrugInfo> OnlineDrugInfos { get; set; }
+    public DbSet<OnlineDrugInfo>? OnlineDrugInfos { get; set; }
 
     /// <summary>
     /// 剂量计算器表
     /// </summary>
-    public DbSet<DosageCalculator> DosageCalculators { get; set; }
+    public DbSet<DosageCalculator>? DosageCalculators { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

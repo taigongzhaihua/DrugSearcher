@@ -78,11 +78,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     private static List<SettingDefinition> CreateTraySettings() => [
             new()
             {
-                Key = SettingKeys.MinimizeToTrayOnClose,
+                Key = SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE,
                 ValueType = typeof(bool),
                 DefaultValue = true,
                 Description = "关闭窗口时最小化到托盘",
-                Category = SettingCategories.Tray,
+                Category = SettingCategories.TRAY,
                 IsReadOnly = false,
                 Validator = value => value is bool
             },
@@ -90,11 +90,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
 
             new()
             {
-                Key = SettingKeys.ShowTrayIcon,
+                Key = SettingKeys.SHOW_TRAY_ICON,
                 ValueType = typeof(bool),
                 DefaultValue = true,
                 Description = "显示系统托盘图标",
-                Category = SettingCategories.Tray,
+                Category = SettingCategories.TRAY,
                 IsReadOnly = false,
                 Validator = value => value is bool
             },
@@ -102,11 +102,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
 
             new()
             {
-                Key = SettingKeys.ShowTrayNotifications,
+                Key = SettingKeys.SHOW_TRAY_NOTIFICATIONS,
                 ValueType = typeof(bool),
                 DefaultValue = true,
                 Description = "显示托盘通知",
-                Category = SettingCategories.Tray,
+                Category = SettingCategories.TRAY,
                 IsReadOnly = false,
                 Validator = value => value is bool
             }
@@ -119,11 +119,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     private static List<SettingDefinition> CreateUiSettings() => [
             new()
             {
-                Key = SettingKeys.ThemeMode,
+                Key = SettingKeys.THEME_MODE,
                 ValueType = typeof(ThemeMode),
                 DefaultValue = ThemeMode.Light,
                 Description = "主题模式（浅色/深色/跟随系统）",
-                Category = SettingCategories.Ui,
+                Category = SettingCategories.UI,
                 IsReadOnly = false,
                 Validator = ValidateThemeMode
             },
@@ -131,11 +131,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
 
             new()
             {
-                Key = SettingKeys.ThemeColor,
+                Key = SettingKeys.THEME_COLOR,
                 ValueType = typeof(ThemeColor),
                 DefaultValue = ThemeColor.Blue,
                 Description = "主题颜色",
-                Category = SettingCategories.Ui,
+                Category = SettingCategories.UI,
                 IsReadOnly = false,
                 Validator = ValidateThemeColor
             },
@@ -143,11 +143,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
 
             new()
             {
-                Key = SettingKeys.FontSize,
+                Key = SettingKeys.FONT_SIZE,
                 ValueType = typeof(int),
                 DefaultValue = 12,
                 Description = "字体大小",
-                Category = SettingCategories.Ui,
+                Category = SettingCategories.UI,
                 IsReadOnly = false,
                 Validator = ValidateFontSize
             },
@@ -155,11 +155,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
 
             new()
             {
-                Key = SettingKeys.Language,
+                Key = SettingKeys.LANGUAGE,
                 ValueType = typeof(string),
                 DefaultValue = "zh-CN",
                 Description = "界面语言",
-                Category = SettingCategories.Ui,
+                Category = SettingCategories.UI,
                 IsReadOnly = false,
                 Validator = ValidateLanguage
             }
@@ -170,66 +170,66 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     private static List<SettingDefinition> CreateHotKeySettings() => [
             new()
             {
-            Key = SettingKeys.HotKeyShowMainWindow,
+            Key = SettingKeys.HOT_KEY_SHOW_MAIN_WINDOW,
             ValueType = typeof(string), // 改为string类型，存储JSON
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F1, ModifierKeys.Alt)),
             Description = "显示主窗口的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null // 移除验证器，在DynamicSettingsService中处理
         },
 
         new()
         {
-            Key = SettingKeys.HotKeyQuickSearch,
+            Key = SettingKeys.HOT_KEY_QUICK_SEARCH,
             ValueType = typeof(string),
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F2, ModifierKeys.Control | ModifierKeys.Alt)),
             Description = "快速搜索的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null
         },
 
         new()
         {
-            Key = SettingKeys.HotKeySearch,
+            Key = SettingKeys.HOT_KEY_SEARCH,
             ValueType = typeof(string),
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F, ModifierKeys.Control)),
             Description = "搜索的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null
         },
 
         new()
         {
-            Key = SettingKeys.HotKeyRefresh,
+            Key = SettingKeys.HOT_KEY_REFRESH,
             ValueType = typeof(string),
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.F5, ModifierKeys.None)),
             Description = "刷新的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null
         },
 
         new()
         {
-            Key = SettingKeys.HotKeySettings,
+            Key = SettingKeys.HOT_KEY_SETTINGS,
             ValueType = typeof(string),
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.S, ModifierKeys.Control)),
             Description = "设置的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null
         },
 
         new()
         {
-            Key = SettingKeys.HotKeyExit,
+            Key = SettingKeys.HOT_KEY_EXIT,
             ValueType = typeof(string),
             DefaultValue = JsonSerializer.Serialize(new HotKeySetting(Key.Q, ModifierKeys.Control)),
             Description = "退出的快捷键",
-            Category = SettingCategories.HotKey,
+            Category = SettingCategories.HOT_KEY,
             IsReadOnly = false,
             Validator = null
         }
@@ -241,11 +241,11 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     private static List<SettingDefinition> CreateApplicationSettings() => [
             new()
             {
-                Key = SettingKeys.AutoStartup,
+                Key = SettingKeys.AUTO_STARTUP,
                 ValueType = typeof(bool),
                 DefaultValue = false,
                 Description = "开机自启动",
-                Category = SettingCategories.Application,
+                Category = SettingCategories.APPLICATION,
                 IsReadOnly = false,
                 Validator = value => value is bool
             }
@@ -276,8 +276,8 @@ public class DefaultSettingsProvider : IDefaultSettingsProvider
     /// <returns>是否有效</returns>
     private static bool ValidateFontSize(object? value) => value switch
     {
-        double doubleSize => doubleSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
-        int intSize => intSize is >= FontSizeConstraints.MinSize and <= FontSizeConstraints.MaxSize,
+        double doubleSize => doubleSize is >= FontSizeConstraints.MIN_SIZE and <= FontSizeConstraints.MAX_SIZE,
+        int intSize => intSize is >= FontSizeConstraints.MIN_SIZE and <= FontSizeConstraints.MAX_SIZE,
         _ => false
     };
 

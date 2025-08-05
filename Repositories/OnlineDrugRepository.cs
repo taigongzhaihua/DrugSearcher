@@ -20,18 +20,18 @@ public class OnlineDrugRepository(
     private static readonly TimeSpan LongCacheExpiration = TimeSpan.FromMinutes(30);
     private static readonly TimeSpan StatisticsCacheExpiration = TimeSpan.FromMinutes(15);
 
-    private const string CacheKeyPrefix = "OnlineDrug";
-    private const string CacheKeyAll = $"{CacheKeyPrefix}_All";
-    private const string CacheKeyStatistics = $"{CacheKeyPrefix}_Statistics";
-    private const string CacheKeyCountPrefix = $"{CacheKeyPrefix}_Count";
-    private const string CacheKeySearchPrefix = $"{CacheKeyPrefix}_Search";
-    private const string CacheKeySuggestionsPrefix = $"{CacheKeyPrefix}_Suggestions";
-    private const string CacheKeyRecentPrefix = $"{CacheKeyPrefix}_Recent";
-    private const string CacheKeyPagedPrefix = $"{CacheKeyPrefix}_Paged";
+    private const string CACHE_KEY_PREFIX = "OnlineDrug";
+    private const string CACHE_KEY_ALL = $"{CACHE_KEY_PREFIX}_All";
+    private const string CACHE_KEY_STATISTICS = $"{CACHE_KEY_PREFIX}_Statistics";
+    private const string CACHE_KEY_COUNT_PREFIX = $"{CACHE_KEY_PREFIX}_Count";
+    private const string CACHE_KEY_SEARCH_PREFIX = $"{CACHE_KEY_PREFIX}_Search";
+    private const string CACHE_KEY_SUGGESTIONS_PREFIX = $"{CACHE_KEY_PREFIX}_Suggestions";
+    private const string CACHE_KEY_RECENT_PREFIX = $"{CACHE_KEY_PREFIX}_Recent";
+    private const string CACHE_KEY_PAGED_PREFIX = $"{CACHE_KEY_PREFIX}_Paged";
 
     public async Task<OnlineDrugInfo?> GetByIdAsync(int id)
     {
-        var cacheKey = $"{CacheKeyPrefix}_ById_{id}";
+        var cacheKey = $"{CACHE_KEY_PREFIX}_ById_{id}";
 
         if (cache.TryGetValue<OnlineDrugInfo>(cacheKey, out var cached))
         {
@@ -39,7 +39,7 @@ public class OnlineDrugRepository(
         }
 
         await using var context = contextFactory.CreateDbContext();
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .FirstOrDefaultAsync(d => d.Id == id);
 
@@ -51,9 +51,10 @@ public class OnlineDrugRepository(
         return result;
     }
 
+    // Fix for CA1873: Wrap expensive logging arguments in a conditional check for IsEnabled
     public async Task<List<OnlineDrugInfo>> GetAllAsync()
     {
-        if (cache.TryGetValue<List<OnlineDrugInfo>>(CacheKeyAll, out var cached))
+        if (cache.TryGetValue<List<OnlineDrugInfo>>(CACHE_KEY_ALL, out var cached))
         {
             if (cached != null) return cached;
         }
@@ -61,22 +62,27 @@ public class OnlineDrugRepository(
         var sw = System.Diagnostics.Stopwatch.StartNew();
         await using var context = contextFactory.CreateDbContext();
 
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .OrderBy(d => d.DrugName)
             .ToListAsync();
 
         sw.Stop();
-        logger.LogDebug($"GetAllAsync 查询耗时: {sw.ElapsedMilliseconds}ms, 返回 {result.Count} 条记录");
+
+        // Check if logging is enabled before evaluating the expensive argument
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug($"GetAllAsync 查询耗时: {sw.ElapsedMilliseconds}ms, 返回 {result.Count} 条记录");
+        }
 
         // 使用较短的缓存时间，因为数据量可能很大
-        cache.Set(CacheKeyAll, result, ShortCacheExpiration);
+        cache.Set(CACHE_KEY_ALL, result, ShortCacheExpiration);
         return result;
     }
 
     public async Task<(List<OnlineDrugInfo> Items, int TotalCount)> GetPagedAsync(int pageIndex, int pageSize, CrawlStatus? status = null)
     {
-        var cacheKey = $"{CacheKeyPagedPrefix}_{pageIndex}_{pageSize}_{status?.ToString() ?? "null"}";
+        var cacheKey = $"{CACHE_KEY_PAGED_PREFIX}_{pageIndex}_{pageSize}_{status?.ToString() ?? "null"}";
 
         if (cache.TryGetValue<(List<OnlineDrugInfo>, int)>(cacheKey, out var cached))
         {
@@ -86,7 +92,7 @@ public class OnlineDrugRepository(
         var sw = System.Diagnostics.Stopwatch.StartNew();
         await using var context = contextFactory.CreateDbContext();
 
-        var query = context.OnlineDrugInfos.AsNoTracking().AsQueryable();
+        var query = (context.OnlineDrugInfos ?? throw new InvalidOperationException()).AsNoTracking().AsQueryable();
         if (status.HasValue)
         {
             query = query.Where(d => d.CrawlStatus == status.Value);
@@ -105,7 +111,12 @@ public class OnlineDrugRepository(
         var result = (await itemsTask, await countTask);
 
         sw.Stop();
-        logger.LogDebug($"GetPagedAsync 查询耗时: {sw.ElapsedMilliseconds}ms");
+
+        // Check if logging is enabled before evaluating the expensive argument
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug($"GetPagedAsync 查询耗时: {sw.ElapsedMilliseconds}ms");
+        }
 
         cache.Set(cacheKey, result, DefaultCacheExpiration);
         return result;
@@ -116,7 +127,7 @@ public class OnlineDrugRepository(
         if (string.IsNullOrWhiteSpace(keyword))
             return [];
 
-        var cacheKey = $"{CacheKeySearchPrefix}_{keyword.ToLower().Trim()}";
+        var cacheKey = $"{CACHE_KEY_SEARCH_PREFIX}_{keyword.ToLower().Trim()}";
 
         if (cache.TryGetValue<List<OnlineDrugInfo>>(cacheKey, out var cached))
         {
@@ -128,7 +139,7 @@ public class OnlineDrugRepository(
 
         var keywordTrimmed = keyword.Trim();
 
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus == CrawlStatus.Success &&
                        (EF.Functions.Like(d.DrugName, $"%{keywordTrimmed}%") ||
@@ -140,7 +151,12 @@ public class OnlineDrugRepository(
             .ToListAsync();
 
         sw.Stop();
-        logger.LogDebug($"SearchAsync '{keyword}' 耗时: {sw.ElapsedMilliseconds}ms, 返回 {result.Count} 条记录");
+
+        // Check if logging is enabled before evaluating the expensive argument
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug($"SearchAsync '{keyword}' 耗时: {sw.ElapsedMilliseconds}ms, 返回 {result.Count} 条记录");
+        }
 
         cache.Set(cacheKey, result, DefaultCacheExpiration);
         return result;
@@ -163,7 +179,7 @@ public class OnlineDrugRepository(
             };
         }
 
-        var cacheKey = $"{CacheKeySearchPrefix}_Paginated_{keyword.ToLower().Trim()}_{pageIndex}_{pageSize}_{includeCount}";
+        var cacheKey = $"{CACHE_KEY_SEARCH_PREFIX}_Paginated_{keyword.ToLower().Trim()}_{pageIndex}_{pageSize}_{includeCount}";
 
         if (cache.TryGetValue<PaginatedResult<OnlineDrugInfo>>(cacheKey, out var cached))
         {
@@ -174,7 +190,7 @@ public class OnlineDrugRepository(
         await using var context = contextFactory.CreateDbContext();
 
         var keywordTrimmed = keyword.Trim();
-        var query = context.OnlineDrugInfos
+        var query = (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus == CrawlStatus.Success)
             .Where(d =>
@@ -206,7 +222,8 @@ public class OnlineDrugRepository(
         };
 
         sw.Stop();
-        logger.LogDebug($"SearchWithPaginationOptimizedAsync '{keyword}' 耗时: {sw.ElapsedMilliseconds}ms");
+        var message = $"SearchWithPaginationOptimizedAsync '{keyword}' 耗时: {sw.ElapsedMilliseconds}ms";
+        logger.LogDebug(message);
 
         cache.Set(cacheKey, result, ShortCacheExpiration);
         return result;
@@ -217,7 +234,7 @@ public class OnlineDrugRepository(
         if (string.IsNullOrWhiteSpace(keyword))
             return [];
 
-        var cacheKey = $"{CacheKeySuggestionsPrefix}_{keyword.ToLower().Trim()}";
+        var cacheKey = $"{CACHE_KEY_SUGGESTIONS_PREFIX}_{keyword.ToLower().Trim()}";
 
         if (cache.TryGetValue<List<string>>(cacheKey, out var cached))
         {
@@ -227,7 +244,7 @@ public class OnlineDrugRepository(
         await using var context = contextFactory.CreateDbContext();
         var keywordTrimmed = keyword.Trim();
 
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus == CrawlStatus.Success &&
                        EF.Functions.Like(d.DrugName, $"%{keywordTrimmed}%"))
@@ -242,7 +259,7 @@ public class OnlineDrugRepository(
 
     public async Task<bool> ExistsAsync(int id)
     {
-        var cacheKey = $"{CacheKeyPrefix}_Exists_{id}";
+        var cacheKey = $"{CACHE_KEY_PREFIX}_Exists_{id}";
 
         if (cache.TryGetValue<bool>(cacheKey, out var cached))
         {
@@ -250,7 +267,7 @@ public class OnlineDrugRepository(
         }
 
         await using var context = contextFactory.CreateDbContext();
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .AnyAsync(d => d.Id == id);
 
@@ -262,7 +279,7 @@ public class OnlineDrugRepository(
     {
         await using var context = contextFactory.CreateDbContext();
 
-        var existing = await context.OnlineDrugInfos.FindAsync(onlineDrugInfo.Id);
+        var existing = await (context.OnlineDrugInfos ?? throw new InvalidOperationException()).FindAsync(onlineDrugInfo.Id);
 
         if (existing == null)
         {
@@ -288,11 +305,11 @@ public class OnlineDrugRepository(
 
         foreach (var drugInfo in drugInfos)
         {
-            var existing = await context.OnlineDrugInfos.FindAsync(drugInfo.Id);
+            var existing = await (context.OnlineDrugInfos ?? throw new InvalidOperationException()).FindAsync(drugInfo.Id);
 
             if (existing == null)
             {
-                context.OnlineDrugInfos.Add(drugInfo);
+                (context.OnlineDrugInfos ?? throw new InvalidOperationException()).Add(drugInfo);
             }
             else
             {
@@ -312,7 +329,7 @@ public class OnlineDrugRepository(
     public async Task<bool> DeleteAsync(int id)
     {
         await using var context = contextFactory.CreateDbContext();
-        var drugInfo = await context.OnlineDrugInfos.FindAsync(id);
+        var drugInfo = await (context.OnlineDrugInfos ?? throw new InvalidOperationException()).FindAsync(id);
         if (drugInfo == null) return false;
 
         context.OnlineDrugInfos.Remove(drugInfo);
@@ -327,7 +344,7 @@ public class OnlineDrugRepository(
     public async Task<bool> DeleteRangeAsync(List<int> ids)
     {
         await using var context = contextFactory.CreateDbContext();
-        var drugInfos = await context.OnlineDrugInfos
+        var drugInfos = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .Where(d => ids.Contains(d.Id))
             .ToListAsync();
 
@@ -344,7 +361,7 @@ public class OnlineDrugRepository(
 
     public async Task<int> GetCountByStatusAsync(CrawlStatus status)
     {
-        var cacheKey = $"{CacheKeyCountPrefix}_{status}";
+        var cacheKey = $"{CACHE_KEY_COUNT_PREFIX}_{status}";
 
         if (cache.TryGetValue<int>(cacheKey, out var cached))
         {
@@ -352,7 +369,7 @@ public class OnlineDrugRepository(
         }
 
         await using var context = contextFactory.CreateDbContext();
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .CountAsync(d => d.CrawlStatus == status);
 
@@ -362,7 +379,7 @@ public class OnlineDrugRepository(
 
     public async Task<List<int>> GetFailedDrugIdsAsync()
     {
-        const string cacheKey = $"{CacheKeyPrefix}_FailedIds";
+        const string cacheKey = $"{CACHE_KEY_PREFIX}_FailedIds";
 
         if (cache.TryGetValue<List<int>>(cacheKey, out var cached))
         {
@@ -370,7 +387,7 @@ public class OnlineDrugRepository(
         }
 
         await using var context = contextFactory.CreateDbContext();
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus != CrawlStatus.Success)
             .Select(d => d.Id)
@@ -384,7 +401,7 @@ public class OnlineDrugRepository(
 
     public async Task<CrawlStatistics> GetCrawlStatisticsAsync()
     {
-        if (cache.TryGetValue<CrawlStatistics>(CacheKeyStatistics, out var cached))
+        if (cache.TryGetValue<CrawlStatistics>(CACHE_KEY_STATISTICS, out var cached))
         {
             if (cached != null) return cached;
         }
@@ -397,7 +414,7 @@ public class OnlineDrugRepository(
         var monthStart = new DateTime(today.Year, today.Month, 1);
 
         // 使用批量查询优化
-        var allRecords = await context.OnlineDrugInfos
+        var allRecords = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Select(d => new { d.CrawlStatus, d.CrawledAt })
             .ToListAsync();
@@ -419,15 +436,16 @@ public class OnlineDrugRepository(
             : 0;
 
         sw.Stop();
-        logger.LogDebug($"GetCrawlStatisticsAsync 查询耗时: {sw.ElapsedMilliseconds}ms");
+        string message = $"GetCrawlStatisticsAsync 查询耗时: {sw.ElapsedMilliseconds}ms";
+        logger.LogDebug(message);
 
-        cache.Set(CacheKeyStatistics, statistics, StatisticsCacheExpiration);
+        cache.Set(CACHE_KEY_STATISTICS, statistics, StatisticsCacheExpiration);
         return statistics;
     }
 
     public async Task<List<OnlineDrugInfo>> GetByStatusAsync(CrawlStatus status, int? limit = null)
     {
-        var cacheKey = $"{CacheKeyPrefix}_ByStatus_{status}_{limit?.ToString() ?? "null"}";
+        var cacheKey = $"{CACHE_KEY_PREFIX}_ByStatus_{status}_{limit?.ToString() ?? "null"}";
 
         if (cache.TryGetValue<List<OnlineDrugInfo>>(cacheKey, out var cached))
         {
@@ -436,7 +454,7 @@ public class OnlineDrugRepository(
 
         await using var context = contextFactory.CreateDbContext();
 
-        var query = context.OnlineDrugInfos
+        var query = (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus == status)
             .OrderByDescending(d => d.CrawledAt);
@@ -454,7 +472,7 @@ public class OnlineDrugRepository(
 
     public async Task<List<OnlineDrugInfo>> GetRecentCrawledAsync(int count = 10)
     {
-        var cacheKey = $"{CacheKeyRecentPrefix}_{count}";
+        var cacheKey = $"{CACHE_KEY_RECENT_PREFIX}_{count}";
 
         if (cache.TryGetValue<List<OnlineDrugInfo>>(cacheKey, out var cached))
         {
@@ -463,7 +481,7 @@ public class OnlineDrugRepository(
 
         await using var context = contextFactory.CreateDbContext();
 
-        var result = await context.OnlineDrugInfos
+        var result = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .AsNoTracking()
             .Where(d => d.CrawlStatus == CrawlStatus.Success)
             .OrderByDescending(d => d.CrawledAt)
@@ -478,7 +496,7 @@ public class OnlineDrugRepository(
     {
         await using var context = contextFactory.CreateDbContext();
 
-        var oldRecords = await context.OnlineDrugInfos
+        var oldRecords = await (context.OnlineDrugInfos ?? throw new InvalidOperationException())
             .Where(d => d.CrawlStatus == status && d.CrawledAt < olderThan)
             .ToListAsync();
 
@@ -500,8 +518,8 @@ public class OnlineDrugRepository(
     private void InvalidateRelatedCaches(int id)
     {
         // 清除特定ID的缓存
-        cache.Remove($"{CacheKeyPrefix}_ById_{id}");
-        cache.Remove($"{CacheKeyPrefix}_Exists_{id}");
+        cache.Remove($"{CACHE_KEY_PREFIX}_ById_{id}");
+        cache.Remove($"{CACHE_KEY_PREFIX}_Exists_{id}");
 
         // 清除统计相关缓存
         InvalidateStatisticsCaches();
@@ -516,8 +534,8 @@ public class OnlineDrugRepository(
     private void InvalidateAllCaches()
     {
         // 清除所有主要缓存键
-        cache.Remove(CacheKeyAll);
-        cache.Remove(CacheKeyStatistics);
+        cache.Remove(CACHE_KEY_ALL);
+        cache.Remove(CACHE_KEY_STATISTICS);
 
         // 清除统计相关缓存
         InvalidateStatisticsCaches();
@@ -536,15 +554,15 @@ public class OnlineDrugRepository(
     /// </summary>
     private void InvalidateStatisticsCaches()
     {
-        cache.Remove(CacheKeyStatistics);
+        cache.Remove(CACHE_KEY_STATISTICS);
 
         // 清除各状态的计数缓存
         foreach (var status in Enum.GetValues<CrawlStatus>())
         {
-            cache.Remove($"{CacheKeyCountPrefix}_{status}");
+            cache.Remove($"{CACHE_KEY_COUNT_PREFIX}_{status}");
         }
 
-        cache.Remove($"{CacheKeyPrefix}_FailedIds");
+        cache.Remove($"{CACHE_KEY_PREFIX}_FailedIds");
     }
 
     /// <summary>
@@ -552,21 +570,21 @@ public class OnlineDrugRepository(
     /// </summary>
     private void InvalidateListCaches()
     {
-        cache.Remove(CacheKeyAll);
+        cache.Remove(CACHE_KEY_ALL);
 
         // 清除最近记录缓存
         for (var i = 1; i <= 50; i += 5) // 常用的数量
         {
-            cache.Remove($"{CacheKeyRecentPrefix}_{i}");
+            cache.Remove($"{CACHE_KEY_RECENT_PREFIX}_{i}");
         }
 
         // 清除状态相关缓存
         foreach (var status in Enum.GetValues<CrawlStatus>())
         {
-            cache.Remove($"{CacheKeyPrefix}_ByStatus_{status}_null");
+            cache.Remove($"{CACHE_KEY_PREFIX}_ByStatus_{status}_null");
             for (var limit = 10; limit <= 100; limit += 10)
             {
-                cache.Remove($"{CacheKeyPrefix}_ByStatus_{status}_{limit}");
+                cache.Remove($"{CACHE_KEY_PREFIX}_ByStatus_{status}_{limit}");
             }
         }
     }

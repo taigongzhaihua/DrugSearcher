@@ -84,6 +84,7 @@ public partial class CrawlerPageViewModel : ObservableObject
     [ObservableProperty] public partial int ParseErrorDrugs { get; set; }
 
     [ObservableProperty] public partial string CompletionRate { get; set; } = "0%";
+
     public ObservableCollection<CrawlLogEntry> CrawlLogs { get; }
 
     #endregion
@@ -410,7 +411,9 @@ public partial class CrawlerPageViewModel : ObservableObject
 public class CrawlLogEntry
 {
     public DateTime Timestamp { get; set; }
+
     public LogLevel Level { get; set; }
+
     public string Message { get; set; } = string.Empty;
 
     public string FormattedTimestamp => Timestamp.ToString("HH:mm:ss");

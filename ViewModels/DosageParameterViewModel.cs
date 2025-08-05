@@ -9,7 +9,7 @@ public partial class DosageParameterViewModel : ObservableObject
     {
         Options = [];
         OptionsText = string.Empty;
-        DataType = ParameterTypes.Number;
+        DataType = ParameterTypes.NUMBER;
     }
     /// <summary>
     /// 转换为模型对象
@@ -52,7 +52,7 @@ public partial class DosageParameterViewModel : ObservableObject
     public partial string DisplayName { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string DataType { get; set; } = ParameterTypes.Number;
+    public partial string DataType { get; set; } = ParameterTypes.NUMBER;
 
     [ObservableProperty]
     public partial string Unit { get; set; } = string.Empty;
@@ -92,7 +92,7 @@ public partial class DosageParameterViewModel : ObservableObject
         {
             switch (DataType)
             {
-                case ParameterTypes.Number:
+                case ParameterTypes.NUMBER:
                     {
                         if (double.TryParse(value, out var numValue))
                         {
@@ -105,7 +105,7 @@ public partial class DosageParameterViewModel : ObservableObject
 
                         break;
                     }
-                case ParameterTypes.Boolean:
+                case ParameterTypes.BOOLEAN:
                     {
                         if (bool.TryParse(value, out var boolValue))
                         {
@@ -184,19 +184,19 @@ public partial class DosageParameterViewModel : ObservableObject
         // 根据数据类型设置默认值
         switch (value)
         {
-            case ParameterTypes.Number:
+            case ParameterTypes.NUMBER:
                 if (DefaultValue == null || !IsNumeric(DefaultValue))
                     DefaultValue = 0;
                 break;
-            case ParameterTypes.Boolean:
+            case ParameterTypes.BOOLEAN:
                 if (DefaultValue == null || DefaultValue is not bool)
                     DefaultValue = false;
                 break;
-            case ParameterTypes.Select:
+            case ParameterTypes.SELECT:
                 if (DefaultValue == null || DefaultValue is not string)
                     DefaultValue = "";
                 break;
-            case ParameterTypes.Text:
+            case ParameterTypes.TEXT:
                 if (DefaultValue == null || DefaultValue is not string)
                     DefaultValue = "";
                 break;
@@ -209,10 +209,10 @@ public partial class DosageParameterViewModel : ObservableObject
 
     private static bool IsNumeric(object value) => value is byte or sbyte or short or ushort or int or uint or long or ulong or float or double or decimal;
 
-    public bool IsNumberType => DataType == ParameterTypes.Number;
-    public bool IsSelectType => DataType == ParameterTypes.Select;
-    public bool IsBooleanType => DataType == ParameterTypes.Boolean;
-    public bool IsTextType => DataType == ParameterTypes.Text;
+    public bool IsNumberType => DataType == ParameterTypes.NUMBER;
+    public bool IsSelectType => DataType == ParameterTypes.SELECT;
+    public bool IsBooleanType => DataType == ParameterTypes.BOOLEAN;
+    public bool IsTextType => DataType == ParameterTypes.TEXT;
 
     // 为DataGrid提供数据类型选项
     public static List<string> DataTypeOptions => ParameterTypes.All;

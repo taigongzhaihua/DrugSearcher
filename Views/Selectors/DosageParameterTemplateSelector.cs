@@ -7,8 +7,11 @@ namespace DrugSearcher.Views.Selectors;
 public class DosageParameterTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? TextTemplate { get; set; }
+
     public DataTemplate? NumberTemplate { get; set; }
+
     public DataTemplate? BooleanTemplate { get; set; }
+
     public DataTemplate? SelectionTemplate { get; set; }
 
     public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
@@ -18,10 +21,10 @@ public class DosageParameterTemplateSelector : DataTemplateSelector
 
         return parameter.DataType switch
         {
-            ParameterTypes.Text => TextTemplate,
-            ParameterTypes.Number => NumberTemplate,
-            ParameterTypes.Boolean => BooleanTemplate,
-            ParameterTypes.Select => SelectionTemplate,
+            ParameterTypes.TEXT => TextTemplate,
+            ParameterTypes.NUMBER => NumberTemplate,
+            ParameterTypes.BOOLEAN => BooleanTemplate,
+            ParameterTypes.SELECT => SelectionTemplate,
             _ => TextTemplate
         };
     }

@@ -13,7 +13,9 @@ namespace DrugSearcher.Views;
 public partial class CalculatorGenerationDialog
 {
     public string CalculatorType { get; private set; } = string.Empty;
+
     public string AdditionalRequirements { get; private set; } = string.Empty;
+
     private readonly ThemeManager _themeManager;
 
     public CalculatorGenerationDialog()

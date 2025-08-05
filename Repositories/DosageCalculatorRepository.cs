@@ -1,6 +1,7 @@
 using DrugSearcher.Data;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace DrugSearcher.Repositories;
 
@@ -12,13 +13,14 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<DosageCalculator?> GetByIdAsync(int id)
     {
         await using var context = contextFactory.CreateDbContext();
+        Debug.Assert(context.DosageCalculators != null);
         return await context.DosageCalculators.FindAsync(id);
     }
 
     public async Task<List<DosageCalculator>> GetAllAsync()
     {
         await using var context = contextFactory.CreateDbContext();
-        return await context.DosageCalculators
+        return await (context.DosageCalculators ?? throw new InvalidOperationException())
             .Where(c => c.IsActive)
             .OrderBy(c => c.DrugName)
             .ThenBy(c => c.CalculatorName)
@@ -28,7 +30,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<List<DosageCalculator>> GetByDrugIdentifierAsync(string drugIdentifier)
     {
         await using var context = contextFactory.CreateDbContext();
-        return await context.DosageCalculators
+        return await (context.DosageCalculators ?? throw new InvalidOperationException())
             .Where(c => c.DrugIdentifier == drugIdentifier && c.IsActive)
             .OrderBy(c => c.CalculatorName)
             .ToListAsync();
@@ -37,7 +39,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<List<DosageCalculator>> GetByDataSourceAndDrugIdAsync(DataSource dataSource, int drugId)
     {
         await using var context = contextFactory.CreateDbContext();
-        return await context.DosageCalculators
+        return await (context.DosageCalculators ?? throw new InvalidOperationException())
             .Where(c => c.DataSource == dataSource && c.OriginalDrugId == drugId && c.IsActive)
             .OrderBy(c => c.CalculatorName)
             .ToListAsync();
@@ -53,7 +55,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     {
         await using var context = contextFactory.CreateDbContext();
 
-        var query = context.DosageCalculators.Where(c => c.IsActive);
+        var query = (context.DosageCalculators ?? throw new InvalidOperationException()).Where(c => c.IsActive);
         var totalCount = await query.CountAsync();
 
         var items = await query
@@ -74,7 +76,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
         await using var context = contextFactory.CreateDbContext();
         var keywordLower = keyword.Trim().ToLower();
 
-        return await context.DosageCalculators
+        return await (context.DosageCalculators ?? throw new InvalidOperationException())
             .Where(c => c.IsActive &&
                        (EF.Functions.Like(c.DrugName.ToLower(), $"%{keywordLower}%") ||
                         EF.Functions.Like(c.CalculatorName.ToLower(), $"%{keywordLower}%") ||
@@ -87,7 +89,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<bool> ExistsAsync(DataSource dataSource, int drugId, string calculatorName)
     {
         await using var context = contextFactory.CreateDbContext();
-        return await context.DosageCalculators
+        return await (context.DosageCalculators ?? throw new InvalidOperationException())
             .AnyAsync(c => c.DataSource == dataSource &&
                           c.OriginalDrugId == drugId &&
                           c.CalculatorName == calculatorName &&
@@ -99,6 +101,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
         await using var context = contextFactory.CreateDbContext();
         calculator.CreatedAt = DateTime.Now;
         calculator.UpdatedAt = DateTime.Now;
+        Debug.Assert(context.DosageCalculators != null);
         context.DosageCalculators.Add(calculator);
         await context.SaveChangesAsync();
         return calculator;
@@ -108,6 +111,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     {
         await using var context = contextFactory.CreateDbContext();
         calculator.UpdatedAt = DateTime.Now;
+        Debug.Assert(context.DosageCalculators != null);
         context.DosageCalculators.Update(calculator);
         await context.SaveChangesAsync();
         return calculator;
@@ -116,7 +120,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<bool> DeleteAsync(int id)
     {
         await using var context = contextFactory.CreateDbContext();
-        var calculator = await context.DosageCalculators.FindAsync(id);
+        var calculator = await (context.DosageCalculators ?? throw new InvalidOperationException()).FindAsync(id);
         if (calculator == null) return false;
 
         // 软删除
@@ -129,7 +133,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
     public async Task<bool> DeleteRangeAsync(List<int> ids)
     {
         await using var context = contextFactory.CreateDbContext();
-        var calculators = await context.DosageCalculators
+        var calculators = await (context.DosageCalculators ?? throw new InvalidOperationException())
             .Where(c => ids.Contains(c.Id))
             .ToListAsync();
 
@@ -155,7 +159,7 @@ public class DosageCalculatorRepository(IDrugDbContextFactory contextFactory) : 
 
         var statistics = new DosageCalculatorStatistics
         {
-            TotalCalculators = await context.DosageCalculators.CountAsync(),
+            TotalCalculators = await (context.DosageCalculators ?? throw new InvalidOperationException()).CountAsync(),
             ActiveCalculators = await context.DosageCalculators.CountAsync(c => c.IsActive),
             TodayCreated = await context.DosageCalculators.CountAsync(c => c.CreatedAt.Date == today),
             WeekCreated = await context.DosageCalculators.CountAsync(c => c.CreatedAt.Date >= weekStart),

@@ -14,27 +14,27 @@ public static class SystemThemeHelper
     /// <summary>
     /// 系统主题注册表键路径
     /// </summary>
-    private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+    private const string REGISTRY_KEY_PATH = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
 
     /// <summary>
     /// 应用主题注册表值名称
     /// </summary>
-    private const string RegistryValueName = "AppsUseLightTheme";
+    private const string REGISTRY_VALUE_NAME = "AppsUseLightTheme";
 
     /// <summary>
     /// 系统主题注册表值名称（用于系统级主题检测）
     /// </summary>
-    private const string SystemRegistryValueName = "SystemUsesLightTheme";
+    private const string SYSTEM_REGISTRY_VALUE_NAME = "SystemUsesLightTheme";
 
     /// <summary>
     /// 浅色主题注册表值
     /// </summary>
-    private const int LightThemeValue = 1;
+    private const int LIGHT_THEME_VALUE = 1;
 
     /// <summary>
     /// 深色主题注册表值
     /// </summary>
-    private const int DarkThemeValue = 0;
+    private const int DARK_THEME_VALUE = 0;
 
     #endregion
 
@@ -229,13 +229,13 @@ public static class SystemThemeHelper
     /// 检测应用主题是否为深色
     /// </summary>
     /// <returns>如果是深色主题返回true，浅色主题返回false，无法检测返回null</returns>
-    private static bool? IsAppThemeDark() => GetThemeValueFromRegistry(RegistryValueName);
+    private static bool? IsAppThemeDark() => GetThemeValueFromRegistry(REGISTRY_VALUE_NAME);
 
     /// <summary>
     /// 检测系统主题是否为深色
     /// </summary>
     /// <returns>如果是深色主题返回true，浅色主题返回false，无法检测返回null</returns>
-    private static bool? IsSystemThemeDark() => GetThemeValueFromRegistry(SystemRegistryValueName);
+    private static bool? IsSystemThemeDark() => GetThemeValueFromRegistry(SYSTEM_REGISTRY_VALUE_NAME);
 
     /// <summary>
     /// 从注册表获取主题值
@@ -246,10 +246,10 @@ public static class SystemThemeHelper
     {
         try
         {
-            using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
+            using var key = Registry.CurrentUser.OpenSubKey(REGISTRY_KEY_PATH);
             if (key == null)
             {
-                Debug.WriteLine($"无法打开注册表键: {RegistryKeyPath}");
+                Debug.WriteLine($"无法打开注册表键: {REGISTRY_KEY_PATH}");
                 return null;
             }
 
@@ -262,7 +262,7 @@ public static class SystemThemeHelper
                 case int registryValue:
                     {
                         // 0表示深色主题，1表示浅色主题
-                        var isDark = registryValue == DarkThemeValue;
+                        var isDark = registryValue == DARK_THEME_VALUE;
                         Debug.WriteLine($"注册表值 {valueName}: {registryValue} ({(isDark ? "深色" : "浅色")})");
                         return isDark;
                     }
@@ -390,9 +390,9 @@ public static class SystemThemeHelper
         /// </summary>
         /// <returns>主题信息字符串</returns>
         public readonly override string ToString() => $"App: {(IsAppThemeDark?.ToString() ?? "Unknown")}, " +
-                   $"System: {(IsSystemThemeDark?.ToString() ?? "Unknown")}, " +
-                   $"Effective: {(EffectiveThemeIsDark ? "Dark" : "Light")}, " +
-                   $"Success: {IsDetectionSuccessful}";
+                                                      $"System: {(IsSystemThemeDark?.ToString() ?? "Unknown")}, " +
+                                                      $"Effective: {(EffectiveThemeIsDark ? "Dark" : "Light")}, " +
+                                                      $"Success: {IsDetectionSuccessful}";
     }
 
     /// <summary>

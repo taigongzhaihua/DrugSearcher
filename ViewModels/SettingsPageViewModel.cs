@@ -509,5 +509,6 @@ public partial class SettingsPageViewModel : ObservableObject
 public class HotKeyConflictResult
 {
     public bool HasConflict { get; set; }
+
     public string ConflictDescription { get; set; } = string.Empty;
 }

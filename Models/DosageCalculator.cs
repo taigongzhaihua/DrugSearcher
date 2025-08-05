@@ -54,7 +54,9 @@ public class DosageCalculator
     public string ParameterDefinitions { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
     public bool IsActive { get; set; } = true;
 
     [MaxLength(50)]
@@ -83,11 +85,17 @@ public class DosageCalculator
 public class DosageParameter
 {
     public string? Name { get; set; } = string.Empty;
+
     public string DisplayName { get; set; } = string.Empty;
+
     public string DataType { get; set; } = string.Empty; // "number", "text", "select", "boolean"
+
     public string Unit { get; set; } = string.Empty;
+
     public bool IsRequired { get; set; } = true;
+
     public double? MinValue { get; set; }
+
     public double? MaxValue { get; set; }
 
     /// <summary>
@@ -97,10 +105,12 @@ public class DosageParameter
     public object? DefaultValue { get; set; }
 
     public List<string> Options { get; set; } = [];
+
     public string Description { get; set; } = string.Empty;
 
     [JsonIgnore]
     public object Value { get; set; } = null!; // UI绑定用
+
     /// <summary>
     /// 获取类型化的默认值
     /// </summary>
@@ -130,16 +140,16 @@ public class DosageParameter
         {
             return DataType switch
             {
-                ParameterTypes.Number => 0.0,
-                ParameterTypes.Boolean => false,
+                ParameterTypes.NUMBER => 0.0,
+                ParameterTypes.BOOLEAN => false,
                 _ => string.Empty
             };
         }
 
         return DataType switch
         {
-            ParameterTypes.Number => (object)GetTypedDefaultValue<double>() ?? 0.0,
-            ParameterTypes.Boolean => (object)GetTypedDefaultValue<bool>() ?? false,
+            ParameterTypes.NUMBER => (object)GetTypedDefaultValue<double>() ?? 0.0,
+            ParameterTypes.BOOLEAN => (object)GetTypedDefaultValue<bool>() ?? false,
             _ => GetTypedDefaultValue<string>() ?? string.Empty
         };
     }
@@ -217,12 +227,19 @@ public class FlexibleDefaultValueConverter : JsonConverter<object?>
 public class DosageCalculationResult
 {
     public string Description { get; set; } = string.Empty;
+
     public double Dose { get; set; }
+
     public string Unit { get; set; } = string.Empty;
+
     public string Frequency { get; set; } = string.Empty;
+
     public string Duration { get; set; } = string.Empty;
+
     public string Notes { get; set; } = string.Empty;
+
     public bool IsWarning { get; set; }
+
     public string WarningMessage { get; set; } = string.Empty;
 }
 
@@ -232,6 +249,7 @@ public class DosageCalculationResult
 public class DosageCalculationRequest
 {
     public int CalculatorId { get; set; }
+
     public Dictionary<string, object> Parameters { get; set; } = [];
 
     public string CalculationCode { get; set; } = string.Empty;
@@ -243,10 +261,15 @@ public class DosageCalculationRequest
 public class DosageCalculatorStatistics
 {
     public int TotalCalculators { get; set; }
+
     public int ActiveCalculators { get; set; }
+
     public int TodayCreated { get; set; }
+
     public int WeekCreated { get; set; }
+
     public int MonthCreated { get; set; }
+
     public Dictionary<string, int> CalculatorsByDrug { get; set; } = [];
 }
 
@@ -255,11 +278,11 @@ public class DosageCalculatorStatistics
 /// </summary>
 public static class ParameterTypes
 {
-    public const string Number = "number";
-    public const string Text = "text";
-    public const string Select = "select";
-    public const string Boolean = "boolean";
-    public const string Array = "array";
+    public const string NUMBER = "number";
+    public const string TEXT = "text";
+    public const string SELECT = "select";
+    public const string BOOLEAN = "boolean";
+    public const string ARRAY = "array";
 
-    public static readonly List<string> All = [Number, Text, Select, Boolean];
+    public static readonly List<string> All = [NUMBER, TEXT, SELECT, BOOLEAN];
 }

@@ -1,21 +1,22 @@
-﻿using Autofac;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
 using DrugSearcher.Data;
 using DrugSearcher.Managers;
 using DrugSearcher.Repositories;
 using DrugSearcher.Services;
 using DrugSearcher.ViewModels;
 using DrugSearcher.Views;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace DrugSearcher.Configuration;
 
 /// <summary>
-/// Autofac 依赖注入容器配置
+/// Microsoft.Extensions.DependencyInjection 依赖注入容器配置
 /// </summary>
 public static class ContainerConfig
 {
@@ -23,29 +24,29 @@ public static class ContainerConfig
     /// 配置依赖注入容器
     /// </summary>
     /// <returns>配置好的容器实例</returns>
-    public static IContainer Configure()
+    public static IServiceProvider Configure()
     {
-        var builder = new ContainerBuilder();
+        var services = new ServiceCollection();
 
         try
         {
             // 按类别注册各种依赖
-            RegisterLoggingServices(builder);
-            RegisterDatabaseServices(builder);
-            RegisterRepositories(builder);
-            RegisterCacheServices(builder);
-            RegisterBusinessServices(builder);
-            RegisterSettingsServices(builder); // 新增：注册设置服务
-            RegisterViewModels(builder);
-            RegisterViews(builder);
-            RegisterManagers(builder);
+            RegisterLoggingServices(services);
+            RegisterDatabaseServices(services);
+            RegisterRepositories(services);
+            RegisterCacheServices(services);
+            RegisterBusinessServices(services);
+            RegisterSettingsServices(services);
+            RegisterViewModels(services);
+            RegisterViews(services);
+            RegisterManagers(services);
 
-            var container = builder.Build();
+            var serviceProvider = services.BuildServiceProvider();
 
             // 初始化动态设置系统
-            InitializeDynamicSettings(container);
+            InitializeDynamicSettings(serviceProvider);
 
-            return container;
+            return serviceProvider;
         }
         catch (Exception ex)
         {
@@ -54,50 +55,32 @@ public static class ContainerConfig
         }
     }
 
-
     /// <summary>
     /// 注册日志服务
     /// </summary>
-    private static void RegisterLoggingServices(ContainerBuilder builder)
+    private static void RegisterLoggingServices(IServiceCollection services)
     {
-        // 注册 ILoggerFactory
-        builder.Register<ILoggerFactory>(_ =>
+        // 注册日志服务
+        services.AddLogging(config =>
         {
-            var loggerFactory = LoggerFactory.Create(config =>
-            {
-                config.AddConsole();
-                config.AddDebug();
-                config.SetMinimumLevel(LogLevel.Information);
+            config.AddConsole();
+            config.AddDebug();
 
-                // 开发环境下启用更详细的日志
 #if DEBUG
-                config.SetMinimumLevel(LogLevel.Debug);
+            config.SetMinimumLevel(LogLevel.Debug);
+#else
+            config.SetMinimumLevel(LogLevel.Information);
 #endif
-            });
-
-            return loggerFactory;
-        }).As<ILoggerFactory>().SingleInstance();
-
-        // 注册泛型 ILogger<T>
-        builder.RegisterGeneric(typeof(Logger<>))
-            .As(typeof(ILogger<>))
-            .SingleInstance();
-
-        // 注册 ILogger (非泛型版本)
-        builder.Register(context =>
-        {
-            var loggerFactory = context.Resolve<ILoggerFactory>();
-            return loggerFactory.CreateLogger("DrugSearcher");
-        }).As<ILogger>().SingleInstance();
+        });
     }
 
     /// <summary>
     /// 注册数据库相关服务
     /// </summary>
-    private static void RegisterDatabaseServices(ContainerBuilder builder)
+    private static void RegisterDatabaseServices(IServiceCollection services)
     {
         // 注册 ApplicationDbContext 配置
-        builder.Register(_ =>
+        services.AddSingleton(provider =>
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             var dbPath = GetDatabasePath();
@@ -110,10 +93,10 @@ public static class ContainerConfig
 #endif
 
             return optionsBuilder.Options;
-        }).As<DbContextOptions<ApplicationDbContext>>().SingleInstance();
+        });
 
         // 注册药物数据库上下文配置
-        builder.Register(_ =>
+        services.AddSingleton(provider =>
         {
             var optionsBuilder = new DbContextOptionsBuilder<DrugDbContext>();
             var dbPath = GetDrugDatabasePath();
@@ -126,245 +109,168 @@ public static class ContainerConfig
 #endif
 
             return optionsBuilder.Options;
-        }).As<DbContextOptions<DrugDbContext>>().SingleInstance();
+        });
+
+        // 注册数据库上下文（作为 Transient，每次请求创建新实例）
+        services.AddTransient<ApplicationDbContext>();
+        services.AddTransient<DrugDbContext>();
 
         // 注册数据库工厂
-        builder.RegisterType<ApplicationDbContextFactory>()
-            .As<IApplicationDbContextFactory>()
-            .SingleInstance();
-
-        builder.RegisterType<DrugDbContextFactory>()
-            .As<IDrugDbContextFactory>()
-            .SingleInstance();
+        services.AddSingleton<IApplicationDbContextFactory, ApplicationDbContextFactory>();
+        services.AddSingleton<IDrugDbContextFactory, DrugDbContextFactory>();
     }
 
     /// <summary>
     /// 注册仓储层
     /// </summary>
-    private static void RegisterRepositories(ContainerBuilder builder)
+    private static void RegisterRepositories(IServiceCollection services)
     {
         // 注册适配器保持向后兼容
-        builder.RegisterType<DrugRepository>()
-            .As<IDrugRepository>()
-            .InstancePerLifetimeScope();
-
-        builder.RegisterType<OnlineDrugRepository>()
-            .As<IOnlineDrugRepository>()
-            .InstancePerLifetimeScope();
-        builder.RegisterType<DosageCalculatorRepository>()
-            .As<IDosageCalculatorRepository>()
-            .InstancePerLifetimeScope();
+        services.AddScoped<IDrugRepository, DrugRepository>();
+        services.AddScoped<IOnlineDrugRepository, OnlineDrugRepository>();
+        services.AddScoped<IDosageCalculatorRepository, DosageCalculatorRepository>();
     }
-    private static void RegisterCacheServices(ContainerBuilder builder)
+
+    /// <summary>
+    /// 注册缓存服务
+    /// </summary>
+    private static void RegisterCacheServices(IServiceCollection services)
     {
-        // 注册 MemoryCache 配置
-        builder.Register(c => Options.Create(new MemoryCacheOptions
-        {
-            CompactionPercentage = 0.05, // 缓存压缩百分比
-            ExpirationScanFrequency = TimeSpan.FromMinutes(5) // 过期扫描频率
-        }))
-            .As<IOptions<MemoryCacheOptions>>()
-            .SingleInstance();
-
         // 注册 MemoryCache
-        builder.RegisterType<MemoryCache>()
-            .As<IMemoryCache>()
-            .SingleInstance();
+        services.AddMemoryCache(options =>
+        {
+            options.CompactionPercentage = 0.05; // 缓存压缩百分比
+            options.ExpirationScanFrequency = TimeSpan.FromMinutes(5); // 过期扫描频率
+        });
     }
+
     /// <summary>
     /// 注册业务服务层
     /// </summary>
-    private static void RegisterBusinessServices(ContainerBuilder builder)
+    private static void RegisterBusinessServices(IServiceCollection services)
     {
         // 注册 HttpClient
-        builder.Register(_ =>
+        services.AddHttpClient();
+
+        // 为 VersionService 注册专用的 HttpClient
+        services.AddHttpClient<IVersionService, VersionService>(client =>
         {
-            var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromMinutes(5) // 设置超时时间
-            };
-            return httpClient;
-        }).As<HttpClient>().InstancePerLifetimeScope();
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
+
+        // 注册通用 HttpClient（用于其他服务）
+        services.AddScoped(provider =>
+        {
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+            return httpClientFactory.CreateClient();
+        });
 
         // 快捷键服务 - 全局单例
-        builder.RegisterType<HotKeyService>()
-            .As<IHotKeyService>()
-            .SingleInstance();
+        services.AddSingleton<IHotKeyService, HotKeyService>();
 
         // 数据处理服务 - 根据使用场景选择生命周期
-        builder.RegisterType<ExcelService>()
-            .As<IExcelService>()
-            .InstancePerLifetimeScope(); // Excel 处理可能消耗资源，使用作用域
-
-        builder.RegisterType<LocalDrugService>()
-            .As<ILocalDrugService>()
-            .InstancePerLifetimeScope(); // 数据操作服务使用作用域
-
-        builder.RegisterType<YaozsOnlineDrugService>()
-            .As<IOnlineDrugService>()
-            .InstancePerLifetimeScope(); // 在线药物服务使用作用域
+        services.AddScoped<IExcelService, ExcelService>();
+        services.AddScoped<ILocalDrugService, LocalDrugService>();
+        services.AddScoped<IOnlineDrugService, YaozsOnlineDrugService>();
 
         // 药物搜索服务 - 聚合服务
-        builder.RegisterType<DrugSearchService>()
-            .AsSelf()
-            .InstancePerLifetimeScope(); // 改为作用域，避免状态混乱
+        services.AddScoped<DrugSearchService>();
 
-        builder.RegisterType<DatabaseInitializationService>()
-            .As<IDatabaseInitializationService>()
-            .SingleInstance();
-
-        builder.RegisterType<VersionService>()
-            .As<IVersionService>()
-            .SingleInstance();
-
-        builder.RegisterType<JavaScriptDosageCalculatorService>()
-            .AsSelf()
-            .SingleInstance();
-
-        builder.RegisterType<DosageCalculatorAiService>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<IDatabaseInitializationService, DatabaseInitializationService>();
+        services.AddSingleton<JavaScriptDosageCalculatorService>();
+        services.AddSingleton<DosageCalculatorAiService>();
     }
 
     /// <summary>
     /// 注册设置相关服务
     /// </summary>
-    private static void RegisterSettingsServices(ContainerBuilder builder)
+    private static void RegisterSettingsServices(IServiceCollection services)
     {
         // 注册默认设置提供程序
-        builder.RegisterType<DefaultSettingsProvider>()
-            .As<IDefaultSettingsProvider>()
-            .SingleInstance();
+        services.AddSingleton<IDefaultSettingsProvider, DefaultSettingsProvider>();
 
         // 注册用户设置服务 - 全局单例
-        builder.RegisterType<UserSettingsService>()
-            .As<IUserSettingsService>()
-            .SingleInstance();
+        services.AddSingleton<IUserSettingsService, UserSettingsService>();
 
         // 注册动态设置服务 - 全局单例
-        builder.RegisterType<DynamicSettingsService>()
-            .As<IDynamicSettingsService>()
-            .SingleInstance();
+        services.AddSingleton<IDynamicSettingsService, DynamicSettingsService>();
     }
 
     /// <summary>
     /// 注册视图模型
     /// </summary>
-    private static void RegisterViewModels(ContainerBuilder builder)
+    private static void RegisterViewModels(IServiceCollection services)
     {
         // 主窗口 ViewModel - 全局单例
-        builder.RegisterType<MainWindowViewModel>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<MainWindowViewModel>();
 
         // 设置页面 ViewModel - 全局单例
-        builder.RegisterType<SettingsPageViewModel>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<SettingsPageViewModel>();
 
         // 首页页面 ViewModels - 全局单例
-        builder.RegisterType<HomePageViewModel>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<HomePageViewModel>();
 
         // 注册本地数据管理ViewModel
-        builder.RegisterType<LocalDataManagementViewModel>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<LocalDataManagementViewModel>();
 
         // 注册药物编辑对话框ViewModel
-        builder.RegisterType<DrugEditDialogViewModel>()
-            .AsSelf()
-            .InstancePerDependency();
+        services.AddTransient<DrugEditDialogViewModel>();
 
-        builder.RegisterType<CrawlerPageViewModel>()
-            .AsSelf()
-            .SingleInstance();
-
-        builder.RegisterType<AboutPageViewModel>()
-            .AsSelf()
-            .SingleInstance();
-
-        builder.RegisterType<DosageParameterViewModel>()
-            .AsSelf()
-            .InstancePerLifetimeScope();
+        services.AddSingleton<CrawlerPageViewModel>();
+        services.AddSingleton<AboutPageViewModel>();
+        services.AddScoped<DosageParameterViewModel>();
     }
 
     /// <summary>
     /// 注册视图
     /// </summary>
-    private static void RegisterViews(ContainerBuilder builder)
+    private static void RegisterViews(IServiceCollection services)
     {
         // 主窗口 - 全局单例
-        builder.RegisterType<MainWindow>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<MainWindow>();
 
         // 设置页面 - 全局单例（通常设置页面可以复用）
-        builder.RegisterType<SettingsPage>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<SettingsPage>();
 
         // 首页页面 - 全局单例
-        builder.RegisterType<HomePage>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<HomePage>();
 
         // 注册本地数据管理页面
-        builder.RegisterType<LocalDataManagementPage>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<LocalDataManagementPage>();
 
         // 注册药物编辑对话框
-        builder.RegisterType<DrugEditDialog>()
-            .AsSelf()
-            .InstancePerDependency(); // 对话框通常是临时的，使用 InstancePerDependency
+        services.AddTransient<DrugEditDialog>();
 
         // 注册爬虫页面
-        builder.RegisterType<CrawlerPage>()
-            .AsSelf()
-            .SingleInstance(); // 爬虫页面通常是全局单例
+        services.AddSingleton<CrawlerPage>();
 
-        builder.RegisterType<AboutPage>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<AboutPage>();
     }
 
     /// <summary>
     /// 注册管理器和工具类
     /// </summary>
-    private static void RegisterManagers(ContainerBuilder builder)
+    private static void RegisterManagers(IServiceCollection services)
     {
         // 主题管理器 - 全局单例
-        builder.RegisterType<ThemeManager>()
-            .AsSelf()
-            .SingleInstance();
+        services.AddSingleton<ThemeManager>();
 
-        builder.Register(context =>
-            {
-                // 这里我们需要从容器中解析 MainWindow
-                var mainWindow = context.Resolve<MainWindow>();
-                return new HotKeyManager(mainWindow);
-            })
-            .AsSelf()
-            .SingleInstance();
-        // 其他管理器可以在这里添加
-        // builder.RegisterType<ConfigurationManager>()
-        //     .AsSelf()
-        //     .SingleInstance();
+        services.AddSingleton(provider =>
+        {
+            // 这里我们需要从容器中解析 MainWindow
+            var mainWindow = provider.GetRequiredService<MainWindow>();
+            return new HotKeyManager(mainWindow);
+        });
     }
 
     /// <summary>
     /// 初始化动态设置系统
     /// </summary>
-    private static void InitializeDynamicSettings(IContainer container)
+    private static void InitializeDynamicSettings(IServiceProvider serviceProvider)
     {
         try
         {
-            var dynamicSettingsService = container.Resolve<IDynamicSettingsService>();
-
-            // 可选：注册搜索设置（如果你需要的话）
-            // dynamicSettingsService.RegisterSearchSettings();
+            var dynamicSettingsService = serviceProvider.GetRequiredService<IDynamicSettingsService>();
 
             // 异步加载设置值
             _ = Task.Run(async () =>
@@ -459,10 +365,12 @@ public static class ContainerConfig
     /// <summary>
     /// 记录数据库路径
     /// </summary>
-    private static void LogDatabasePath(string dbType, string path) => System.Diagnostics.Debug.WriteLine($"{dbType}路径: {path}");
+    private static void LogDatabasePath(string dbType, string path) =>
+        System.Diagnostics.Debug.WriteLine($"{dbType}路径: {path}");
 
     /// <summary>
     /// 记录错误信息
     /// </summary>
-    private static void LogError(string message, Exception ex) => System.Diagnostics.Debug.WriteLine($"{message}: {ex.Message}");
+    private static void LogError(string message, Exception ex) =>
+        System.Diagnostics.Debug.WriteLine($"{message}: {ex.Message}");
 }

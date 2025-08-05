@@ -473,9 +473,13 @@ public static class JavaScriptLanguageDefinition
 public class FunctionDefinition
 {
     public string? Name { get; set; }
+
     public string? Signature { get; set; }
+
     public string? Description { get; set; }
+
     public ParameterDefinition[] Parameters { get; set; } = [];
+
     public string ReturnType { get; set; } = "void";
 }
 
@@ -485,7 +489,10 @@ public class FunctionDefinition
 public class ParameterDefinition(string name, string type, string description, bool optional = false)
 {
     public string Name { get; set; } = name;
+
     public string Type { get; set; } = type;
+
     public string Description { get; set; } = description;
+
     public bool Optional { get; set; } = optional;
 }

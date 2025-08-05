@@ -3,6 +3,7 @@ using DrugSearcher.Enums;
 using DrugSearcher.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DrugSearcher.Data;
 
@@ -17,7 +18,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// <summary>
     /// 设置项数据集
     /// </summary>
-    public DbSet<SettingItem> Settings { get; set; }
+    [field: MaybeNull, AllowNull]
+    public DbSet<SettingItem>? Settings { get; set; }
 
     #endregion
 
@@ -80,12 +82,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         entity.Property(s => s.Key)
             .IsRequired()
-            .HasMaxLength(SettingConstraints.MaxKeyLength)
+            .HasMaxLength(SettingConstraints.MAX_KEY_LENGTH)
             .HasComment("设置项键名");
 
         entity.Property(s => s.ValueType)
             .IsRequired()
-            .HasMaxLength(SettingConstraints.MaxValueTypeLength)
+            .HasMaxLength(SettingConstraints.MAX_VALUE_TYPE_LENGTH)
             .HasComment("值类型名称");
 
         entity.Property(s => s.CreatedAt)
@@ -104,19 +106,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     private static void ConfigureOptionalProperties(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<SettingItem> entity)
     {
         entity.Property(s => s.Value)
-            .HasMaxLength(SettingConstraints.MaxValueLength)
+            .HasMaxLength(SettingConstraints.MAX_VALUE_LENGTH)
             .HasComment("设置值");
 
         entity.Property(s => s.Description)
-            .HasMaxLength(SettingConstraints.MaxDescriptionLength)
+            .HasMaxLength(SettingConstraints.MAX_DESCRIPTION_LENGTH)
             .HasComment("设置描述");
 
         entity.Property(s => s.Category)
-            .HasMaxLength(SettingConstraints.MaxCategoryLength)
+            .HasMaxLength(SettingConstraints.MAX_CATEGORY_LENGTH)
             .HasComment("设置分类");
 
         entity.Property(s => s.UserId)
-            .HasMaxLength(SettingConstraints.MaxUserIdLength)
+            .HasMaxLength(SettingConstraints.MAX_USER_ID_LENGTH)
             .HasComment("用户ID");
     }
 
@@ -164,29 +166,29 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         return
         [
-            CreateDefaultSetting(1, SettingKeys.MinimizeToTrayOnClose, nameof(Boolean), "true",
-                "关闭窗口时最小化到托盘", SettingCategories.Tray, baseTime),
+            CreateDefaultSetting(1, SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, nameof(Boolean), "true",
+                "关闭窗口时最小化到托盘", SettingCategories.TRAY, baseTime),
 
-            CreateDefaultSetting(2, SettingKeys.ShowTrayIcon, nameof(Boolean), "true",
-                "显示系统托盘图标", SettingCategories.Tray, baseTime),
+            CreateDefaultSetting(2, SettingKeys.SHOW_TRAY_ICON, nameof(Boolean), "true",
+                "显示系统托盘图标", SettingCategories.TRAY, baseTime),
 
-            CreateDefaultSetting(3, SettingKeys.ShowTrayNotifications, nameof(Boolean), "true",
-                "显示托盘通知", SettingCategories.Tray, baseTime),
+            CreateDefaultSetting(3, SettingKeys.SHOW_TRAY_NOTIFICATIONS, nameof(Boolean), "true",
+                "显示托盘通知", SettingCategories.TRAY, baseTime),
 
-            CreateDefaultSetting(4, SettingKeys.ThemeMode, nameof(ThemeMode), "Light",
-                "主题模式", SettingCategories.Ui, baseTime),
+            CreateDefaultSetting(4, SettingKeys.THEME_MODE, nameof(ThemeMode), "Light",
+                "主题模式", SettingCategories.UI, baseTime),
 
-            CreateDefaultSetting(5, SettingKeys.ThemeColor, nameof(ThemeColor), "Blue",
-                "主题颜色", SettingCategories.Ui, baseTime),
+            CreateDefaultSetting(5, SettingKeys.THEME_COLOR, nameof(ThemeColor), "Blue",
+                "主题颜色", SettingCategories.UI, baseTime),
 
-            CreateDefaultSetting(6, SettingKeys.FontSize, nameof(Int32), "12",
-                "字体大小", SettingCategories.Ui, baseTime),
+            CreateDefaultSetting(6, SettingKeys.FONT_SIZE, nameof(Int32), "12",
+                "字体大小", SettingCategories.UI, baseTime),
 
-            CreateDefaultSetting(7, SettingKeys.Language, nameof(String), "zh-CN",
-                "界面语言", SettingCategories.Ui, baseTime),
+            CreateDefaultSetting(7, SettingKeys.LANGUAGE, nameof(String), "zh-CN",
+                "界面语言", SettingCategories.UI, baseTime),
 
-            CreateDefaultSetting(8, SettingKeys.AutoStartup, nameof(Boolean), "false",
-                "开机自启动", SettingCategories.Application, baseTime)
+            CreateDefaultSetting(8, SettingKeys.AUTO_STARTUP, nameof(Boolean), "false",
+                "开机自启动", SettingCategories.APPLICATION, baseTime)
         ];
     }
 
@@ -260,7 +262,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         try
         {
             // 检查是否有任何全局设置
-            var hasGlobalSettings = await Settings.Where(s => s.UserId == null).AnyAsync();
+            var hasGlobalSettings = await (Settings ?? throw new InvalidOperationException()).Where(s => s.UserId == null).AnyAsync();
 
             if (!hasGlobalSettings)
             {
@@ -288,7 +290,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     private async Task AddDefaultSettingsAsync()
     {
         var defaultSettings = GetRuntimeDefaultSettings();
-        await Settings.AddRangeAsync(defaultSettings);
+        if (Settings != null) await Settings.AddRangeAsync(defaultSettings);
         var savedCount = await SaveChangesAsync();
 
         Debug.WriteLine($"已添加 {savedCount} 个默认设置");
@@ -301,7 +303,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     private async Task EnsureRequiredSettingsExistAsync()
     {
         var requiredSettings = GetRequiredSettingKeys();
-        var existingKeys = await Settings
+        var existingKeys = await (Settings ?? throw new InvalidOperationException())
             .Where(s => s.UserId == null)
             .Select(s => s.Key)
             .ToListAsync();
@@ -328,14 +330,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// </summary>
     /// <returns>必需设置键列表</returns>
     private static List<string> GetRequiredSettingKeys() => [
-            SettingKeys.MinimizeToTrayOnClose,
-            SettingKeys.ShowTrayIcon,
-            SettingKeys.ShowTrayNotifications,
-            SettingKeys.ThemeMode,
-            SettingKeys.ThemeColor,
-            SettingKeys.FontSize,
-            SettingKeys.Language,
-            SettingKeys.AutoStartup
+            SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE,
+            SettingKeys.SHOW_TRAY_ICON,
+            SettingKeys.SHOW_TRAY_NOTIFICATIONS,
+            SettingKeys.THEME_MODE,
+            SettingKeys.THEME_COLOR,
+            SettingKeys.FONT_SIZE,
+            SettingKeys.LANGUAGE,
+            SettingKeys.AUTO_STARTUP
         ];
 
     /// <summary>
@@ -348,36 +350,36 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         return
         [
-            CreateRuntimeDefaultSetting(SettingKeys.MinimizeToTrayOnClose, nameof(Boolean), "true",
-                "关闭窗口时最小化到托盘", SettingCategories.Tray, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.MINIMIZE_TO_TRAY_ON_CLOSE, nameof(Boolean), "true",
+                "关闭窗口时最小化到托盘", SettingCategories.TRAY, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.ShowTrayIcon, nameof(Boolean), "true",
-                "显示系统托盘图标", SettingCategories.Tray, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.SHOW_TRAY_ICON, nameof(Boolean), "true",
+                "显示系统托盘图标", SettingCategories.TRAY, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.ShowTrayNotifications, nameof(Boolean), "true",
-                "显示托盘通知", SettingCategories.Tray, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.SHOW_TRAY_NOTIFICATIONS, nameof(Boolean), "true",
+                "显示托盘通知", SettingCategories.TRAY, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.ThemeMode, nameof(ThemeMode), "Light",
-                "主题模式", SettingCategories.Ui, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.THEME_MODE, nameof(ThemeMode), "Light",
+                "主题模式", SettingCategories.UI, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.ThemeColor, nameof(ThemeColor), "Blue",
-                "主题颜色", SettingCategories.Ui, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.THEME_COLOR, nameof(ThemeColor), "Blue",
+                "主题颜色", SettingCategories.UI, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.FontSize, nameof(Int32), "12",
-                "字体大小", SettingCategories.Ui, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.FONT_SIZE, nameof(Int32), "12",
+                "字体大小", SettingCategories.UI, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.Language, nameof(String), "zh-CN",
-                "界面语言", SettingCategories.Ui, currentTime),
+            CreateRuntimeDefaultSetting(SettingKeys.LANGUAGE, nameof(String), "zh-CN",
+                "界面语言", SettingCategories.UI, currentTime),
 
 
-            CreateRuntimeDefaultSetting(SettingKeys.AutoStartup, nameof(Boolean), "false",
-                "开机自启动", SettingCategories.Application, currentTime)
+            CreateRuntimeDefaultSetting(SettingKeys.AUTO_STARTUP, nameof(Boolean), "false",
+                "开机自启动", SettingCategories.APPLICATION, currentTime)
         ];
     }
 

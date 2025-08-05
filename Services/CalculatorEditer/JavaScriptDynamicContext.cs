@@ -426,12 +426,19 @@ public partial class JavaScriptDynamicContext
 public class ScopeInfo
 {
     public int StartOffset { get; set; }
+
     public int EndOffset { get; set; }
+
     public int Level { get; set; }
+
     public ScopeInfo? Parent { get; set; }
+
     public bool IsFunctionScope { get; set; }
+
     public HashSet<string> BlockScopeVariables { get; } = [];
+
     public HashSet<string> FunctionScopeVariables { get; } = [];
+
     public HashSet<string> Functions { get; } = [];
 }
 
@@ -441,6 +448,8 @@ public class ScopeInfo
 public class ContextChangedEventArgs : EventArgs
 {
     public HashSet<string> LocalVariables { get; set; } = [];
+
     public HashSet<string> LocalFunctions { get; set; } = [];
+
     public HashSet<string> CurrentScope { get; set; } = [];
 }

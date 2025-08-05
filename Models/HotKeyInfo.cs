@@ -100,7 +100,9 @@ public class LocalHotKeyInfo : HotKeyInfo
 public class HotKeySetting
 {
     public Key Key { get; set; }
+
     public ModifierKeys Modifiers { get; set; }
+
     public bool IsEnabled { get; set; } = true;
 
     public HotKeySetting() { }

@@ -44,9 +44,9 @@ public class ApplicationDbContextFactory(
     {
         try
         {
-            if (context.Settings.Any()) return;
+            if (context.Settings != null && context.Settings.Any()) return;
             var defaultSettings = defaultSettingsProvider.GetDefaultSettingItems();
-            context.Settings.AddRange(defaultSettings);
+            context.Settings?.AddRange(defaultSettings);
             context.SaveChanges();
             Console.WriteLine("已添加默认设置");
         }

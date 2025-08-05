@@ -1,9 +1,9 @@
-﻿using Autofac;
-using DrugSearcher.Configuration;
+﻿using DrugSearcher.Configuration;
 using DrugSearcher.Data;
 using DrugSearcher.Managers;
 using DrugSearcher.Services;
 using DrugSearcher.Views;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 
@@ -27,7 +27,7 @@ public partial class App
         {
             Console.WriteLine("正在启动应用程序...");
 
-            // 配置并初始化Autofac容器
+            // 配置并初始化依赖注入容器
             var container = ContainerConfig.Configure();
             ContainerAccessor.Initialize(container);
             Console.WriteLine("容器初始化完成");
@@ -106,15 +106,16 @@ public partial class App
             // 释放ThemeManager资源
             if (ContainerAccessor.IsInitialized)
             {
-                var themeManager = ContainerAccessor.Container.ResolveOptional<ThemeManager>();
+                // 使用 GetService 替代 ResolveOptional
+                var themeManager = ContainerAccessor.Container.GetService<ThemeManager>();
                 themeManager?.Dispose();
 
                 // 释放应用程序数据库上下文
-                var appDbContext = ContainerAccessor.Container.ResolveOptional<ApplicationDbContext>();
+                var appDbContext = ContainerAccessor.Container.GetService<ApplicationDbContext>();
                 appDbContext?.Dispose();
 
                 // 释放药物数据库上下文
-                var drugDbContext = ContainerAccessor.Container.ResolveOptional<DrugDbContext>();
+                var drugDbContext = ContainerAccessor.Container.GetService<DrugDbContext>();
                 drugDbContext?.Dispose();
 
                 // 释放容器
